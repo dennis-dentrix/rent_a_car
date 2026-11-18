@@ -1,0 +1,30 @@
+# Secrets: only .env.example is committed
+.env
+.env.*
+!.env.example
+
+# Keys and certificates
+*.pem
+*.key
+*.p12
+service-account*.json
+supabase/.temp/
+supabase/.env*
+
+# Dependencies and build output
+node_modules/
+.next/
+out/
+build/
+coverage/
+playwright-report/
+test-results/
+
+# Local experiments, never pushed
+scratch/
+
+# Logs, editor, OS
+*.log
+.DS_Store
+.vscode/
+.idea/

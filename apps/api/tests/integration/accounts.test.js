@@ -1,0 +1,134 @@
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import {
+  IDS,
+  accounts,
+  call,
+  signInWithSecondFactor,
+  signUpCustomer,
+  withApi,
+} from './api-client.js'
+
+const db = withApi()
+
+const me = (token, method = 'GET', body) => call(method, '/me', { token, body })
+const asAdmin = (method, path, body) => call(method, path, { body, token: accounts.admin })
+
+describe('a profile is created at sign-up', () => {
+  it('makes every new account a customer, whatever the sign-up data says', async () => {
+    await db.query(
+      `insert into auth.users (id, email, raw_user_meta_data)
+       values (gen_random_uuid(), 'trigger-1@example.test', '{"role":"admin","full_name":"Sneaky"}')`,
+    )
+    const { rows } = await db.query(
+      "select role, full_name from profiles where email = 'trigger-1@example.test'",
+    )
+    expect(rows).toEqual([{ role: 'customer', full_name: 'Sneaky' }])
+  })
+
+  it('shows a new customer their own profile', async () => {
+    const { token, email } = await signUpCustomer('Amina Otieno')
+    const { status, body } = await me(token)
+    expect(status).toBe(200)
+    expect(body.data).toMatchObject({
+      full_name: 'Amina Otieno',
+      email,
+      role: 'customer',
+      company: null,
+    })
+  })
+
+  it('requires a signed-in user', async () => {
+    expect((await me(null)).status).toBe(401)
+  })
+})
+
+describe('PATCH /me', () => {
+  it('changes the name and the marketing choice', async () => {
+    const { token } = await signUpCustomer()
+    await me(token, 'PATCH', { full_name: 'Renamed Person', marketing_opt_in: true })
+    const { body } = await me(token)
+    expect(body.data).toMatchObject({ full_name: 'Renamed Person', marketing_opt_in: true })
+  })
+
+  it.each([
+    ['a role change', { role: 'admin' }],
+    ['a phone number not in international format', { phone: '0700000000' }],
+    ['an empty update', {}],
+  ])('rejects %s', async (_name, body) => {
+    const { token } = await signUpCustomer()
+    expect((await me(token, 'PATCH', body)).status).toBe(400)
+  })
+
+  it('rejects a phone number that belongs to another account', async () => {
+    const { token } = await signUpCustomer()
+    expect((await me(token, 'PATCH', { phone: '+254700000001' })).status).toBe(400)
+  })
+})
+
+describe('admin manages team members', () => {
+  it('invites a new team member by email with the staff role', async () => {
+    const email = `invite-${Date.now()}@example.test`
+    const { status, body } = await asAdmin('POST', '/admin/staff', {
+      email,
+      full_name: 'New Teammate',
+      role: 'staff',
+    })
+    expect([status, body.data.role, body.data.email]).toEqual([201, 'staff', email])
+  })
+
+  it('promotes an existing account, which can then use staff routes', async () => {
+    const { id, email, token } = await signUpCustomer()
+    expect((await call('GET', '/staff/vehicles', { token })).status).toBe(403)
+    await asAdmin('POST', '/admin/staff', { email, full_name: 'Promoted', role: 'staff' })
+    expect((await call('GET', '/staff/vehicles', { token })).status).toBe(200)
+    expect((await asAdmin('GET', '/admin/staff')).body.data.map((member) => member.id)).toContain(
+      id,
+    )
+  })
+
+  it('switches a team member off and on again', async () => {
+    const { id, email, token } = await signUpCustomer()
+    await asAdmin('POST', '/admin/staff', { email, full_name: 'Promoted', role: 'staff' })
+    await asAdmin('PATCH', `/admin/staff/${id}`, { active: false })
+    expect((await call('GET', '/staff/vehicles', { token })).status).toBe(403)
+    await asAdmin('PATCH', `/admin/staff/${id}`, { active: true })
+    expect((await call('GET', '/staff/vehicles', { token })).status).toBe(200)
+  })
+
+  it('stops an admin changing their own access', async () => {
+    const { rows } = await db.query("select id from profiles where email = 'admin@example.test'")
+    const { status } = await asAdmin('PATCH', `/admin/staff/${rows[0].id}`, { active: false })
+    expect(status).toBe(403)
+  })
+
+  it('only changes team members, and only for admins', async () => {
+    expect((await asAdmin('PATCH', `/admin/staff/${IDS.UNKNOWN}`, { active: false })).status).toBe(
+      404,
+    )
+    const staff = await call('GET', '/admin/staff', { token: accounts.staff })
+    expect(staff.status).toBe(403)
+  })
+})
+
+describe('staff must use a second factor', () => {
+  beforeEach(() => {
+    process.env.REQUIRE_STAFF_MFA = 'true'
+  })
+  afterEach(() => {
+    process.env.REQUIRE_STAFF_MFA = 'false'
+  })
+
+  it('refuses a staff sign-in that has no second factor', async () => {
+    const { status, body } = await call('GET', '/staff/vehicles', { token: accounts.staff })
+    expect([status, body.error.details.reason]).toEqual([403, 'mfa_required'])
+  })
+
+  it('accepts a staff sign-in that used an authenticator app', async () => {
+    const token = await signInWithSecondFactor('staff@example.test')
+    expect((await call('GET', '/staff/vehicles', { token })).status).toBe(200)
+  })
+
+  it('does not ask customers for a second factor', async () => {
+    expect((await me(accounts.customer)).status).toBe(200)
+  })
+})
