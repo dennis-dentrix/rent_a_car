@@ -44,7 +44,7 @@ Do not edit the docs to resolve a conflict without the owner's say-so. Report it
 - Cancellation: more than 24 hours before pickup the deposit is refundable in full; inside 24 hours nothing, and the customer must acknowledge it. The refund owed is recorded on the booking until payments exist. Pack §23.1.
 - Date change: once, up to 24 hours before pickup, re-priced from the rate table; a deposit already received is kept. UX spec §3 (the free change reading is an assumption).
 - Documents: ID and driving licence uploaded by the customer, the signed agreement scanned by staff; JPG, PNG, or PDF up to 10 MB. Files go straight to the private bucket on signed links; staff must give a reason to open one, and it is logged. The rental agreement is a PDF built from the booking and the settings; the customer signs it online (tick, typed name, optional drawing) once the booking is confirmed, which stores the signed PDF as a verified agreement with the evidence of the signature. Office signing stays: print the PDF and staff upload the scan. The wording is a draft for lawyer review.
-- Hosting: one region (Johannesburg) for Oracle VM, Supabase, and R2.
+- Hosting: Supabase in Ireland (eu-west-1); Oracle VM in Johannesburg (the account's home region, which holds the Always Free allowance). Owner ruling, 22 November 2026. The API and the database are about 170 ms apart, so a request that touches money or status runs as one database function call, not a chain of queries.
 - Languages: English first; all copy as message keys.
 - Design direction: Apple HIG as the base, with selected Material 3 ideas (tonal surfaces, state layers, tonal button, chips, segmented control, pill active indicator). See `design-system.md`. Owner request, 15 November 2026.
 
@@ -60,7 +60,7 @@ Do not edit the docs to resolve a conflict without the owner's say-so. Report it
 
 ## 5. Open items (do not build around these)
 
-Tingg USD support and security-amount method (payments deferred); licence years per class; Supabase region near Johannesburg; lawyer view on Johannesburg hosting; logo and final brand colour; retention periods; PostHog privacy review.
+Tingg USD support and security-amount method (payments deferred); licence years per class; R2 location (Cloudflare has no Africa location; the EU jurisdiction would keep files with the database); lawyer view on hosting outside Kenya (Johannesburg VM, Ireland database); logo and final brand colour; retention periods; PostHog privacy review.
 
 ## 6. Known drift to align when its phase starts
 

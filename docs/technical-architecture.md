@@ -126,7 +126,7 @@ Flags live in the `settings` table: currency selector, eTIMS, reviews display, r
 ## 13. Open decisions
 
 1. TypeScript or JavaScript.
-2. Supabase region closest to Nairobi that supports the required features; record the decision.
+2. Decided 22 November 2026: Supabase in Ireland (eu-west-1). See the Oracle compute notes for the latency this adds.
 3. Analytics tool (PostHog proposed).
 4. Supabase point-in-time recovery plan.
 
@@ -154,7 +154,8 @@ Each component runs where it fits best. Vercel is not used. Supabase remains the
 
 - Reported change: the Always Free Ampere A1 allowance was reduced to 2 OCPUs and 12 GB RAM from 15 June 2026. Confirm the current figures in the Oracle console before sizing the VM.
 - Instances above the free allowance, or left running after a trial ends without an upgrade, can be disabled and then deleted. Production uses a paid account, so the server is not at risk of deletion.
-- The Nairobi Oracle region is not yet live. The VM is placed in Johannesburg until it opens, and the lawyer confirms that this is acceptable under the Data Protection Act before launch.
+- The Nairobi Oracle region is not yet live. The VM is placed in Johannesburg until it opens, and the lawyer confirms that this is acceptable under the Data Protection Act before launch. The same review covers the database, which is in Ireland.
+- The VM (Johannesburg) and Supabase (Ireland) are in different regions, about 170 ms apart. Each sequential query adds that delay, so writes that touch money or status run as a single Postgres function (one round trip), and request times are watched in Sentry from the first deploy.
 
 **Risks.** Two providers and an origin server mean more to operate. Mitigations: infrastructure defined in code, the Docker images tested in preview, and the restore test in section 11 repeated for the Oracle backup.
 
