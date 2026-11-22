@@ -20,3 +20,12 @@ crons = ["* * * * *"]
 
 [observability]
 enabled = true
+
+# Staging: its own Worker, secrets, and domain, deployed with `--env staging`. Wrangler does not copy every
+# top-level setting into an environment, so what staging needs is written out below.
+[env.staging]
+name = "carvo-api-staging"
+routes = [{ pattern = "stage.api.carvo.co.ke", custom_domain = true }]
+
+[env.staging.vars]
+REQUIRE_STAFF_MFA = "true"
