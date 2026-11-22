@@ -85,8 +85,7 @@ async function getInspection(db, id) {
 
 /** Every inspection report for a booking, pickup and return, with its files. */
 export async function listInspections({ db }, bookingId) {
-  const booking = unwrap(await db.from('bookings').select('id').eq('id', bookingId).maybeSingle())
-  if (!booking) throw new AppError('NOT_FOUND')
+  await findOne(db, 'bookings', 'id', bookingId)
   const reports = unwrap(
     await db
       .from('handover_records')

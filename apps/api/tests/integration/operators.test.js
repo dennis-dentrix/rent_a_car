@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { actAs, actAsOwner, attempt, ids, isBlocked, withSeededTransaction } from './helpers.js'
-import { opIds, seedOperators, vehicleInsert } from './operators-helpers.js'
+import { insertOperatorOwner, opIds, seedOperators, vehicleInsert } from './operators-helpers.js'
 
 const client = withSeededTransaction()
 beforeEach(() => seedOperators(client))
@@ -166,5 +166,105 @@ describe('availability', () => {
     expect(await free()).toBe(4)
     await client.query("update operators set status = 'suspended' where id = $1", [opIds.opA])
     expect(await free()).toBe(3)
+  })
+})
+
+const AGREEMENT =
+  "insert into ownership_agreements (owner_id, vehicle_id, commission_percent, starts_on) values ($1, $2, 10, '2026-01-01')"
+
+describe('owner records', () => {
+  it("are invisible to other operators, including an owner's private details", async () => {
+    const ownerB = await insertOperatorOwner(client, opIds.opB, 'Owner of B')
+    await client.query(
+      'insert into vehicle_owner_private (owner_id, national_id_number) values ($1, $2)',
+      [ownerB, '12345678'],
+    )
+    await actAs(client, opIds.userA)
+    expect(await idsOf('select id from vehicle_owners')).toEqual([])
+    expect(await idsOf('select owner_id as id from vehicle_owner_private')).toEqual([])
+    await actAs(client, opIds.userB)
+    expect(await idsOf('select owner_id as id from vehicle_owner_private')).toEqual([ownerB])
+  })
+
+  it("cannot be linked to another operator's vehicle or agreement", async () => {
+    const ownerB = await insertOperatorOwner(client, opIds.opB, 'Owner of B')
+    await actAs(client, opIds.userA)
+    const link = await attempt(client, 'update vehicles set owner_id = $2 where id = $1', [
+      opIds.vehA,
+      ownerB,
+    ])
+    expect(link.error?.message).toContain('VALIDATION_FAILED')
+    const agreement = await attempt(client, AGREEMENT, [ownerB, opIds.vehA])
+    expect(agreement.error?.message).toContain('VALIDATION_FAILED')
+  })
+
+  it('link to its own vehicle through an agreement', async () => {
+    await actAs(client, opIds.userA)
+    const own = await attempt(
+      client,
+      "insert into vehicle_owners (full_name, phone, operator_id) values ('Mine', '+254711000098', $1) returning id",
+      [opIds.opA],
+    )
+    const agreement = await attempt(client, AGREEMENT, [own.rows[0].id, opIds.vehA])
+    expect(agreement.error).toBeNull()
+  })
+})
+
+const PENDING = '00000000-0000-4000-8000-000000000603'
+
+const addPendingOperator = () =>
+  client.query(
+    "insert into operators (id, business_name, slug) values ($1, 'Pending Co', 'pending-co')",
+    [PENDING],
+  )
+
+const review = (operator, status, reason = null) =>
+  attempt(client, 'select * from review_operator($1, $2, $3)', [operator, status, reason])
+
+describe('who can review an operator', () => {
+  beforeEach(addPendingOperator)
+
+  it('lets an admin approve, and records who and when', async () => {
+    await actAs(client, ids.admin)
+    const result = await review(PENDING, 'approved')
+    expect(result.error).toBeNull()
+    expect(result.rows[0]).toMatchObject({ status: 'approved', verified_by: ids.admin })
+    expect(result.rows[0].verified_at).not.toBeNull()
+    await actAsOwner(client)
+    const log = await client.query(
+      "select actor_id from audit_log where table_name = 'operators' and row_id = $1 and action = 'UPDATE'",
+      [PENDING],
+    )
+    expect(log.rows).toEqual([{ actor_id: ids.admin }])
+  })
+
+  it.each([
+    ['staff', ids.staff],
+    ['an operator', opIds.userA],
+    ['a customer', ids.custA],
+  ])('refuses %s', async (_name, user) => {
+    await actAs(client, user)
+    expect((await review(PENDING, 'approved')).error?.message).toContain('FORBIDDEN')
+  })
+})
+
+describe('the rules of a review', () => {
+  beforeEach(addPendingOperator)
+
+  it('needs a reason to reject or suspend', async () => {
+    await actAs(client, ids.admin)
+    expect((await review(PENDING, 'rejected')).error?.message).toContain('VALIDATION_FAILED')
+    expect((await review(opIds.opA, 'suspended', '  ')).error?.message).toContain(
+      'VALIDATION_FAILED',
+    )
+  })
+
+  it('follows the allowed moves only', async () => {
+    await actAs(client, ids.admin)
+    expect((await review(opIds.opA, 'rejected', 'late')).error?.message).toContain(
+      'INVALID_STATUS_TRANSITION',
+    )
+    expect((await review(opIds.opA, 'suspended', 'complaints')).error).toBeNull()
+    expect((await review(opIds.opA, 'approved')).error).toBeNull()
   })
 })

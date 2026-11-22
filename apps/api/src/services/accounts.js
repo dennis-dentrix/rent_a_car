@@ -5,16 +5,16 @@ import { updateOne } from './records.js'
 const PROFILE_COLUMNS =
   'id, full_name, phone, email, role, marketing_opt_in, company:companies(id, name)'
 
+/** A user's profile with the given columns, or null when they have none or it was deleted. */
+export async function findProfile(db, userId, columns) {
+  return unwrap(
+    await db.from('profiles').select(columns).eq('id', userId).is('deleted_at', null).maybeSingle(),
+  )
+}
+
 /** The signed-in person's profile, with their company if they belong to one. */
 export async function getMe({ db, user }) {
-  const profile = unwrap(
-    await db
-      .from('profiles')
-      .select(PROFILE_COLUMNS)
-      .eq('id', user.id)
-      .is('deleted_at', null)
-      .maybeSingle(),
-  )
+  const profile = await findProfile(db, user.id, PROFILE_COLUMNS)
   if (!profile) throw new AppError('FORBIDDEN', { message: 'Your account has no active profile.' })
   return profile
 }

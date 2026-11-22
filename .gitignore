@@ -2,6 +2,10 @@
 .env
 .env.*
 !.env.example
+!.env.test.example
+# Cloudflare Worker: local secrets and local state
+.dev.vars
+.wrangler/
 
 # Keys and certificates
 *.pem

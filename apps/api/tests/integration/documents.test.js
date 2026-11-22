@@ -6,6 +6,7 @@ import {
   bookNewQuote,
   call,
   changeStatus,
+  reviewDocument,
   staff,
   uploadDocument,
   withApi,
@@ -109,7 +110,7 @@ describe('staff review documents', () => {
 
   it('records who verified a document and when', async () => {
     const { id } = await uploadDocument(accounts.customer)
-    const { body } = await staff('PATCH', `/staff/documents/${id}`, { status: 'verified' })
+    const { body } = await reviewDocument(id, { status: 'verified' })
     const { rows } = await db.query(
       'select reviewed_by, reviewed_at from documents where id = $1',
       [id],
@@ -125,10 +126,8 @@ describe('staff review documents', () => {
 describe('staff accept or reject documents', () => {
   it('needs a reason to reject, and the customer then sees it', async () => {
     const { id } = await uploadDocument(accounts.customer)
-    expect((await staff('PATCH', `/staff/documents/${id}`, { status: 'rejected' })).status).toBe(
-      400,
-    )
-    await staff('PATCH', `/staff/documents/${id}`, {
+    expect((await reviewDocument(id, { status: 'rejected' })).status).toBe(400)
+    await reviewDocument(id, {
       status: 'rejected',
       rejection_reason: 'The photo is blurred',
     })
@@ -141,10 +140,10 @@ describe('staff accept or reject documents', () => {
 
   it('reviews a document once, and only for staff', async () => {
     const { id } = await uploadDocument(accounts.customer)
-    await staff('PATCH', `/staff/documents/${id}`, { status: 'verified' })
+    await reviewDocument(id, { status: 'verified' })
     expect(
       (
-        await staff('PATCH', `/staff/documents/${id}`, {
+        await reviewDocument(id, {
           status: 'rejected',
           rejection_reason: 'Changed my mind',
         })
@@ -193,8 +192,7 @@ describe('from upload to a booking that is ready', () => {
     ]
     await changeStatus(booking, 'confirmed', 'Deposit received')
     expect((await changeStatus(booking, 'ready')).body.error.code).toBe('DOCUMENTS_NOT_VERIFIED')
-    for (const { id } of documents)
-      await staff('PATCH', `/staff/documents/${id}`, { status: 'verified' })
+    for (const { id } of documents) await reviewDocument(id, { status: 'verified' })
     const ready = await changeStatus(booking, 'ready')
     expect([ready.status, ready.body.data.status]).toEqual([200, 'ready'])
   })

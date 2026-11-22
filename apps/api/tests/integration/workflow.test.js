@@ -14,11 +14,11 @@ const client = withSeededTransaction()
 
 const errorOf = (result) => result.error?.message
 
+const readyError = async () => errorOf(await tryTransition(client, ids.bookingA, 'ready'))
+
 describe('status rules: documents', () => {
   it('stops a booking becoming ready before its documents are verified', async () => {
-    expect(errorOf(await tryTransition(client, ids.bookingA, 'ready'))).toBe(
-      'DOCUMENTS_NOT_VERIFIED',
-    )
+    expect(await readyError()).toBe('DOCUMENTS_NOT_VERIFIED')
   })
 
   it('lets it become ready once ID, licence, and agreement are verified', async () => {

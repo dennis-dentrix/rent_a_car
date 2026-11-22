@@ -33,5 +33,6 @@ function toAppError(error) {
 // Express recognises an error handler by its four parameters.
 export const errorHandler = (error, _req, res, _next) => {
   const appError = toAppError(error)
+  res.removeHeader('Cache-Control') // an error is never kept by the edge, even on a cached route
   res.status(appError.status).json(toErrorBody(appError))
 }

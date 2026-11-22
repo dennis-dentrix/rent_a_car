@@ -6,7 +6,7 @@ import {
   bookNewQuote,
   call,
   changeStatus,
-  staff,
+  reviewDocument,
   uploadDocument,
   withApi,
 } from './api-client.js'
@@ -46,7 +46,7 @@ describe('emails are queued when something happens', () => {
 
   it('tells the customer why a document was rejected', async () => {
     const { id } = await uploadDocument(accounts.customer)
-    await staff('PATCH', `/staff/documents/${id}`, {
+    await reviewDocument(id, {
       status: 'rejected',
       rejection_reason: 'The photo is blurred',
     })
@@ -57,7 +57,7 @@ describe('emails are queued when something happens', () => {
 
   it('does not queue anything for a document that is accepted', async () => {
     const { id } = await uploadDocument(accounts.customer)
-    await staff('PATCH', `/staff/documents/${id}`, { status: 'verified' })
+    await reviewDocument(id, { status: 'verified' })
     expect(await kinds()).toEqual([])
   })
 })

@@ -3,6 +3,7 @@ import { AppError, fieldError } from '../lib/errors.js'
 import { unwrap, withServiceRole } from '../lib/supabase.js'
 import { listPage } from '../lib/pagination.js'
 import { buildTimeline } from '../domain/booking-timeline.js'
+import { findOne } from './records.js'
 
 // The fields a customer sees on every booking response. Nothing else leaves the server.
 const SUMMARY_FIELDS = [
@@ -77,8 +78,7 @@ const related = (db, table, columns, bookingId) =>
 /** One booking with its timeline, documents (type and status only), delivery, and payments. */
 export async function getBooking({ db }, id) {
   if (!z.uuid().safeParse(id).success) throw new AppError('NOT_FOUND')
-  const booking = unwrap(await db.from('bookings').select(LIST_COLUMNS).eq('id', id).maybeSingle())
-  if (!booking) throw new AppError('NOT_FOUND')
+  const booking = await findOne(db, 'bookings', LIST_COLUMNS, id)
   const [events, documents, payments, deliveries] = await Promise.all([
     related(db, 'booking_status_events', 'to_status, created_at', id),
     related(db, 'documents', 'id, type, status, rejection_reason', id),

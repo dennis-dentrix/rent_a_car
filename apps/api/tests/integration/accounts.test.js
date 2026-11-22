@@ -13,6 +13,9 @@ const db = withApi()
 const me = (token, method = 'GET', body) => call(method, '/me', { token, body })
 const asAdmin = (method, path, body) => call(method, path, { body, token: accounts.admin })
 
+// 200 when the account may use staff routes, 403 when not.
+const staffAccessStatus = async (token) => (await call('GET', '/staff/vehicles', { token })).status
+
 describe('a profile is created at sign-up', () => {
   it('makes every new account a customer, whatever the sign-up data says', async () => {
     await db.query(
@@ -78,7 +81,7 @@ describe('admin manages team members', () => {
 
   it('promotes an existing account, which can then use staff routes', async () => {
     const { id, email, token } = await signUpCustomer()
-    expect((await call('GET', '/staff/vehicles', { token })).status).toBe(403)
+    expect(await staffAccessStatus(token)).toBe(403)
     await asAdmin('POST', '/admin/staff', { email, full_name: 'Promoted', role: 'staff' })
     expect((await call('GET', '/staff/vehicles', { token })).status).toBe(200)
     expect((await asAdmin('GET', '/admin/staff')).body.data.map((member) => member.id)).toContain(

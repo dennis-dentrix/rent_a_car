@@ -1,17 +1,6 @@
 import { z } from 'zod'
-import {
-  CUSTOMER_DOCUMENT_TYPES,
-  DOCUMENT_CONTENT_TYPES,
-  MAX_FILE_BYTES,
-  STAFF_DOCUMENT_TYPES,
-} from '../constants.js'
-import { pageFields } from './common.js'
-
-/** What the browser says it is about to upload. The signed link only accepts exactly this. */
-const fileDeclaration = {
-  content_type: z.enum(DOCUMENT_CONTENT_TYPES),
-  size_bytes: z.number().int().min(1).max(MAX_FILE_BYTES),
-}
+import { CUSTOMER_DOCUMENT_TYPES, STAFF_DOCUMENT_TYPES } from '../constants.js'
+import { fileDeclaration, pageFields } from './common.js'
 
 /** A customer's own ID or driving licence, optionally for one booking. */
 export const createDocumentSchema = z.strictObject({

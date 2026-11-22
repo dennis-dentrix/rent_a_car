@@ -39,6 +39,17 @@ describe('GET /classes', () => {
     const { body } = await get(`/classes${query({ from: START })}`)
     expect(body.error.code).toBe('VALIDATION_FAILED')
   })
+
+  it('lets the edge keep the plain list, but never a dated list or an error', async () => {
+    const plain = await get('/classes')
+    const dated = await get(`/classes${query({ from: START, to: END_3_DAYS })}`)
+    const failed = await get(`/classes${query({ from: START })}`)
+    expect(plain.headers['cache-control']).toMatch(/^public, .*s-maxage=60/)
+    expect([dated.headers['cache-control'], failed.headers['cache-control']]).toEqual([
+      undefined,
+      undefined,
+    ])
+  })
 })
 
 describe('GET /classes/{id}, /locations, /availability', () => {

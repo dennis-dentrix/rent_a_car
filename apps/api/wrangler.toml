@@ -1,0 +1,22 @@
+# The API on Cloudflare Workers. Secrets are never written here: set each with `npx wrangler secret put NAME`,
+# and use `.dev.vars` (git-ignored) for local runs. See apps/api/.env.example for the names.
+name = "carvo-api"
+main = "src/worker.js"
+compatibility_date = "2025-11-01"
+# nodejs_compat lets Express run; populate_process_env keeps `process.env.NAME` working for secrets and vars.
+compatibility_flags = ["nodejs_compat", "nodejs_compat_populate_process_env"]
+
+# Run next to the Supabase database (Ireland), so a query takes milliseconds and not a long round trip.
+[placement]
+region = "aws:eu-west-1"
+
+# Not secret, so it may sit here. Staff and admin must use a second factor.
+[vars]
+REQUIRE_STAFF_MFA = "true"
+
+# The jobs behind /api/v1/internal/jobs: release unpaid holds and send queued emails. See src/worker.js.
+[triggers]
+crons = ["* * * * *"]
+
+[observability]
+enabled = true

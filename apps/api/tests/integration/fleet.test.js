@@ -26,6 +26,11 @@ const addVehicle = (chassis) =>
     [chassis, ids.cls],
   )
 
+const insertInspectionWithFile = async () => {
+  const inspection = await insertInspection(client)
+  await insertInspectionFile(client, inspection.rows[0].id)
+}
+
 describe('chassis numbers', () => {
   it('requires a chassis number on every vehicle', async () => {
     const result = await addVehicle(null)
@@ -174,17 +179,13 @@ describe('inspection reports', () => {
   })
 
   it('keeps inspection files append-only', async () => {
-    const inspection = await insertInspection(client)
-    await insertInspectionFile(client, inspection.rows[0].id)
+    await insertInspectionWithFile()
     expect((await attempt(client, "update inspection_files set label = 'x'")).error).not.toBeNull()
   })
 })
 
 describe('inspection file access', () => {
-  beforeEach(async () => {
-    const inspection = await insertInspection(client)
-    await insertInspectionFile(client, inspection.rows[0].id)
-  })
+  beforeEach(insertInspectionWithFile)
 
   const visibleTo = async (user) => {
     await actAs(client, user)

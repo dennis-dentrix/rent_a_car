@@ -134,24 +134,8 @@ describe('private owners and agreements', () => {
   })
 })
 
-describe('ownership agreement rules', () => {
-  it('rejects an agreement for a vehicle another owner already has', async () => {
-    const vehicle = await addVehicle()
-    await addAgreement((await addOwner()).id, vehicle.id)
-    const second = await addOwner({ full_name: 'API Owner Two', phone: '+254711000021' })
-    expect((await addAgreement(second.id, vehicle.id, { starts_on: '2027-06-01' })).status).toBe(
-      409,
-    )
-  })
-
-  it('rejects a commission above 100 percent', async () => {
-    const vehicle = await addVehicle()
-    const { status } = await addAgreement((await addOwner()).id, vehicle.id, {
-      commission_percent: 120,
-    })
-    expect(status).toBe(400)
-  })
-
+// Agreement rules (one owner per vehicle, no overlaps, commission range) are tested in fleet.test.js.
+describe('owner read model', () => {
   it('lists the vehicles and agreements on an owner', async () => {
     const vehicle = await addVehicle()
     const owner = await addOwner()
@@ -176,21 +160,5 @@ describe('trackers', () => {
       device_id: 'API-IMEI-1',
       status: 'active',
     })
-  })
-
-  it('allows one active tracker per vehicle and a new one once the old is removed', async () => {
-    const { id } = await addVehicle()
-    const first = (await addTracker(id)).body.data
-    expect((await addTracker(id, trackerBody('API-IMEI-2'))).status).toBe(409)
-    const removed = { status: 'removed', removed_on: '2026-11-15' }
-    await as('admin', 'PATCH', `/admin/trackers/${first.id}`, { body: removed })
-    expect((await addTracker(id, trackerBody('API-IMEI-2'))).status).toBe(201)
-  })
-
-  it('stops staff adding a tracker', async () => {
-    const { id } = await addVehicle()
-    const body = trackerBody()
-    const { status } = await as('staff', 'POST', `/admin/vehicles/${id}/trackers`, { body })
-    expect(status).toBe(403)
   })
 })

@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { DEFAULT_LIMIT, MAX_LIMIT } from '../constants.js'
+import { DEFAULT_LIMIT, DOCUMENT_CONTENT_TYPES, MAX_FILE_BYTES, MAX_LIMIT } from '../constants.js'
 
 // Building blocks shared by more than one endpoint schema.
 export const CURRENCIES = ['KES', 'USD']
@@ -40,6 +40,12 @@ export const hasAtLeastOneField = [
   (value) => Object.keys(value).length > 0,
   { message: 'Send at least one field.' },
 ]
+
+/** What the browser says it is about to upload. The signed link only accepts exactly this. */
+export const fileDeclaration = {
+  content_type: z.enum(DOCUMENT_CONTENT_TYPES),
+  size_bytes: z.number().int().min(1).max(MAX_FILE_BYTES),
+}
 
 /** The `limit` and `cursor` query fields every list endpoint takes. */
 export const pageFields = {

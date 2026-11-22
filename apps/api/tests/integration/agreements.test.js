@@ -189,14 +189,17 @@ describe('what a signature allows', () => {
   })
 })
 
+const changeDates = (id) =>
+  asCustomer('PATCH', `/bookings/${id}`, {
+    start_at: '2027-04-01T08:00:00+03:00',
+    end_at: '2027-04-05T08:00:00+03:00',
+  })
+
 describe('a change of dates', () => {
   it('voids the signature, and the customer signs again', async () => {
     const id = await confirmedBooking()
     await sign(id)
-    const change = await asCustomer('PATCH', `/bookings/${id}`, {
-      start_at: '2027-04-01T08:00:00+03:00',
-      end_at: '2027-04-05T08:00:00+03:00',
-    })
+    const change = await changeDates(id)
     expect(change.status).toBe(200)
     expect(await documents(id)).toEqual([{ type: 'agreement', status: 'replaced' }])
     const agreement = await read(id)

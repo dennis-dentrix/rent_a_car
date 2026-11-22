@@ -37,23 +37,23 @@ export const TEST_PASSWORD = 'Passw0rd!local'
 
 let app
 
-/** Load the local environment and create the app once. Call from `beforeAll`. */
+/** Load the test environment (.env.test, local stack only, never .env.local) and create the app once. Call from `beforeAll`. */
 export function loadApp() {
-  process.loadEnvFile('.env.local')
+  process.loadEnvFile('.env.test')
   assertSafeTarget(process.env.SUPABASE_URL)
   app = createApp()
 }
 
 export const query = (params) => `?${new URLSearchParams(params)}`
 
-/** Call the API; returns the HTTP status and the parsed JSON body. */
+/** Call the API; returns the HTTP status, the parsed JSON body, and the response headers. */
 export async function call(method, path, { body, token, headers = {} } = {}) {
   let pending = request(app)[method.toLowerCase()](`/api/v1${path}`)
   if (token) pending = pending.set('authorization', `Bearer ${token}`)
   for (const [name, value] of Object.entries(headers)) pending = pending.set(name, value)
   if (body !== undefined) pending = pending.send(body)
   const response = await pending
-  return { status: response.status, body: response.body }
+  return { status: response.status, body: response.body, headers: response.headers }
 }
 
 export const get = (path, options) => call('GET', path, options)
@@ -251,3 +251,9 @@ export async function getBinary(path, token) {
     })
   return { status: response.status, type: response.headers['content-type'], bytes: response.body }
 }
+
+/** Review an uploaded document as staff: accept it, or reject it with a reason. */
+export const reviewDocument = (id, review) => staff('PATCH', `/staff/documents/${id}`, review)
+
+/** The status and error code of a response, for asserting a refused request in one line. */
+export const errorOf = ({ status, body }) => [status, body.error?.code]

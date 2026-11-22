@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { DOCUMENT_CONTENT_TYPES, MAX_FILE_BYTES } from '../constants.js'
+import { fileDeclaration } from './common.js'
 
 export const FUEL_LEVELS = ['empty', 'quarter', 'half', 'three_quarters', 'full']
 
@@ -9,8 +9,7 @@ const fileSchema = z.strictObject({
   caption: z.string().trim().min(1).max(300).optional(),
   // Object key in the private bucket. The file itself is uploaded with a signed link.
   storage_path: z.string().trim().min(3).max(300),
-  content_type: z.enum(DOCUMENT_CONTENT_TYPES),
-  size_bytes: z.number().int().min(1).max(MAX_FILE_BYTES),
+  ...fileDeclaration,
 })
 
 export const createInspectionSchema = z.strictObject({

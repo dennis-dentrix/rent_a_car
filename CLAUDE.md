@@ -44,6 +44,7 @@ Rules for the split: the web app never queries the database; it calls the API. T
 ## Coding rules (pack section 14, condensed)
 
 - One source per fact: prices in `apps/api/src/services/pricing.js`, statuses in `apps/api/src/domain/booking-status.js`, validation schemas, money, dates, and error codes in `packages/shared`, text in `apps/web/copy/`.
+- Clean code. One function, one responsibility: if describing it needs "and", split it. Comments say why (a rule, a trade-off, a surprise), never what the code does; if a comment explains what, rename or extract instead. At most three arguments; past that, pass one options object. Framework signatures such as Express handlers are exempt. Booleans read as questions (`isActive`, `hasDates`, `canSign`), not `active` or `flag`. Avoid deep nesting: return early or extract a function (the depth limit is below). Keep it DRY (the repetition rule is below).
 - Money is integer KES. No floats. Round once, at the final total.
 - Store UTC; display Africa/Nairobi only in display code.
 - The server computes price, status, and role. Never trust the browser.
@@ -51,13 +52,22 @@ Rules for the split: the web app never queries the database; it calls the API. T
 - Business constants (deposit percent, grace period, minimum hire days) live in the `settings` table, not code.
 - Every external call has a timeout and a failure path. Webhooks return success only after the change is saved.
 - A bug fix starts with a failing test. Tests take dates as arguments.
+- Avoid repetition as much as possible, in code, SQL, tests, and docs. Before writing anything, look for an existing helper, schema, constant, or test that already covers it, and reuse or extend it. A second copy is a defect, even when `jscpd` does not catch it.
+- Tests: one rule, one test, at the layer that owns the rule. A database constraint or RLS policy is tested in the database tests; the API tests check only what the API adds (auth, status code, error envelope, mapping a database error to its API error, once per kind); a pure rule is unit tested beside its code. Never test the same behaviour at two layers. One test file per area, and a new case goes into that file; do not start a second file for an area that has one. Setup that two files share goes in `tests/integration/helpers.js`.
+- Running tests: while working, run only the file you changed (`npx vitest run <path>` in the app). Run `npm run test:db` only when SQL, a route, or a service changed, and `npm run check` once before finishing a change. Never run a test twice on the same code, and do not re-run a passing suite when nothing changed.
+- Before creating a test file, search `tests/` and the app's `src/` for an existing file on the same area, and for tests that already cover the behaviour. If one exists, add to it; create a new file only when none covers the area, and say what the search found. Before adding a test, check that no existing test already asserts the same thing.
+- No N+1 queries. Never query inside a loop or a `map` over rows; fetch the related rows in one query (`in`, a join, or a database function) and look them up in memory. The number of queries behind an endpoint must not grow with the number of rows it returns.
+- Index what the API filters, sorts, or looks up by. A new filter, sort, or lookup ships with its index in the same migration. Every list is `created_at desc, id desc`, so a list that filters adds that sort to the filter's index.
+- In an RLS policy, write a helper that takes no argument as `(select is_staff())`, so it runs once per query and not once per row. This holds for `is_staff`, `is_admin`, `is_approver`, `auth_role`, `auth_company_id`, `auth_operator_id`, and `auth.uid()`. The policy helpers `add_admin_policy`, `add_staff_policy`, and `add_staff_read_policy` already do this; a helper that takes a column, such as `operates(operator_id)`, needs the row and stays as it is.
+- Cache only data that rarely changes and never feeds a price, an availability answer, a payment, or a signed-in user's view (classes, locations). Use `publicCache` in `apps/api/src/middleware/cache.js`, which sets `Cache-Control` for Cloudflare. Everything else is read from the database every time.
+- Optimistic UI, once the web app has screens: every click that changes data updates the screen at once and rolls back with a plain message if the server refuses. While the server has not answered, the screen shows "saving", never "confirmed". Price, status, payment, and availability always come from the server's response, never from the browser's guess.
 - Add a dependency only when writing it ourselves is long and risky. Record each one in the decision log.
 
 ## Commands
 
 - `npm run dev:api` and `npm run dev:web` run the apps (API on 4000, web on 3000).
 - `npm run db:start` and `npm run db:reset` run the local Supabase.
-- `npm test` unit tests; `npm run test:db` database and API tests (needs the local Supabase and `apps/api/.env.local`).
+- `npm test` unit tests; `npm run test:db` database and API tests (needs the local Supabase and `apps/api/.env.test`, copied from `.env.test.example`; it never reads `.env.local`).
 - `docker compose up -d --build` in `deploy/` runs the whole stack (see `docs/deployment.md`).
 - `npm run check` lint, format, duplicate scan, and unit tests.
 

@@ -15,6 +15,8 @@ export default [
       'no-nested-ternary': 'error',
       'max-lines': ['error', { max: 300, skipBlankLines: true, skipComments: true }],
       'max-depth': ['error', 3],
+      // A warning, not an error: new code is flagged now, and the older functions are tidied in their own change.
+      'max-params': ['warn', 3],
       'max-lines-per-function': ['error', { max: 40, skipBlankLines: true, skipComments: true }],
     },
   },

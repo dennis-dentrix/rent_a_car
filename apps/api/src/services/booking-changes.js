@@ -59,10 +59,7 @@ function quoteInputFor(booking, quote, { start_at, end_at }) {
  * changes allowed, and a vehicle of the class is free.
  */
 export async function changeBookingDates({ db }, id, dates) {
-  const booking = unwrap(
-    await db.from('bookings').select('id, class_id, start_at, quote_id').eq('id', id).maybeSingle(),
-  )
-  if (!booking) throw new AppError('NOT_FOUND')
+  const booking = await findOne(db, 'bookings', 'id, class_id, start_at, quote_id', id)
   const original = await withServiceRole('read_booking_quote', (admin) =>
     findOne(admin, 'quotes', '*', booking.quote_id),
   )

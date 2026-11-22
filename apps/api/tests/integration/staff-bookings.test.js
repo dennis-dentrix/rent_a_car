@@ -5,6 +5,7 @@ import {
   call,
   changeStatus,
   deliveryHandover,
+  errorOf,
   get,
   newBooking,
   officeQuote,
@@ -170,25 +171,10 @@ describe('the staff inbox', () => {
 })
 
 describe('changing status', () => {
-  it('needs a note to confirm by hand', async () => {
-    const { id } = await newBooking()
-    expect((await changeStatus(id, 'confirmed')).status).toBe(400)
-    expect(
-      (await changeStatus(id, 'confirmed', 'Cash received at the office')).body.data.status,
-    ).toBe('confirmed')
-  })
-
   it('refuses a move the transition table does not allow', async () => {
     const { id } = await newBooking()
     const { status, body } = await changeStatus(id, 'active')
     expect([status, body.error.code]).toEqual([422, 'INVALID_STATUS_TRANSITION'])
-  })
-
-  it('refuses ready until the documents are verified', async () => {
-    const { id } = await newBooking()
-    await changeStatus(id, 'confirmed', 'Deposit received')
-    const { status, body } = await changeStatus(id, 'ready')
-    expect([status, body.error.code]).toEqual([422, 'DOCUMENTS_NOT_VERIFIED'])
   })
 
   it('keeps the route away from customers and unknown bookings', async () => {
@@ -206,16 +192,15 @@ describe('a booking from confirmation to closed', () => {
   const inspect = (booking_id, type) =>
     staff('POST', '/staff/inspections', { booking_id, type, fuel_level: 'full', mileage_km: 1000 })
 
-  it('needs inspections before it becomes active and before it is returned', async () => {
+  // The document and inspection rules are tested in workflow.test.js; this is the happy path through the API.
+  it('takes a booking from confirmation to closed', async () => {
     const { id } = await newBooking()
     await changeStatus(id, 'confirmed', 'Deposit received')
     const { rows } = await db.query('select customer_id from bookings where id = $1', [id])
     await insertVerifiedDocuments(db, { booking: id, owner: rows[0].customer_id })
     expect((await changeStatus(id, 'ready')).status).toBe(200)
-    expect((await changeStatus(id, 'active')).body.error.code).toBe('INSPECTION_REQUIRED')
     await inspect(id, 'pickup')
     expect((await changeStatus(id, 'active')).status).toBe(200)
-    expect((await changeStatus(id, 'returned')).body.error.code).toBe('INSPECTION_REQUIRED')
     await inspect(id, 'return')
     expect((await changeStatus(id, 'returned')).status).toBe(200)
     expect((await changeStatus(id, 'closed')).body.data.status).toBe('closed')
@@ -236,9 +221,9 @@ describe('assigning a vehicle and driver', () => {
     const first = await newBooking()
     const second = await newBooking()
     const { rows } = await db.query('select vehicle_id from bookings where id = $1', [second.id])
-    const { status, body } = await staff('POST', `/staff/bookings/${first.id}/assign`, {
+    const response = await staff('POST', `/staff/bookings/${first.id}/assign`, {
       vehicle_id: rows[0].vehicle_id,
     })
-    expect([status, body.error.code]).toEqual([409, 'BOOKING_OVERLAP'])
+    expect(errorOf(response)).toEqual([409, 'BOOKING_OVERLAP'])
   })
 })

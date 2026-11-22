@@ -33,6 +33,13 @@ const threeFiles = (bookingId) =>
     { kind: 'document', label: 'signed sheet', content_type: 'application/pdf' },
   ])
 
+// A new booking with one uploaded photo: the starting point of most upload checks.
+const uploadedFront = async () => {
+  const bookingId = await newBookingId()
+  const [file] = await uploadInspectionFiles(bookingId, [{ label: 'front' }])
+  return { bookingId, file }
+}
+
 describe('inspection reports', () => {
   it('saves a report with its uploaded photos and documents against the booking', async () => {
     const bookingId = await newBookingId()
@@ -64,29 +71,32 @@ describe('inspection reports', () => {
 
 describe('inspection file uploads', () => {
   it("gives links under the booking's own folder", async () => {
-    const bookingId = await newBookingId()
-    const [file] = await uploadInspectionFiles(bookingId, [{ label: 'front' }])
+    const { bookingId, file } = await uploadedFront()
     expect(file.storage_path.startsWith(`inspections/${bookingId}/`)).toBe(true)
   })
 
-  it('refuses a report that names a file that was never uploaded', async () => {
-    const bookingId = await newBookingId()
-    const [file] = await uploadInspectionFiles(bookingId, [{ label: 'front' }])
-    const missing = { ...file, storage_path: `inspections/${bookingId}/never-uploaded.jpg` }
-    expect((await inspect(report(bookingId, [missing]))).status).toBe(400)
+  // Each case spoils the uploaded file in one way; the report must be refused whichever way it is.
+  it.each([
+    [
+      'names a file that was never uploaded',
+      (bookingId, file) => ({
+        ...file,
+        storage_path: `inspections/${bookingId}/never-uploaded.jpg`,
+      }),
+    ],
+    [
+      'declares a different size than was uploaded',
+      (_bookingId, file) => ({ ...file, size_bytes: file.size_bytes + 1 }),
+    ],
+  ])('refuses a report that %s', async (_name, spoil) => {
+    const { bookingId, file } = await uploadedFront()
+    expect((await inspect(report(bookingId, [spoil(bookingId, file)]))).status).toBe(400)
   })
 
   it("refuses a file from another booking's folder", async () => {
     const [first, second] = [await newBookingId(), await newBookingId()]
     const files = await uploadInspectionFiles(first, [{ label: 'front' }])
     expect((await inspect(report(second, files))).status).toBe(400)
-  })
-
-  it('refuses a report that declares a different size than was uploaded', async () => {
-    const bookingId = await newBookingId()
-    const [file] = await uploadInspectionFiles(bookingId, [{ label: 'front' }])
-    const wrong = { ...file, size_bytes: file.size_bytes + 1 }
-    expect((await inspect(report(bookingId, [wrong]))).status).toBe(400)
   })
 
   it('makes the storage refuse a file bigger than the one declared', async () => {

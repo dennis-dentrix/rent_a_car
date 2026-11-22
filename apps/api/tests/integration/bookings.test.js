@@ -8,6 +8,7 @@ import {
   bookNewQuote,
   call,
   createBooking,
+  errorOf,
   get,
   officeQuote,
   postQuote,
@@ -78,8 +79,7 @@ describe('POST /bookings conflicts', () => {
   it('refuses a booking when every vehicle of the class is taken', async () => {
     await bookNewQuote()
     await bookNewQuote(OTHER_CUSTOMER, accounts.other)
-    const { status, body } = await bookNewQuote()
-    expect([status, body.error.code]).toEqual([409, 'BOOKING_OVERLAP'])
+    expect(errorOf(await bookNewQuote())).toEqual([409, 'BOOKING_OVERLAP'])
   })
 })
 

@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { AppError } from '../lib/errors.js'
-import { createAnonClient, createUserClient, unwrap } from '../lib/supabase.js'
+import { createAnonClient, createUserClient } from '../lib/supabase.js'
+import { findProfile } from '../services/accounts.js'
 
 // The access token was already verified with Supabase, so its claims can be read safely.
 const assuranceLevel = (token) => {
@@ -38,14 +39,7 @@ export const requireRoles = (...roles) => [
   authenticate,
   async (req, _res, next) => {
     const { db, user } = req.auth
-    const profile = unwrap(
-      await db
-        .from('profiles')
-        .select('role')
-        .eq('id', user.id)
-        .is('deleted_at', null)
-        .maybeSingle(),
-    )
+    const profile = await findProfile(db, user.id, 'role')
     if (!profile || !roles.includes(profile.role)) throw new AppError('FORBIDDEN')
     if (mfaRequired() && req.auth.aal !== 'aal2') {
       throw new AppError('FORBIDDEN', {
