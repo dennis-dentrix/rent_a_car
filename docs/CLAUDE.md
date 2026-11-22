@@ -18,7 +18,7 @@
 
 ## 2. Precedence when documents conflict
 
-1. `product-pack.md` §24, then §23, then §21 (the newest decision wins).
+1. `product-pack.md` §25, then §24, then §23, then §21 (the newest decision wins). §25 is the Carvo marketplace direction.
 2. The owning document in the table above, for its own facts.
 3. Older text in pack sections 1 to 20, PRD, UX spec, which still show earlier wording.
 

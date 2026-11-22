@@ -2,8 +2,8 @@
 // Tokens (styles/tokens) and the Tailwind config read from here.
 // Placeholder values until the owner supplies the final name, logo, and colour.
 export const brand = {
-  name: 'Car Rental',
-  legalName: 'Car Rental Ltd',
+  name: 'Carvo',
+  legalName: 'Dirant Technologies',
   supportPhone: '+254700000000',
   supportWhatsapp: '+254700000000',
   accent: '#0A5CC8',

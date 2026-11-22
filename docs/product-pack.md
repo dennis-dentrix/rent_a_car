@@ -1362,3 +1362,84 @@ Deferred until the company sees its corporate accounts in practice (section 23.3
 - Tingg payment integration (checkout, webhook, refunds) is skipped for now and will be revisited later. Until then a booking cannot be paid online, so staff move bookings forward by hand through the status workflow. The payment tables stay in the database, unused.
 - SMS (Mobile Sasa) is skipped for now. Notifications go by email only, and customer sign-in cannot rely on SMS one-time codes (section 7), so email sign-in is used instead until SMS returns.
 - The pricing, deposit, and cancellation rules are unchanged. Only the collecting of money is postponed.
+
+## 25. Carvo Marketplace Direction (22 November 2026)
+
+The owner reviewed the "Kenya Car Rental Marketplace" product spec (22 November 2026) and chose to build the platform as a marketplace of rental companies. Where this section differs from section 24 or earlier, section 25 wins. Each row is marked **Decided** (stated by the owner) or **Working assumption** (proposed in review, owner to confirm).
+
+**25.1 Name and model**
+
+| Topic | Ruling | Status | Replaces |
+| --- | --- | --- | --- |
+| Platform name | Carvo. The logo, domain, and support contacts are still to be supplied. | Decided | Placeholder "Car Rental" in `packages/shared/src/brand.js` |
+| Legal owner | Carvo is a product of Dirant Technologies, the registered business, which also owns another product, Diraschool. The registered name's suffix (for example "Ltd") is still to be confirmed. | Decided | |
+| Model | A marketplace that connects renters with operators. An operator is a rental company with its own fleet. The platform does not run its own fleet for the marketplace. | Decided | "Owned fleet first" (section 23.1, fleet model row; section 24.10 wording) |
+| Operator onboarding | An operator is listed only after admin review of its registration, KRA PIN, address, insurance certificate, and vehicle logbooks, as in the spec. | Working assumption | |
+| Renter view | Renters see the operator company's fleet. An individual owner behind a vehicle never appears to renters. The operator is the lessor on the rental agreement. | Decided | |
+
+**25.2 Vehicle ownership and owner records**
+
+- An operator's vehicles may be the company's own or managed for an individual owner. The operator states which when it onboards the vehicle. **Decided.**
+- Owner details are still captured, and the operator sees them on its own pages to manage and track its fleet. **Decided.**
+- Owner records, ownership agreements, and trackers belong to one operator. Only that operator's users can read or change them. Renters never see them, and Carvo admins do not read them by default; an admin who must open one gives a reason, and the access is logged, as for documents (section 22). **Working assumption.** This replaces the admin-only access in section 24.10.
+- A vehicle with an owner is a managed vehicle. The operator uploads the owner's authorisation or management agreement when it links an owner, so "verified operator" is backed by proof the operator may rent the vehicle out. **Working assumption.**
+- The commission percent on an ownership agreement is the operator's own figure. The platform stores it and does not calculate with it. **Working assumption.**
+- National ID number and payout details for owners are optional, operator-only, and stored encrypted. Whether they belong on the platform at all is open. **Working assumption.**
+- The operator agreement states that the operator is responsible for the owner's consent to the storage of their data, and that Carvo stores it on the operator's behalf. To go to the lawyer (section 25.7).
+
+**25.3 How bookings work**
+
+The owner asked that bookings work as they do on Booking.com and Airbnb. **Decided as the direction.** The mechanics below were proposed in review and are working assumptions.
+
+| Pattern | Carvo rule |
+| --- | --- |
+| Confirmation | Per vehicle, the operator chooses Instant or Request. Instant creates a confirmed booking. Request waits for the operator to accept within a set response time (the spec suggests 2 hours, configurable) and expires if no answer comes. |
+| Statuses | Add `requested`, `declined`, and `expired` (for requests), and `disputed`. The 30-minute payment hold in section 23.3 item 7 no longer applies to the default flow. |
+| Date blocking | Only confirmed bookings block a vehicle's dates. The existing database overlap rule rejects a second confirmation. |
+| Payment | Pay at handover by default, recorded by the operator (cash or M-PESA reference). Online booking fees or deposits come only with a payment partner (section 25.5). |
+| Cancellation | The operator picks one of three platform policies (flexible, moderate, strict). The 24-hour rule in section 23.1 becomes the Flexible policy. Exact terms of the other two are open. |
+| Reviews | From completed bookings only, shown after both sides review or a set window passes. |
+| Contact details | Kept inside the platform until a booking is confirmed. |
+| Disputes | Opened within a set window after return. The pickup and return inspection reports are the evidence. Payouts are not built, so the hold in the spec applies only once money flows through the platform. |
+| Operator reliability | Response rate and operator cancellations feed search ranking and suspension. |
+
+**25.4 Revenue**
+
+- Operators use the platform free in the early stage. **Decided.**
+- Later, once the platform has traction, operators get a 30-day trial and then pay a subscription. **Decided.**
+- No commission is charged at launch. A small fee on bookings paid on the platform may be added after on-platform payments exist. **Working assumption.**
+- Build now: only a plan field on the operator (starting value `free_launch`). Plans, subscriptions, billing, and the lapsed-subscription rule come later, with plan prices held in the database.
+- Open: whether early operators stay free or start their 30 days when billing begins.
+
+**25.5 Payments**
+
+- The provider is Tingg for now, to be chosen finally later. **Decided.** This keeps section 24.12 and replaces the Daraja proposal in the spec.
+- With a free launch and pay at handover, Phase 1 takes no online payments. The operator records payment on the booking, and `cash` is added as a payment method. **Working assumption.**
+- Before booking deposits are built, confirm with Tingg whether it can settle to separate merchants, since deposits belong to operators and subscriptions to Carvo.
+
+**25.6 Chauffeurs**
+
+- Operators are responsible for verifying their chauffeurs. When listing a vehicle the operator states whether it offers a chauffeur and the cost. Carvo's terms say this plainly. **Decided.**
+- When an operator offers a chauffeur, it records an attestation, with a timestamp, that the driver is licensed and the insurance covers chauffeur use. The driver's licence expiry is stored for alerts. **Working assumption.**
+- The operator agreement carries the operator's warranties about drivers and insurance. To go to the lawyer.
+
+**25.7 Legal checks before launch (not yet done)**
+
+- Whether chauffeur-driven bookings bring Carvo under the ride-hailing rules, even with the operator-attested model. The spec's source says a business can count as a regulated transport network company whatever it calls itself.
+- Marketplace terms, operator agreement, and renter terms, including the owner-data and driver points above.
+- Data Protection Act registration and obligations for ID and licence images and owner details.
+- Whether operators serving tourists need tourism licences.
+
+**25.8 Still open**
+
+| # | Item |
+| --- | --- |
+| 1 | Corporate accounts: the spec has them in its Phase 2; the build plan has them in Phase 5. Not decided. |
+| 2 | How free-period operators move to paid (section 25.4). |
+| 3 | Terms of the moderate and strict cancellation policies, and the default response time. |
+| 4 | Registered-name suffix for Dirant Technologies, and the logo, domain, and support contacts for Carvo. |
+| 5 | Whether the spec's Phase 1 table is adopted whole, or the build plan's phases still lead. |
+
+**25.9 What this changes in the build**
+
+The change list and order are in the review of 22 November 2026: operators and operator roles with row-level security, vehicle-level rates and terms, request and accept booking, both-party agreement signing and inspection confirmation, operator onboarding and the admin queue, then payments, disputes, reviews, and the interfaces. Phase 0 and phase 1 work already built stays, except where this section says otherwise. The documents that still describe a single company (PRD, UX spec, information architecture, database design, API spec) are out of date until corrected, and section 25 applies meanwhile.
