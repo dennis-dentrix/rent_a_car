@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import posthog from 'posthog-js'
 import Button from '@/components/Button'
 import DatesField from '@/components/DatesField'
 import { copy } from '@/copy/en'
@@ -23,6 +24,7 @@ export default function ClassDates({ slug }) {
   const submit = (event) => {
     event.preventDefault()
     if (!stay.start) return setHasTriedWithoutDates(true)
+    posthog.capture('class_availability_checked', { has_end_date: Boolean(stay.end) })
     router.push(buildSearchUrl('car_hire', { ...emptySearch(), stay }, { class: slug }))
   }
 

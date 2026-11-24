@@ -27,6 +27,7 @@ export default async function SignInPage({ searchParams }) {
           fields={signInFields}
           hidden={{ next: safeNext(next, '') }}
           submitLabel={text.submit}
+          eventName="sign_in_submitted"
         />
         <p className="text-callout">
           <AuthLink href="/auth/forgot">{text.forgot}</AuthLink>

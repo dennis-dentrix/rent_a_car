@@ -26,6 +26,7 @@ export default async function SignUpPage({ searchParams }) {
           fields={signUpFields}
           hidden={{ next }}
           submitLabel={text.submit}
+          eventName="sign_up_submitted"
         />
         <p className="text-callout text-label-2">
           {text.haveAccount} <AuthLink href="/auth">{text.signIn}</AuthLink>

@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import posthog from 'posthog-js'
 import { Search } from 'lucide-react'
 import Button from '@/components/Button'
 import Card from '@/components/Card'
@@ -34,6 +35,12 @@ function useSearchForm({ initialGroup, initialService }) {
   const submit = (event) => {
     event.preventDefault()
     if (!hasSearchDate(group, values)) return setHasTriedWithoutDate(true)
+    posthog.capture('car_search_submitted', {
+      service_group: group,
+      has_service: Boolean(values.service),
+      car_type_count: values.types.length,
+      has_end_date: Boolean(values.stay.end),
+    })
     router.push(buildSearchUrl(group, values))
   }
   return { group, chooseGroup, values, set, submit, hasTriedWithoutDate }

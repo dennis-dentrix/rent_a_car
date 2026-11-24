@@ -1,6 +1,7 @@
 'use client'
 
 import { useActionState, useEffect, useEffectEvent, useRef } from 'react'
+import posthog from 'posthog-js'
 import Alert from '@/components/Alert'
 import TextField from '@/components/Field'
 import PasswordField from '@/components/PasswordField'
@@ -64,9 +65,14 @@ export default function AuthForm({
   initial = {},
   saved,
   onSaved,
+  eventName,
 }) {
   const [state, run] = useActionState(action, null)
   const formRef = useRef(null)
+  const submit = (formData) => {
+    if (eventName) posthog.capture(eventName)
+    return run(formData)
+  }
   useAnswerEffects(state, formRef, onSaved)
   if (state?.status === 'sent' && sent) {
     return (
@@ -76,7 +82,7 @@ export default function AuthForm({
     )
   }
   return (
-    <form ref={formRef} action={run} className="flex flex-col gap-4">
+    <form ref={formRef} action={submit} className="flex flex-col gap-4">
       {Object.entries(hidden).map(([name, value]) => (
         <input key={name} type="hidden" name={name} value={value ?? ''} />
       ))}

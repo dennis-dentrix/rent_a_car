@@ -26,6 +26,8 @@ export async function GET() {
   return NextResponse.json(
     {
       isSignedIn: true,
+      id: profile.id,
+      email: profile.email,
       name: profile.full_name,
       role: profile.role,
       avatar: avatarUrl(profile.avatar_path),
