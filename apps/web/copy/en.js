@@ -10,6 +10,7 @@ import { editor } from './editor.js'
 import { home } from './home.js'
 import { blogCopy } from './blog/index.js'
 import { operators } from './operators.js'
+import { privacy } from './privacy.js'
 import { servicePages } from './service-pages.js'
 import { settings } from './settings.js'
 import { services } from './services.js'
@@ -25,6 +26,7 @@ export const copy = {
   home,
   blog: blogCopy,
   operators,
+  privacy,
   classPage,
   services,
   servicePages,
@@ -37,7 +39,6 @@ export const copy = {
     transfers: 'Transfers',
     events: 'Events',
     allCars: 'All cars',
-    bookings: 'Bookings',
     account: 'Account',
     help: 'Help',
     home: 'Home',
@@ -56,6 +57,7 @@ export const copy = {
     message: 'Message us',
     operators: 'For rental companies',
     guides: 'Guides',
+    privacy: 'Privacy policy',
     maker: (company) => `A product of ${company}`,
   },
   status: {
@@ -93,6 +95,14 @@ export const copy = {
     results: 'Suggestions',
     kinds: { service: 'Service', car: 'Car type', place: 'Place' },
     searchFor: (text) => `Search for "${text}"`,
+  },
+  consent: {
+    label: 'Cookie notice',
+    body: 'We use cookies to keep you signed in, remember your preferences, and understand how the site is used.',
+    privacy: { before: 'See our ', link: 'privacy policy', after: '.' },
+    accept: 'Accept',
+    turnOff: 'Turn off analytics',
+    turnOn: 'Turn on analytics',
   },
   currency: {
     label: 'Currency',

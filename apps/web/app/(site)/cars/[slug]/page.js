@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import { formatMoney } from '@carvo/shared'
+import { TrackEvent } from '@/components/AnalyticsProvider'
 import Breadcrumbs from '@/components/Breadcrumbs'
 import Button from '@/components/Button'
 import ClassFacts from '@/components/ClassFacts'
@@ -102,6 +103,10 @@ export default async function ClassPage({ params }) {
   const description = text.meta.description(item.name, item.seats, '')
   return (
     <div className="flex flex-col gap-14 md:gap-20">
+      <TrackEvent
+        name="class_viewed"
+        properties={{ class_id: item.id, price_per_day_kes: item.price_per_day_kes }}
+      />
       <JsonLd data={breadcrumbJsonLd(trailFor(item.name, slug))} />
       <JsonLd
         data={productJsonLd({

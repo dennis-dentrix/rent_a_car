@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Search } from 'lucide-react'
+import { useAnalytics } from '@/components/AnalyticsProvider'
 import Button from '@/components/Button'
 import Card from '@/components/Card'
 import CarTypePicker from '@/components/CarTypePicker'
@@ -19,6 +20,7 @@ const FIELDS = { car_hire: CarHireFields, transfers: TransferFields, events: Eve
 // instead of listing every car as if it were free.
 function useSearchForm({ initialGroup, initialService }) {
   const router = useRouter()
+  const { track } = useAnalytics()
   const [group, setGroup] = useState(initialGroup)
   const [values, setValues] = useState(() => ({ ...emptySearch(), service: initialService }))
   const [hasTriedWithoutDate, setHasTriedWithoutDate] = useState(false)
@@ -34,6 +36,10 @@ function useSearchForm({ initialGroup, initialService }) {
   const submit = (event) => {
     event.preventDefault()
     if (!hasSearchDate(group, values)) return setHasTriedWithoutDate(true)
+    const { start, end } = values.stay
+    track('search_submitted', {
+      duration_days: group === 'car_hire' ? countDays(start, end ?? start) : undefined,
+    })
     router.push(buildSearchUrl(group, values))
   }
   return { group, chooseGroup, values, set, submit, hasTriedWithoutDate }

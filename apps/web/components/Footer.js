@@ -1,6 +1,7 @@
 import { brand } from '@carvo/shared/brand'
 import Link from 'next/link'
 import AskButton from '@/components/AskButton'
+import ConsentLink from '@/components/ConsentLink'
 import Logo from '@/components/Logo'
 import { copy } from '@/copy/en'
 import { topLinks } from '@/lib/nav'
@@ -13,6 +14,7 @@ export default function Footer() {
     { href: '/#how', label: copy.nav.how },
     { href: '/blog', label: copy.footer.guides },
     { href: '/operators', label: copy.footer.operators },
+    { href: '/privacy', label: copy.footer.privacy },
   ]
   return (
     <footer className="mt-16 border-t border-separator bg-bg-grouped">
@@ -32,6 +34,9 @@ export default function Footer() {
             ))}
             <li>
               <AskButton className="text-label-2 hover:text-label">{copy.footer.message}</AskButton>
+            </li>
+            <li>
+              <ConsentLink className="text-label-2 hover:text-label" />
             </li>
           </ul>
         </nav>

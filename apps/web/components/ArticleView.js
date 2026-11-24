@@ -29,10 +29,11 @@ function Picture({ image, isPriority = false }) {
   )
 }
 
-function Contents({ sections }) {
+/** The list of a page's sections, each linking to its heading. `label` names it ("In this guide" by default). */
+export function Contents({ sections, label = text.contents }) {
   return (
-    <nav aria-label={text.contents} className="rounded-card bg-bg-grouped p-4 md:p-5">
-      <p className="mb-2 text-callout font-semibold">{text.contents}</p>
+    <nav aria-label={label} className="rounded-card bg-bg-grouped p-4 md:p-5">
+      <p className="mb-2 text-callout font-semibold">{label}</p>
       <ol className="flex list-decimal flex-col gap-1 pl-5 text-callout">
         {sections.map((section) => (
           <li key={section.id}>
@@ -46,7 +47,8 @@ function Contents({ sections }) {
   )
 }
 
-function Section({ section }) {
+/** One section of a long page: its heading, paragraphs, and an optional list. */
+export function Section({ section }) {
   return (
     <section id={section.id} className="scroll-mt-24">
       <h2 className="mb-3 text-title-2 md:text-title-1">{section.heading}</h2>

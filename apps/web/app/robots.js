@@ -1,3 +1,4 @@
+import { PRIVATE_AREAS } from '@/lib/private-areas'
 import { absoluteUrl } from '@/lib/site'
 
 // Search engines may crawl the public pages. Account, booking, staff, admin, and internal areas are
@@ -8,7 +9,7 @@ export default function robots() {
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/account', '/book', '/quote', '/console', '/admin', '/auth', '/dev', '/api'],
+        disallow: PRIVATE_AREAS,
       },
     ],
     sitemap: absoluteUrl('/sitemap.xml'),

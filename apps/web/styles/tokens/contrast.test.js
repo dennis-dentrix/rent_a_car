@@ -35,6 +35,7 @@ const ratio = (foreground, background, page) => {
 const TEXT_ON_PAGE = [
   'label',
   'label-2',
+  'label-3',
   'primary',
   'accent',
   'success',
@@ -80,7 +81,7 @@ describe.each(['light', 'dark'])('%s theme contrast', (theme) => {
     expect(ratio(c['on-hero-2'], c.hero, c.bg)).toBeGreaterThanOrEqual(4.5)
   })
 
-  it('keeps label-3 to placeholders at 3:1 or better', () => {
-    expect(ratio(c['label-3'], c.fill, c.bg)).toBeGreaterThanOrEqual(3)
+  it('reads label-3 placeholders on an input fill at 4.5:1 or better', () => {
+    expect(ratio(c['label-3'], c.fill, c.bg)).toBeGreaterThanOrEqual(4.5)
   })
 })

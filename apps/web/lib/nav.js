@@ -1,9 +1,9 @@
 import { copy } from '@/copy/en'
 
-// Customer navigation: three tabs on phones (UX spec), text links in the top bar from tablet up.
+// Customer navigation: tabs on phones, text links in the top bar from tablet up. Only pages that exist: a Bookings
+// tab (`/account/bookings`) joins when that page is built, or the tab bar prefetches a 404.
 export const customerTabs = [
   { href: '/cars', label: copy.nav.cars, icon: 'car' },
-  { href: '/account/bookings', label: copy.nav.bookings, icon: 'bookings' },
   { href: '/account', label: copy.nav.account, icon: 'user' },
 ]
 

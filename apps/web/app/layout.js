@@ -1,15 +1,16 @@
 import './globals.css'
-import { Inter } from 'next/font/google'
+import { Nunito_Sans } from 'next/font/google'
 import { brand } from '@carvo/shared/brand'
+import { AnalyticsProvider } from '@/components/AnalyticsProvider'
+import ConsentBanner from '@/components/ConsentBanner'
 import JsonLd from '@/components/JsonLd'
 import { ToastProvider } from '@/components/Toast'
 import { SITE_URL } from '@/lib/site'
 import { organizationJsonLd } from '@/lib/structured-data'
 import { themeInitScript } from '@/lib/theme'
 
-const inter = Inter({
+const nunitoSans = Nunito_Sans({
   subsets: ['latin'],
-  axes: ['opsz'],
   display: 'swap',
   variable: '--font-sans',
 })
@@ -31,13 +32,16 @@ export const viewport = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en-KE" className={inter.variable} data-theme="light" suppressHydrationWarning>
+    <html lang="en-KE" className={nunitoSans.variable} data-theme="light" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
       <body>
         <JsonLd data={organizationJsonLd()} />
-        <ToastProvider>{children}</ToastProvider>
+        <AnalyticsProvider>
+          <ToastProvider>{children}</ToastProvider>
+          <ConsentBanner />
+        </AnalyticsProvider>
       </body>
     </html>
   )

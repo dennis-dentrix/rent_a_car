@@ -31,5 +31,10 @@
     "jscpd": "4.3.0",
     "prettier": "3.10.1",
     "supabase": "3.1.0"
+  },
+  "overrides": {
+    "@opennextjs/aws": {
+      "cookie": "0.7.2"
+    }
   }
 }

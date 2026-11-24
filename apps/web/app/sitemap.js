@@ -23,6 +23,7 @@ export default async function sitemap() {
     { url: absoluteUrl('/cars'), changeFrequency: 'daily', priority: 0.9 },
     { url: absoluteUrl('/operators'), changeFrequency: 'monthly', priority: 0.7 },
     { url: absoluteUrl('/blog'), changeFrequency: 'weekly', priority: 0.7 },
+    { url: absoluteUrl('/privacy'), changeFrequency: 'yearly', priority: 0.3 },
     ...(posts.data ?? []).map((post) => ({
       url: absoluteUrl(`/blog/${post.slug}`),
       lastModified: post.updated_at,

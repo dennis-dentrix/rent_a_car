@@ -28,7 +28,7 @@ Names are meaning-based. Tailwind utilities use the same names (`bg-bg-grouped`,
 | `fill`           | #E9EDFF   | #232B40                 | Inputs, tonal controls, skeleton                 |
 | `label`          | #141B2B   | #F2F4FA                 | Primary text                                     |
 | `label-2`        | #424753   | #B4BACB                 | Secondary text, metadata                         |
-| `label-3`        | #727785   | #8A91A5                 | Placeholders and disabled only (about 3:1)       |
+| `label-3`        | #646A78   | #9097AB                 | Placeholders and disabled only (4.5:1)           |
 | `separator`      | #DCE2F7   | #2B3349                 | Hairlines and card borders                       |
 | `primary`        | #00459C   | derived, lighter        | Buttons, prices, eyebrow labels, links (Stitch "primary") |
 | `on-primary`     | #FFFFFF   | #0B0F1A                 | Text on primary                                  |
@@ -50,7 +50,7 @@ Names are meaning-based. Tailwind utilities use the same names (`bg-bg-grouped`,
 - **Amber** (`verified`, and `mark-pin` #D97706 for the logo dot) marks proof only: vetted operators, verified documents. Never decoration.
 - **Brand source:** `packages/shared/src/brand.js` holds the name, `accent`, `accentDark`, and `markPin`. `styles/tokens` and the Tailwind config derive every other token from it. No component contains a brand name or colour.
 - **Derived values:** `accent-pressed` is the accent mixed 28% toward black (light) or white (dark); `accent-subtle` is the accent at 14% (light) or 16% (dark).
-- **Contrast:** `apps/web/styles/tokens/contrast.test.js` checks every text token on every surface and tint in both themes (4.5:1, and 3:1 for `label-3`). Body text 4.5:1, large text and icons 3:1, checked per token pair in both themes at the Phase 0 gate. `label-3` is exempt only because it is never used for reading.
+- **Contrast:** `apps/web/styles/tokens/contrast.test.js` checks every text token on every surface and tint in both themes (4.5:1, `label-3` included: Lighthouse counts a visible placeholder as text). Body text 4.5:1, large text and icons 3:1, checked per token pair in both themes at the Phase 0 gate. `label-3` is still only for placeholders and disabled states.
 
 ## 3. Typography
 
