@@ -13,6 +13,7 @@ import {
 import { idParam, requireRoles } from '../middleware/auth.js'
 import { handle } from '../middleware/respond.js'
 import { adminDataRouter } from './admin-data.js'
+import { adminOverviewRouter } from './admin-overview.js'
 import { adminOperatorsRouter } from './admin-operators.js'
 import { adminPostsRouter } from './posts.js'
 import { adminServicesRouter } from './admin-services.js'
@@ -25,6 +26,7 @@ import { createVehicle, updateVehicle } from '../services/vehicles.js'
 export const adminRouter = Router()
 adminRouter.use(requireRoles('admin'))
 adminRouter.param('id', idParam)
+adminRouter.use(adminOverviewRouter)
 adminRouter.use(adminDataRouter)
 adminRouter.use(adminServicesRouter)
 adminRouter.use(adminPostsRouter)

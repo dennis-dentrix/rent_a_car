@@ -167,6 +167,7 @@ describe('the staff inbox', () => {
       note: 'Deposit received by M-PESA',
       actor: { full_name: 'Test Staff' },
     })
+    expect(body.data.next_statuses).toEqual(['ready', 'cancelled'])
   })
 })
 

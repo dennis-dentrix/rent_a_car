@@ -1,3 +1,4 @@
+import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { verifyEmailAction } from '@/app/auth/actions'
 import AuthForm from '@/components/AuthForm'
@@ -5,6 +6,7 @@ import AuthLink from '@/components/AuthLink'
 import LargeTitle from '@/components/LargeTitle'
 import ResendCode from '@/components/ResendCode'
 import { copy } from '@/copy/en'
+import { readPendingEmail } from '@/lib/auth/cookies'
 import { codeFields } from '@/lib/auth/fields'
 import { safeNext } from '@/lib/auth/token'
 
@@ -14,7 +16,8 @@ export const metadata = { title: text.meta.title }
 
 // The step after creating an account: the six-digit code that was emailed confirms the address and signs the person in.
 export default async function VerifyEmailPage({ searchParams }) {
-  const { email, next } = await searchParams
+  const { next } = await searchParams
+  const email = readPendingEmail(await cookies())
   if (!email) redirect('/auth/sign-up')
   return (
     <>
@@ -23,10 +26,10 @@ export default async function VerifyEmailPage({ searchParams }) {
         <AuthForm
           action={verifyEmailAction}
           fields={codeFields}
-          hidden={{ email, next: safeNext(next, '') }}
+          hidden={{ next: safeNext(next, '') }}
           submitLabel={text.submit}
         />
-        <ResendCode email={email} />
+        <ResendCode />
         <p className="text-center text-callout">
           <AuthLink href="/auth/sign-up">{text.wrongEmail}</AuthLink>
         </p>

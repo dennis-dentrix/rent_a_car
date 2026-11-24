@@ -5,11 +5,17 @@ export default function TabBar({ items, label }) {
   return (
     <nav
       aria-label={label}
-      className="glass pb-safe fixed inset-x-0 bottom-0 z-header border-t border-separator lg:hidden"
+      className="glass pb-safe fixed inset-x-0 bottom-0 z-header border-t border-separator md:hidden"
     >
       <div className="mx-auto flex h-tabbar max-w-md items-stretch px-2">
         {items.map((item) => (
-          <NavLink key={item.href} href={item.href} icon={item.icon} variant="tab">
+          <NavLink
+            key={item.href}
+            href={item.href}
+            icon={item.icon}
+            isExact={item.isExact}
+            variant="tab"
+          >
             {item.label}
           </NavLink>
         ))}

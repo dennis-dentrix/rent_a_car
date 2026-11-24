@@ -13,7 +13,14 @@ import {
 } from '@rent-a-car/shared'
 import { copy } from '@/copy/en'
 import { apiGet, apiSend } from '@/lib/api'
-import { clearSession, readTokens, writeSession } from '@/lib/auth/cookies'
+import {
+  clearPendingEmail,
+  clearSession,
+  readPendingEmail,
+  readTokens,
+  writePendingEmail,
+  writeSession,
+} from '@/lib/auth/cookies'
 import { fieldErrors } from '@/lib/auth/fields'
 import { findVerifiedFactor, startEnrol, verifyCode } from '@/lib/auth/mfa'
 import { homeFor } from '@/lib/auth/roles'
@@ -35,10 +42,16 @@ const accountError = () =>
     ? text.errors.account
     : `${text.errors.account} ${text.errors.accountDev}`
 
+// The page that takes the sign-up code. The address travels in a cookie, never in the link.
+async function goToCodePage(email, formData) {
+  writePendingEmail(await cookies(), email)
+  const next = safeNext(formData.get('next'), '')
+  redirect(next ? `/auth/verify-email?next=${encodeURIComponent(next)}` : '/auth/verify-email')
+}
+
 async function unconfirmed(email, formData) {
   await anonAuthClient().auth.resend({ type: 'signup', email })
-  const next = safeNext(formData.get('next'), '')
-  redirect(`/auth/verify-email?email=${encodeURIComponent(email)}&next=${encodeURIComponent(next)}`)
+  return goToCodePage(email, formData)
 }
 
 /** Step one: email and password. Staff and admin go on to their second factor; everyone else to where they were going. */
@@ -63,9 +76,6 @@ export async function signInAction(_state, formData) {
 const signUpMessage = (error) =>
   ({ user_already_exists: text.errors.exists, weak_password: text.errors.weak })[error.code] ??
   text.errors.generic
-
-const verifyEmailUrl = (email, next) =>
-  `/auth/verify-email?email=${encodeURIComponent(email)}&next=${encodeURIComponent(next)}`
 
 /**
  * The account exists and is signed in. A rental company's person then starts their company, which waits for the
@@ -103,9 +113,8 @@ async function submitSignUp(formData, { schema, names, extra = {} }) {
     options: { data: { ...details, ...extra } },
   })
   if (error) return { error: signUpMessage(error), values }
-  const next = safeNext(formData.get('next'), '')
-  if (!data.session) redirect(verifyEmailUrl(email, next))
-  return finishSignUp(data.session, data.user, next)
+  if (!data.session) return goToCodePage(email, formData)
+  return finishSignUp(data.session, data.user, safeNext(formData.get('next'), ''))
 }
 
 export async function signUpAction(_state, formData) {
@@ -139,7 +148,9 @@ export async function registerCompanyAction(_state, formData) {
 /** Checks the six-digit code from the sign-up email. A right code confirms the address and signs the person in. */
 export async function verifyEmailAction(_state, formData) {
   const input = authCodeSchema.safeParse({ code: formData.get('code') })
-  const email = field(formData, 'email')
+  const store = await cookies()
+  const email = readPendingEmail(store)
+  if (!email) redirect('/auth/sign-up')
   if (!input.success) return { error: text.errors.otp }
   const { data, error } = await anonAuthClient().auth.verifyOtp({
     email,
@@ -147,15 +158,15 @@ export async function verifyEmailAction(_state, formData) {
     type: 'email',
   })
   if (error || !data.session) return { error: text.errors.otp }
+  clearPendingEmail(store)
   return finishSignUp(data.session, data.user, safeNext(formData.get('next'), ''))
 }
 
 /** Sends the sign-up code again. Supabase limits how often; a refusal is shown as "wait a moment". */
-export async function resendCodeAction(_state, formData) {
-  const { error } = await anonAuthClient().auth.resend({
-    type: 'signup',
-    email: field(formData, 'email'),
-  })
+export async function resendCodeAction() {
+  const email = readPendingEmail(await cookies())
+  if (!email) redirect('/auth/sign-up')
+  const { error } = await anonAuthClient().auth.resend({ type: 'signup', email })
   return error ? { error: text.errors.tooSoon } : { status: 'sent', at: Date.now() }
 }
 

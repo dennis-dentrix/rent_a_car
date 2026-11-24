@@ -298,3 +298,26 @@ describe('filtering by service', () => {
     expect((await offeredBy(operatorId)).body.data).toEqual(['convoy'])
   })
 })
+
+describe('the admin overview and audit log', () => {
+  it('counts what needs attention, for admins only', async () => {
+    const { status, body } = await admin('GET', '/admin/overview')
+    expect(status).toBe(200)
+    expect(body.data).toMatchObject({
+      companies_pending: expect.any(Number),
+      documents_to_review: expect.any(Number),
+      enquiries_open: expect.any(Number),
+      pickups_today: expect.any(Number),
+      returns_today: expect.any(Number),
+    })
+    expect((await call('GET', '/admin/overview', { token: accounts.staff })).status).toBe(403)
+  })
+
+  it('lists the audit log newest first with the name of who made each change', async () => {
+    await addRate((await addClass()).id)
+    const { status, body } = await admin('GET', '/admin/audit?limit=5')
+    expect(status).toBe(200)
+    expect(body.data[0]).toMatchObject({ table_name: 'rates', action: 'INSERT' })
+    expect(body.data[0]).toHaveProperty('actor')
+  })
+})

@@ -7,8 +7,8 @@ import Badge from '@/components/Badge'
 import Button from '@/components/Button'
 import LargeTitle from '@/components/LargeTitle'
 import { copy } from '@/copy/en'
+import { requireAdmin } from '@/lib/admin'
 import { apiGet } from '@/lib/api'
-import { getCurrentUser } from '@/lib/auth/session'
 
 const text = copy.auth.adminPosts
 
@@ -39,19 +39,13 @@ function PostRow({ post }) {
 // Every guide, newest first, drafts included. A new one is started with just a title.
 export default async function PostsPage({ searchParams }) {
   const { cursor } = await searchParams
-  const { token } = await getCurrentUser()
+  const { token } = await requireAdmin()
   const { data, meta, error } = await apiGet('/admin/posts', {
     query: { cursor },
     token,
   })
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-6">
-      <Link
-        href="/admin"
-        className="text-callout font-medium text-primary underline underline-offset-2"
-      >
-        {copy.auth.adminOperators.back}
-      </Link>
       <LargeTitle subtitle={text.subtitle}>{text.title}</LargeTitle>
       <AuthForm action={createPostAction} fields={NEW_GUIDE_FIELDS} submitLabel={text.newSubmit} />
       {error && <Alert tone="error" title={copy.classPage.errorTitle} />}

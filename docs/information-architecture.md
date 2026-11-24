@@ -93,6 +93,8 @@ A guest who pays is asked to create an account after confirmation, with the book
 
 ## 7. Admin routes (`/admin`)
 
+Built (24 November 2026): `/admin` (what needs the admin, today's movement, latest changes), `/admin/bookings` and `/admin/bookings/{id}` (status moves), `/admin/enquiries`, `/admin/documents` (open with a logged reason, verify or reject), `/admin/operators` (company review), `/admin/posts` (guides), `/admin/team`, `/admin/audit`, and `/admin/menu` (the phone's list of sections). A side rail with Work, Content and Setup groups from tablet up; four tabs on phones, the last opening `/admin/menu`. Still to build below: prices, places, settings, and fleet screens (their API exists).
+
 | Route              | Purpose                                               |
 | ------------------ | ----------------------------------------------------- |
 | `/admin/rates`     | Rate table by class and date                          |

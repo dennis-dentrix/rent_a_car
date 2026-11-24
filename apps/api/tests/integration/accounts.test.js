@@ -33,8 +33,9 @@ describe('a profile is created at sign-up', () => {
 
   it('shows a new customer their own profile', async () => {
     const { token, email } = await signUpCustomer('Amina Otieno')
-    const { status, body } = await me(token)
+    const { status, body, headers } = await me(token)
     expect(status).toBe(200)
+    expect(headers['cache-control']).toBe('private, no-store')
     expect(body.data).toMatchObject({
       full_name: 'Amina Otieno',
       email,

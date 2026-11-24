@@ -10,6 +10,12 @@ export function createApp() {
   // The app sits behind Cloudflare and Caddy, so the client address is in the forwarded header.
   app.set('trust proxy', true)
   app.use(helmet())
+  // What is asked for with a sign-in is about one person, so no browser, proxy, or edge may keep it. Public routes that
+  // are meant to be cached (publicCache) are sent without a sign-in and set their own header.
+  app.use((req, res, next) => {
+    if (req.headers.authorization) res.set('Cache-Control', 'private, no-store')
+    next()
+  })
   app.use(express.json({ limit: '100kb' }))
   app.use('/api/v1', router)
   app.use(notFoundHandler)

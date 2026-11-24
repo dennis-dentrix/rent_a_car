@@ -34,3 +34,15 @@ export const readTokens = (store) => ({
   accessToken: store.get(ACCESS_COOKIE)?.value ?? null,
   refreshToken: store.get(REFRESH_COOKIE)?.value ?? null,
 })
+
+// The address a sign-up code was sent to, kept between the sign-up form and the code page. It is a cookie and not part
+// of the address, so the email never lands in browser history, server logs, analytics, or a Referer header.
+export const PENDING_EMAIL_COOKIE = 'rc_pending_email'
+const FIFTEEN_MINUTES = 60 * 15
+
+export const writePendingEmail = (store, email) =>
+  store.set(PENDING_EMAIL_COOKIE, email, { ...options(FIFTEEN_MINUTES), path: '/auth' })
+
+export const readPendingEmail = (store) => store.get(PENDING_EMAIL_COOKIE)?.value ?? null
+
+export const clearPendingEmail = (store) => store.delete(PENDING_EMAIL_COOKIE)

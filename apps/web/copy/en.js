@@ -1,5 +1,6 @@
 // All visible text lives here as message keys (English first). Components receive text as props or
 // read it from this file; no sentence is written inside a component.
+import { admin } from './admin.js'
 import { auth } from './auth.js'
 import { classPage } from './class-page.js'
 import { editor } from './editor.js'
@@ -11,6 +12,7 @@ import { settings } from './settings.js'
 import { services } from './services.js'
 
 export const copy = {
+  admin,
   auth,
   settings,
   editor,

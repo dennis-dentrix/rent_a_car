@@ -1,4 +1,5 @@
 import { nairobiDayRange } from '@rent-a-car/shared'
+import { nextStatuses } from '../domain/booking-status.js'
 import { listPage } from '../lib/pagination.js'
 import { unwrap, withServiceRole } from '../lib/supabase.js'
 import { LIST_COLUMNS, getBooking, toSummary } from './bookings.js'
@@ -39,7 +40,13 @@ export async function getStaffBooking({ db }, id) {
       .eq('booking_id', id)
       .order('created_at'),
   ])
-  return { ...booking, customer: people.customer, vehicle: people.vehicle, events: unwrap(events) }
+  return {
+    ...booking,
+    customer: people.customer,
+    vehicle: people.vehicle,
+    events: unwrap(events),
+    next_statuses: nextStatuses(booking.status),
+  }
 }
 
 /**

@@ -3,13 +3,20 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
+  Building2,
   CalendarDays,
   Car,
   CarFront,
   CircleHelp,
   ClipboardList,
+  FileCheck,
+  Inbox,
   LayoutDashboard,
+  LayoutGrid,
+  Newspaper,
+  ScrollText,
   User,
+  Users,
 } from 'lucide-react'
 import { cx } from '@/lib/cx'
 
@@ -22,9 +29,18 @@ const ICONS = {
   requests: ClipboardList,
   fleet: CarFront,
   help: CircleHelp,
+  inbox: Inbox,
+  documents: FileCheck,
+  companies: Building2,
+  guides: Newspaper,
+  team: Users,
+  audit: ScrollText,
+  more: LayoutGrid,
 }
 
-const isActivePath = (pathname, href) => pathname === href || pathname.startsWith(`${href}/`)
+// `isExact` is for a section's home page, which would otherwise count as current on every page inside the section.
+const isActivePath = (pathname, href, isExact) =>
+  pathname === href || (!isExact && pathname.startsWith(`${href}/`))
 
 // Top bar and side rail: a pill that gains a tint when current.
 const PILL = {
@@ -49,8 +65,8 @@ function TabItem({ Icon, isActive, children }) {
 }
 
 /** A link that knows when it is the current page: a tint and a bolder label, never colour alone. */
-export default function NavLink({ href, icon, variant = 'top', children }) {
-  const isActive = isActivePath(usePathname(), href)
+export default function NavLink({ href, icon, variant = 'top', isExact = false, children }) {
+  const isActive = isActivePath(usePathname(), href, isExact)
   const Icon = ICONS[icon]
   const current = isActive ? 'text-accent' : 'text-label-2 hover:text-label'
   if (variant === 'tab') {
