@@ -5,6 +5,7 @@ import { unwrap, withServiceRole } from '../lib/supabase.js'
 import { loadAgreementFacts } from './agreement-facts.js'
 import { renderAgreementPdf } from './agreement-pdf.js'
 import { buildTerms } from './agreement-terms.js'
+import { pinDocumentFile } from './documents.js'
 import { findOne } from './records.js'
 
 const SIGNATURE_COLUMNS = 'id, document_id, signed_name, signed_at, has_drawn_signature'
@@ -121,12 +122,13 @@ export async function signAgreement(
   })
   const documentId = randomUUID()
   const key = documentKey(user.id, documentId, 'application/pdf')
-  await putObject(key, bytes, 'application/pdf')
+  const etag = await putObject(key, bytes, 'application/pdf')
   const signature = await recordSignature(user.id, bookingId, documentId, key, bytes, input, {
     terms,
     signedAt: now,
     ip,
     userAgent,
   })
+  await pinDocumentFile(documentId, etag)
   return { signature_id: signature.id, document_id: documentId, signed_at: signature.signed_at }
 }

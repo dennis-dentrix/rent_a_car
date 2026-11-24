@@ -1,7 +1,13 @@
 import { randomUUID } from 'node:crypto'
 import { fieldError } from '../lib/errors.js'
 import { listPage } from '../lib/pagination.js'
-import { assertUploaded, createDownloadUrl, createUploadUrl, documentKey } from '../lib/storage.js'
+import {
+  assertUnchanged,
+  assertUploaded,
+  createDownloadUrl,
+  createUploadUrl,
+  documentKey,
+} from '../lib/storage.js'
 import { unwrap, withServiceRole } from '../lib/supabase.js'
 import { findOne, insertOne, updateOne } from './records.js'
 
@@ -9,6 +15,14 @@ import { findOne, insertOne, updateOne } from './records.js'
 const DOCUMENT_COLUMNS =
   'id, type, status, booking_id, rejection_reason, file_confirmed_at, content_type, size_bytes, created_at'
 const QUEUE_COLUMNS = `${DOCUMENT_COLUMNS}, owner:profiles!documents_owner_id_fkey(full_name, phone)`
+
+const LINK_COLUMNS = 'storage_path, file_confirmed_at, content_type, file_etag'
+
+/** A link to the stored file, but only while it is still the file that was checked. */
+async function openFile({ storage_path: key, file_etag: etag, content_type: contentType }) {
+  await assertUnchanged(key, etag)
+  return createDownloadUrl(key, contentType)
+}
 
 /**
  * Create the document row and a signed link to upload to. Customers cannot insert rows themselves (they
@@ -54,13 +68,30 @@ export async function createStaffDocument({ db, user }, bookingId, input) {
   return startUpload({ ownerId: booking.customer_id, uploaderId: user.id, bookingId, input })
 }
 
-/** The file has been uploaded. Check it is really there, then mark the document as arrived. */
+/** Remember which version of the file was checked. Only the service role can write this column. */
+export const pinDocumentFile = (id, etag) =>
+  withServiceRole('pin_document_file', (admin) =>
+    updateOne(admin, 'documents', 'id', id, { file_etag: etag }),
+  )
+
+/**
+ * The file has been uploaded. Check it is really there and really what it says, remember which version
+ * was checked, then mark the document as arrived. The version is saved with the service role: nobody
+ * else can write it, so the signed upload link cannot be used to swap the file after review.
+ */
 export async function completeDocument({ db }, id) {
-  const document = await findOne(db, 'documents', 'id, storage_path, content_type, size_bytes', id)
-  await assertUploaded(document.storage_path, {
+  const document = await findOne(
+    db,
+    'documents',
+    'id, type, storage_path, content_type, size_bytes',
+    id,
+  )
+  const etag = await assertUploaded(document.storage_path, {
     sizeBytes: document.size_bytes,
     contentType: document.content_type,
+    purpose: document.type,
   })
+  await pinDocumentFile(id, etag)
   unwrap(await db.rpc('confirm_document', { p_document_id: id }))
   return findOne(db, 'documents', DOCUMENT_COLUMNS, id)
 }
@@ -70,11 +101,11 @@ export const listMyDocuments = ({ db, user }, { limit, cursor }) =>
 
 /** The customer opens their own document: a link that works for ten minutes. */
 export async function getMyDocumentUrl({ db, user }, id) {
-  const document = await findOne(db, 'documents', 'storage_path, file_confirmed_at, owner_id', id)
+  const document = await findOne(db, 'documents', `${LINK_COLUMNS}, owner_id`, id)
   if (document.owner_id !== user.id || !document.file_confirmed_at) {
     throw fieldError('id', 'That document is not available.')
   }
-  return createDownloadUrl(document.storage_path)
+  return openFile(document)
 }
 
 /** The review queue: uploaded documents whose file has arrived, oldest first within the page. */
@@ -104,11 +135,11 @@ export async function reviewDocument({ db, user }, id, { status, rejection_reaso
 
 /** Staff open a customer's document. The reason and the reader are logged before the link is made. */
 export async function getStaffDocumentUrl({ db, user }, id, { reason }) {
-  const document = await findOne(db, 'documents', 'storage_path, file_confirmed_at', id)
+  const document = await findOne(db, 'documents', LINK_COLUMNS, id)
   if (!document.file_confirmed_at) throw fieldError('id', 'That document has no file yet.')
   // Staff may add to the access log but not read it, so the row is not selected back.
   unwrap(
     await db.from('document_access_log').insert({ document_id: id, accessed_by: user.id, reason }),
   )
-  return createDownloadUrl(document.storage_path)
+  return openFile(document)
 }

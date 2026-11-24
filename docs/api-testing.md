@@ -27,7 +27,7 @@ cp apps/api/.env.example apps/api/.env.local
 
 Needed for the API so far: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `INTERNAL_JOB_SECRET`.
 
-The seed also creates four local test accounts, all with the password `Passw0rd!local`: `customer@example.test`, `customer2@example.test`, `staff@example.test`, `admin@example.test`. They exist only in the local database.
+The seed also creates five local test accounts, all with the password `Passw0rd!local`: `customer@example.test`, `customer2@example.test`, `staff@example.test`, `admin@example.test`, and `operator@example.test` (the person of an approved company, "Seed Fleet"). They exist only in the local database. Staff, admin, and an approved company's person set up an authenticator app the first time they sign in on the website.
 
 Start the API:
 

@@ -117,7 +117,16 @@ export const withApi = () =>
 
 let signUpCount = 0
 
-/** Sign up a new customer the way the website does. Returns the account's id, email, and token. */
+/** The service-role client, for set-up steps no customer can do for themselves (confirming an email). Local stack only. */
+const serviceClient = () =>
+  createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, {
+    auth: { persistSession: false },
+  })
+
+/**
+ * Sign up a new customer the way the website does. The local project asks for email confirmation, as production does,
+ * so the test confirms the address itself and then signs in. Returns the account's id, email, and token.
+ */
 export async function signUpCustomer(fullName = 'New Customer') {
   signUpCount += 1
   const email = `signup-${Date.now()}-${signUpCount}@example.test`
@@ -128,7 +137,8 @@ export async function signUpCustomer(fullName = 'New Customer') {
     options,
   })
   if (error) throw error
-  return { id: data.user.id, email, token: data.session.access_token }
+  await serviceClient().auth.admin.updateUserById(data.user.id, { email_confirm: true })
+  return { id: data.user.id, email, token: await signIn(email) }
 }
 
 const BASE32 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'
@@ -182,8 +192,18 @@ export const changeStatus = (id, to_status, note) =>
 
 // Uploading files through the signed links, as the browser does.
 
-/** Some file bytes. The content is not inspected, only the size and the declared type. */
-export const sampleFile = (size = 2048) => Buffer.alloc(size, 'a')
+const SIGNATURES = {
+  'image/jpeg': Buffer.from([0xff, 0xd8, 0xff, 0xe0]),
+  'image/png': Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
+  'application/pdf': Buffer.from('%PDF-1.7\n'),
+}
+
+/** Bytes that start like a real file of that type. `fill` makes two files of one size differ. */
+export const sampleFile = (contentType = 'application/pdf', size = 2048, fill = 'a') =>
+  Buffer.concat([
+    SIGNATURES[contentType],
+    Buffer.alloc(size - SIGNATURES[contentType].length, fill),
+  ])
 
 /** Send bytes to a signed upload link. Returns the storage's HTTP status (200 when accepted). */
 export async function putFile(link, bytes) {
@@ -208,7 +228,7 @@ export async function uploadDocument(token, { path = '/documents', size = 2048, 
     ...input,
   }
   const created = await call('POST', path, { body: declared, token })
-  await putFile(created.body.data, sampleFile(size))
+  await putFile(created.body.data, sampleFile(declared.content_type, size))
   const completed = await call('POST', `/documents/${created.body.data.id}/complete`, { token })
   return { id: created.body.data.id, completed }
 }
@@ -218,16 +238,18 @@ export async function uploadDocument(token, { path = '/documents', size = 2048, 
  * entries to put in the report. Each spec can set kind, label, content_type, and size_bytes.
  */
 export async function uploadInspectionFiles(bookingId, specs) {
-  const files = specs.map(({ content_type = 'image/jpeg', size_bytes = 2048 }) => ({
+  const files = specs.map(({ kind = 'photo', content_type = 'image/jpeg', size_bytes = 2048 }) => ({
+    kind,
     content_type,
     size_bytes,
   }))
   const { body } = await staff('POST', `/staff/bookings/${bookingId}/inspection-uploads`, { files })
   await Promise.all(
-    body.data.map((link, index) => putFile(link, sampleFile(files[index].size_bytes))),
+    body.data.map((link, index) =>
+      putFile(link, sampleFile(files[index].content_type, files[index].size_bytes)),
+    ),
   )
   return body.data.map((link, index) => ({
-    kind: specs[index].kind ?? 'photo',
     label: specs[index].label,
     storage_path: link.storage_path,
     ...files[index],

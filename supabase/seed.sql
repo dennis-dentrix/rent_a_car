@@ -30,7 +30,6 @@ insert into rates (class_id, price_kes, effective_from) values
 
 insert into locations (id, name, type, address, latitude, longitude, entrance_note, slug) values
   ('22222222-2222-4222-8222-000000000001', 'Nairobi Office', 'office', 'Westlands, Nairobi', -1.264100, 36.802900, 'Ground floor reception.', 'nairobi-office'),
-  ('22222222-2222-4222-8222-000000000002', 'JKIA Airport Desk', 'airport', 'Jomo Kenyatta International Airport, Nairobi', -1.319200, 36.927400, 'Arrivals hall, meet-and-greet desk.', 'jkia-airport'),
   ('22222222-2222-4222-8222-000000000003', 'Nairobi', 'city', 'Nairobi, Kenya', -1.286389, 36.817223, null, 'nairobi');
 
 insert into delivery_zones (id, name, fee_kes) values
@@ -51,7 +50,7 @@ insert into discounts (id, label, min_days, kind, value, effective_from) values
 insert into exchange_rates (currency, rate_to_kes, rate_date) values ('USD', 129.000000, '2026-11-15');
 
 -- Local test accounts. Fake credentials for local development only; never used outside the local stack.
--- All four use the password 'Passw0rd!local'.
+-- All five use the password 'Passw0rd!local'.
 insert into auth.users (
   id, instance_id, aud, role, email, encrypted_password, email_confirmed_at,
   raw_app_meta_data, raw_user_meta_data, created_at, updated_at,
@@ -60,7 +59,8 @@ insert into auth.users (
   ('aaaaaaaa-aaaa-4aaa-8aaa-000000000001', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'customer@example.test', crypt('Passw0rd!local', gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', ''),
   ('aaaaaaaa-aaaa-4aaa-8aaa-000000000002', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'customer2@example.test', crypt('Passw0rd!local', gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', ''),
   ('aaaaaaaa-aaaa-4aaa-8aaa-000000000003', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'staff@example.test', crypt('Passw0rd!local', gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', ''),
-  ('aaaaaaaa-aaaa-4aaa-8aaa-000000000004', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'admin@example.test', crypt('Passw0rd!local', gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', '');
+  ('aaaaaaaa-aaaa-4aaa-8aaa-000000000004', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'admin@example.test', crypt('Passw0rd!local', gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', ''),
+  ('aaaaaaaa-aaaa-4aaa-8aaa-000000000005', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'operator@example.test', crypt('Passw0rd!local', gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', '');
 
 insert into auth.identities (id, user_id, provider_id, provider, identity_data, last_sign_in_at, created_at, updated_at)
 select gen_random_uuid(), u.id, u.id::text, 'email',
@@ -76,6 +76,14 @@ from (values
   ('aaaaaaaa-aaaa-4aaa-8aaa-000000000004', 'Test Admin', '+254700000004', 'admin')
 ) as v(id, full_name, phone, role)
 where p.id = v.id::uuid;
+
+-- A rental company, already approved, with one person who signs in for it. The sign-up trigger made that person a
+-- customer; the company and the operator role are set together, as register_operator does (the two must agree).
+insert into operators (id, business_name, slug, phone, email, status, verified_at) values
+  ('bbbbbbbb-bbbb-4bbb-8bbb-000000000001', 'Seed Fleet', 'seed-fleet', '+254700000005', 'operator@example.test', 'approved', now());
+update profiles set full_name = 'Test Operator', phone = '+254700000005', role = 'operator',
+  operator_id = 'bbbbbbbb-bbbb-4bbb-8bbb-000000000001'
+where id = 'aaaaaaaa-aaaa-4aaa-8aaa-000000000005';
 
 insert into drivers (id, name, phone, licence_number) values
   ('88888888-8888-4888-8888-000000000001', 'Test Driver', '+254733000001', 'DL-TEST-001');

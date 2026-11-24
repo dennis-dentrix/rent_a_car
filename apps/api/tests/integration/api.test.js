@@ -52,6 +52,17 @@ describe('GET /classes', () => {
   })
 })
 
+describe('GET /exchange-rates', () => {
+  it('lists the display rate for each non-KES currency', async () => {
+    const { status, body } = await get('/exchange-rates')
+    expect(status).toBe(200)
+    expect(body.data.USD).toEqual({
+      rate_to_kes: expect.any(Number),
+      rate_date: expect.any(String),
+    })
+  })
+})
+
 describe('GET /classes/{id}, /locations, /availability', () => {
   it('returns one class', async () => {
     const { body } = await get(`/classes/${IDS.SEDAN}`)
@@ -64,10 +75,16 @@ describe('GET /classes/{id}, /locations, /availability', () => {
     expect(status).toBe(404)
   })
 
+  it('rejects a place search with too little text', async () => {
+    const { body } = await get(`/places/autocomplete${query({ q: 'a' })}`)
+    expect(body.error.code).toBe('VALIDATION_FAILED')
+  })
+
   it('lists served locations', async () => {
     const { body } = await get('/locations')
     const slugs = body.data.map((location) => location.slug).sort()
-    expect(slugs).toEqual(['jkia-airport', 'nairobi', 'nairobi-office'])
+    expect(slugs).toEqual(expect.arrayContaining(['jkia-airport', 'nairobi', 'nairobi-office']))
+    expect(body.data.some((location) => location.type === 'airstrip')).toBe(true)
   })
 
   it('reports availability for a class', async () => {

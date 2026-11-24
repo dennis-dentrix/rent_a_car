@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { hasAtLeastOneField } from './common.js'
+import { LOCATION_TYPES } from '../places.js'
 
 // What an admin enters to run the business: classes, rates, locations, delivery zones, extras, discounts,
 // settings, and the USD rate. Prices are whole KES. Nothing here is deleted; things are switched off.
@@ -48,7 +49,7 @@ export const updateClassSchema = updateSchemaFrom(classFields, {
 
 const locationFields = {
   name: text(120),
-  type: z.enum(['office', 'airport', 'city', 'custom']),
+  type: z.enum(LOCATION_TYPES),
   address: text(300),
   slug,
   latitude: z.number().min(-90).max(90).optional(),

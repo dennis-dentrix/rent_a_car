@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "web",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "-w", "@rent-a-car/web", "--", "-p", "3100"],
+      "port": 3100
+    }
+  ]
+}

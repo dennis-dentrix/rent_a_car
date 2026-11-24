@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { DEFAULT_LIMIT, DOCUMENT_CONTENT_TYPES, MAX_FILE_BYTES, MAX_LIMIT } from '../constants.js'
+import { allowsContentType } from '../file-purposes.js'
 
 // Building blocks shared by more than one endpoint schema.
 export const CURRENCIES = ['KES', 'USD']
@@ -46,6 +47,15 @@ export const fileDeclaration = {
   content_type: z.enum(DOCUMENT_CONTENT_TYPES),
   size_bytes: z.number().int().min(1).max(MAX_FILE_BYTES),
 }
+
+/**
+ * A refinement for an object that declares a file: its type must be one the purpose accepts. `purposeOf`
+ * reads the purpose from the object (a document's type, an inspection file's kind).
+ */
+export const fileTypeMatchesPurpose = (purposeOf) => [
+  (declared) => allowsContentType(purposeOf(declared), declared.content_type),
+  { message: 'That file type is not accepted here.', path: ['content_type'] },
+]
 
 /** The `limit` and `cursor` query fields every list endpoint takes. */
 export const pageFields = {

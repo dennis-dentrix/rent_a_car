@@ -3,12 +3,18 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+
   body {
-    @apply bg-bg-base text-text-primary font-sans text-body;
+    @apply bg-bg font-sans text-body text-label antialiased;
+    min-height: 100dvh;
   }
 
   :focus-visible {
-    outline: 2px solid var(--color-accent-focus);
+    outline: 2px solid var(--color-accent);
     outline-offset: 2px;
   }
 
@@ -17,7 +23,105 @@
     *::before,
     *::after {
       animation-duration: 0.01ms !important;
+      /* Without this an endless animation (the hero's pulse) would flicker at 0.01 ms instead of stopping. */
+      animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
     }
+  }
+}
+
+@layer components {
+  /* Money, plates, dates, durations: digits of equal width so columns line up. */
+  .num {
+    font-variant-numeric: tabular-nums slashed-zero;
+  }
+
+  /* A translucent wash of the control's own colour. Pressed everywhere, hover on pointer devices only. */
+  .state-layer {
+    position: relative;
+    overflow: hidden;
+    touch-action: manipulation;
+    -webkit-touch-callout: none;
+  }
+  .state-layer::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: currentColor;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity theme('transitionDuration.fast') ease-out;
+  }
+  .state-layer:active::after {
+    opacity: 0.12;
+  }
+  @media (hover: hover) {
+    .state-layer:hover::after {
+      opacity: 0.08;
+    }
+  }
+
+  .glass {
+    background: var(--color-overlay);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    backdrop-filter: blur(20px) saturate(180%);
+  }
+
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .pt-safe {
+    padding-top: env(safe-area-inset-top);
+  }
+}
+
+@layer utilities {
+  /* Things enter from where they belong: a sheet from the bottom of the phone, a dialog from its own centre on a
+     wide screen, a popover from its button (set transform-origin where it is used), a toast from below. */
+  @keyframes sheet-in {
+    from {
+      transform: translateY(100%);
+    }
+  }
+  @keyframes pop-in {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+  .animate-sheet-in {
+    animation: sheet-in theme('transitionDuration.drawer') theme('transitionTimingFunction.drawer');
+  }
+  .animate-pop-in {
+    animation: pop-in theme('transitionDuration.standard')
+      theme('transitionTimingFunction.standard');
+  }
+  .animate-rise {
+    animation: rise theme('transitionDuration.standard') theme('transitionTimingFunction.standard');
+  }
+}
+
+/* An answer opens and closes with a short height change, in browsers that can animate to "auto" (the rest
+   open at once, which is fine). */
+@supports (interpolate-size: allow-keywords) {
+  :root {
+    interpolate-size: allow-keywords;
+  }
+  details::details-content {
+    block-size: 0;
+    overflow: clip;
+    transition:
+      block-size theme('transitionDuration.standard') theme('transitionTimingFunction.standard'),
+      content-visibility theme('transitionDuration.standard') allow-discrete;
+  }
+  details[open]::details-content {
+    block-size: auto;
   }
 }

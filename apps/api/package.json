@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "node --watch --env-file=.env.local src/server.js",
+    "dev:local": "node --watch --env-file=.env.test src/server.js",
     "start": "node src/server.js",
     "dev:worker": "wrangler dev --local --test-scheduled",
     "deploy": "wrangler deploy",

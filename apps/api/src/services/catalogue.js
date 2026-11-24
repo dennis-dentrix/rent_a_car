@@ -39,6 +39,17 @@ export async function exchangeRate(db, currency) {
   return { currency, rateToKes: Number(row.rate_to_kes), rateDate: row.rate_date }
 }
 
+/** Display rates for every non-KES currency, keyed by currency, so the web app can offer a currency switch. */
+export async function listDisplayRates(db) {
+  const rows = unwrap(await db.from('exchange_rates').select('currency, rate_to_kes, rate_date'))
+  return Object.fromEntries(
+    rows.map((row) => [
+      row.currency,
+      { rate_to_kes: Number(row.rate_to_kes), rate_date: row.rate_date },
+    ]),
+  )
+}
+
 export async function availableCount(db, classId, startAt, endAt) {
   return unwrap(
     await db.rpc('available_vehicle_count', {
@@ -76,12 +87,15 @@ function toClassItem(cls, { rate, fx, availableCount }) {
 }
 
 /** The public classes with price and, when dates are given, availability. A fixed number of queries, however many classes. */
-export async function listClasses(db, { from, to, currency }) {
-  const [fx, classes] = await Promise.all([
+export async function listClasses(db, { from, to, currency, service }) {
+  const [fx, classes, offering] = await Promise.all([
     exchangeRate(db, currency),
     db.from('vehicle_classes').select('*').eq('is_public', true).order('sort_order'),
+    service ? db.rpc('classes_offering_service', { p_service: service }) : null,
   ])
-  const list = unwrap(classes)
+  // With a service chosen, keep only the classes some listed vehicle of an operator offering it belongs to.
+  const offered = offering ? new Set(unwrap(offering).map((row) => row.class_id)) : null
+  const list = unwrap(classes).filter((cls) => !offered || offered.has(cls.id))
   const [rates, counts] = await Promise.all([
     ratesOn(
       db,

@@ -34,13 +34,14 @@ What to set up before running the API against real services. Everything so far h
 ## 2. Cloudflare R2
 
 1. Create a **private** bucket (no public access, no custom public domain).
-2. Create an API token limited to that bucket with Object Read and Write.
+2. Create an API token limited to that bucket with Object Read and Write. Write includes delete, which the API uses to remove an uploaded file that is not what it claimed to be.
 3. Add a CORS rule to the bucket so the browser can upload straight to it:
    - Allowed origins: the web app's address (and the staging address while testing).
    - Allowed methods: `PUT`, `GET`, `HEAD`.
    - Allowed headers: `Content-Type`, `Content-Length`.
    - Max age: 3600.
 4. Note the account ID, the token's access key ID and secret, and the bucket name.
+5. Create a second bucket for blog and guide images, and make it **public** through a custom domain (for example `media.example.com`). The same API token must cover it. Give it the same CORS rule, with only `PUT` and `HEAD` allowed from the web app's address. Only files under `blog/` are ever written to it.
 
 ## 3. Environment values for the API
 
@@ -49,7 +50,7 @@ Set these on the Oracle VM (or in `apps/api/.env.local` while testing). The temp
 | Value | Where it comes from |
 | --- | --- |
 | `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` | Supabase, Settings, API |
-| `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET` | Cloudflare R2 |
+| `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET`, `R2_PUBLIC_BUCKET` | Cloudflare R2: the private bucket, and the public one for guide images |
 | `ZEPTOMAIL_TOKEN`, `ZEPTOMAIL_FROM` | ZeptoMail: the Send Mail token, and a sender address on a verified domain. Without them emails stay queued. |
 | `INTERNAL_JOB_SECRET` | A long random string. The cron call must send it as `x-job-secret`. |
 | `REQUIRE_STAFF_MFA` | `true`. Only the local file sets it to `false`. |
@@ -69,3 +70,14 @@ A short first test on staging:
 ## 5. Not covered by this checklist
 
 Tingg payments and SMS are still to be built. The Caddy and Compose files for the Oracle VM are in `deploy/` (see `docs/deployment.md`). Cloudflare cron triggers must be created by you, each a `POST` with the header `x-job-secret`: `/api/v1/internal/jobs/expire-holds` every 5 minutes and `/api/v1/internal/jobs/send-notifications` every minute or two. Also not built: an automatic exchange-rate refresh.
+
+## 5. Supabase Auth on the hosted project
+
+Local values are looser (`supabase/config.toml`). On the hosted project, set these in the dashboard:
+
+1. Site URL: the web app's address. Redirect URLs: the same address with `/**`.
+2. Require email confirmation, a minimum password length of 8, and authenticator-app multi-factor.
+3. Email templates: paste `supabase/templates/recovery.html` into "Reset password" and `supabase/templates/confirmation.html` into "Confirm signup". The reset email links to `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery`, a page that uses the link only when the person presses its button. The sign-up email carries a six-digit code (`{{ .Token }}`) that the person types on `/auth/verify-email`; keep the code length at 6.
+4. Sending: SMTP through ZeptoMail, or reset and confirmation emails will not arrive at any volume.
+5. Rate limits for sign-in and reset emails are set in the dashboard and at Cloudflare.
+

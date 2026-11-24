@@ -4,6 +4,9 @@ import {
   accounts,
   call,
   signInWithSecondFactor,
+  putFile,
+  sampleFile,
+  signIn,
   signUpCustomer,
   withApi,
 } from './api-client.js'
@@ -133,5 +136,60 @@ describe('staff must use a second factor', () => {
 
   it('does not ask customers for a second factor', async () => {
     expect((await me(accounts.customer)).status).toBe(200)
+  })
+})
+
+describe('a profile picture', () => {
+  const declared = { content_type: 'image/jpeg', size_bytes: 2048 }
+  const send = async (token, bytes = sampleFile('image/jpeg', 2048)) => {
+    const link = (await call('POST', '/me/avatar-upload', { body: declared, token })).body.data
+    await putFile(link, bytes)
+    return {
+      link,
+      saved: await call('PUT', '/me/avatar', {
+        body: { ...declared, storage_path: link.storage_path },
+        token,
+      }),
+    }
+  }
+
+  it('is uploaded on a signed link, saved, shown by /me, and then removed', async () => {
+    const { id, token } = await signUpCustomer()
+    const { link, saved } = await send(token)
+    expect(link.storage_path).toMatch(new RegExp(`^avatars/${id}/`))
+    expect(saved.body.data.avatar_path).toBe(link.storage_path)
+    expect((await me(token)).body.data.avatar_path).toBe(link.storage_path)
+    const removed = await call('DELETE', '/me/avatar', { token })
+    expect(removed.body.data.avatar_path).toBeNull()
+  })
+
+  it('refuses a file that is not the picture it claims, and a file in someone else’s folder', async () => {
+    const { token } = await signUpCustomer()
+    const fake = await send(token, sampleFile('application/pdf', 2048))
+    expect(fake.saved.status).toBe(400)
+    const other = await signUpCustomer()
+    const theirs = await send(other.token)
+    const stolen = await call('PUT', '/me/avatar', {
+      body: { ...declared, storage_path: theirs.link.storage_path },
+      token,
+    })
+    expect(stolen.status).toBe(400)
+  })
+})
+
+describe('the authenticator app, for someone who turned it on', () => {
+  it('lets a password alone ask who they are, and nothing else, until they use it', async () => {
+    const { email, token } = await signUpCustomer()
+    expect((await call('GET', '/documents', { token })).status).toBe(200)
+    expect((await me(token)).body.data.has_second_factor).toBe(false)
+
+    const strong = await signInWithSecondFactor(email)
+    const passwordOnly = await signIn(email)
+    const who = await me(passwordOnly)
+    expect(who.status).toBe(200)
+    expect(who.body.data.has_second_factor).toBe(true)
+    const refused = await call('GET', '/documents', { token: passwordOnly })
+    expect([refused.status, refused.body.error.details.reason]).toEqual([403, 'mfa_required'])
+    expect((await call('GET', '/documents', { token: strong })).status).toBe(200)
   })
 })

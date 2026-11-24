@@ -86,13 +86,13 @@ function chargeLines({ dailyRateKes, days, extras, deliveryFeeKes, discounts }) 
   ]
 }
 
-/** Lines shown after the total: VAT included, the refundable deposit, the security deposit. */
+/** Lines shown after the total: VAT included, the refundable deposit (none while the percent is 0), the security deposit. */
 const summaryLines = ({ totalKes, vatPercent, depositKes, securityDepositKes }) => [
   ...when(
     vatPercent > 0,
     line('tax', `VAT included (${vatPercent}%)`, vatIncludedKes(totalKes, vatPercent)),
   ),
-  line('refundable_deposit', 'Refundable deposit', depositKes),
+  ...when(depositKes > 0, line('refundable_deposit', 'Refundable deposit', depositKes)),
   ...when(securityDepositKes > 0, line('security_deposit', 'Security deposit', securityDepositKes)),
 ]
 

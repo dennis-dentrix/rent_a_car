@@ -3,15 +3,24 @@ import {
   availabilityQuerySchema,
   classesQuerySchema,
   createEnquirySchema,
+  placeQuerySchema,
   quoteBodySchema,
 } from '@rent-a-car/shared'
 import { idParam } from '../middleware/auth.js'
 import { publicCache } from '../middleware/cache.js'
 import { handle } from '../middleware/respond.js'
 import { createAnonClient } from '../lib/supabase.js'
-import { availableCount, getClass, listClasses, listLocations } from '../services/catalogue.js'
+import { autocompletePlaces } from '../lib/places.js'
+import {
+  availableCount,
+  getClass,
+  listClasses,
+  listDisplayRates,
+  listLocations,
+} from '../services/catalogue.js'
 import { createPublicEnquiry } from '../services/enquiries.js'
 import { createQuote } from '../services/quotes.js'
+import { listServices } from '../services/services.js'
 
 // Public routes: no sign-in needed.
 export const catalogueRouter = Router()
@@ -34,10 +43,30 @@ catalogueRouter.get(
   handle(async (req) => ({ data: await getClass(createAnonClient(), req.params.id) })),
 )
 
+// The list of services changes only when the business adds one.
+catalogueRouter.get(
+  '/services',
+  publicCache(3600),
+  handle(async () => ({ data: await listServices(createAnonClient()) })),
+)
+
 catalogueRouter.get(
   '/locations',
   publicCache(3600),
   handle(async () => ({ data: await listLocations(createAnonClient()) })),
+)
+
+// What a renter types is never the same twice, so this is not cached. Cloudflare rate-limits the path.
+catalogueRouter.get(
+  '/places/autocomplete',
+  handle(async (req) => ({ data: await autocompletePlaces(placeQuerySchema.parse(req.query).q) })),
+)
+
+// Rates change rarely and feed display only (the quote fixes its own rate), so the edge may keep them.
+catalogueRouter.get(
+  '/exchange-rates',
+  publicCache(3600),
+  handle(async () => ({ data: await listDisplayRates(createAnonClient()) })),
 )
 
 catalogueRouter.get(

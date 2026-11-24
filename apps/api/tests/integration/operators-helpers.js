@@ -30,6 +30,12 @@ async function insertOperatorUser(client, userId, name, operatorId) {
 }
 
 export async function seedOperators(client) {
+  // The local seed has a sample company (supabase/seed.sql) for signing in by hand. These tests count companies, so
+  // each starts without it, inside its own transaction.
+  await client.query(
+    "update profiles set role = 'customer', operator_id = null where operator_id in (select id from operators where slug = 'seed-fleet')",
+  )
+  await client.query("delete from operators where slug = 'seed-fleet'")
   for (const [operatorId, name, slug, userId, vehicleId, registration] of OPERATORS) {
     await client.query(
       "insert into operators (id, business_name, slug, status, phone) values ($1, $2, $3, 'approved', '+254700000001')",

@@ -12,6 +12,7 @@
   ],
   "scripts": {
     "dev:api": "npm run dev -w @rent-a-car/api",
+    "dev:api:local": "npm run dev:local -w @rent-a-car/api",
     "dev:web": "npm run dev -w @rent-a-car/web",
     "lint": "eslint .",
     "format": "prettier --check .",

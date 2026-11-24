@@ -92,6 +92,8 @@ Each job is idempotent and logs its result. A failing job alerts through Sentry.
 - Security headers: Content Security Policy, HSTS, `X-Content-Type-Options`, `Referrer-Policy`, and frame restrictions.
 - Rate limits on login, OTP, quote, and booking endpoints at Cloudflare and in the app.
 - Document files in a private bucket; access by short-lived signed URL (10 minutes).
+- Uploads are checked for what they are, not what the browser says. Each purpose has its own allowed types in `packages/shared/src/file-purposes.js` (a car photo is a JPEG or PNG only; an inspection document is a PDF only; an ID or licence is a JPEG, PNG, or PDF). The API refuses a declaration outside the purpose, then reads the stored file's first bytes after upload (`apps/api/src/lib/file-sniff.js`) and deletes a file that does not match. For identity documents it saves the stored file's version tag when it passes, and refuses to open a file whose tag has changed, so a signed upload link cannot swap a file after review. Download links force the verified content type and are marked private and not cacheable. Not covered: malware scanning (an open item) and the version tag for inspection files.
+- Who can open which file: an identity document, only its owner and staff (staff give a reason, which is logged); corporate users see a booking's signed agreement but never the ID or licence; operators see no identity document; inspection files, the renter, the operator whose vehicle it was, and staff. File paths never appear in an API answer.
 - Secrets in Oracle VM environment variables, separate for test and live. Pre-commit scan for keys.
 - Dependency updates through Dependabot; security review before each major release.
 - MFA required for staff and admin accounts.
@@ -143,6 +145,7 @@ Each component runs where it fits best. Vercel is not used. Supabase remains the
 | Scheduled jobs | Cloudflare Cron Triggers, which call a protected internal job endpoint on the app | Schedules managed at the edge; the job logic stays in the app |
 | Retries for email, SMS, and tax receipts | Cloudflare Queues, consumed by a Worker that calls the app | Failed messages retry without blocking bookings |
 | Private documents and vehicle photos | Cloudflare R2, private bucket, signed URLs | No egress fees on document views; private by default |
+| Blog and guide images | Cloudflare R2, public bucket on the media domain, uploaded on signed links | Search engines and share previews must fetch them; the key prefix `blog/` is the only thing that selects this bucket |
 | Payment webhook receiver | Oracle app endpoint, behind the Cloudflare WAF | Signature check and idempotency stay in one codebase |
 | Database, auth, row-level security | Supabase (managed) | Unchanged from the earlier decision |
 | Off-site backup copy | Oracle Cloud Object Storage | Second copy of database exports, outside the primary provider |
@@ -233,8 +236,17 @@ The frontend and the backend are separate applications, each with its own code, 
 
 **Login between the two**
 
-- The frontend holds the Supabase session token and sends it to the backend in the `Authorization` header on each request.
+- The web server holds the Supabase session in two `httpOnly` cookies (`rc_access`, `rc_refresh`), so scripts in the browser can never read it, and sends the access token to the backend in the `Authorization` header on each request. The web proxy renews the session before a page is drawn.
+- Sign-in is at `/auth` (email and password), sign-up at `/auth/sign-up` (with a confirm-password field, then a six-digit code emailed to confirm the address at `/auth/verify-email`), and "forgot password" at `/auth/forgot`. Email links open `/auth/confirm`, which uses the one-time link only when the person presses a button, because mail scanners open links on their own. Resetting a password ends every session of the account. Staff and admin (and anyone who turned it on in Settings) then pass `/auth/verify` (a code from an authenticator app), or `/auth/enrol` the first time for staff and admin. A page that needs a role calls `requireRole` (`apps/web/lib/auth/session.js`); the API still checks the token, the role, and the second factor on every call, so the web check is only for sending people to the right screen.
 - The backend verifies the token on every protected route, using the access rules in section 13 of the pack.
+
+**Rental companies sign themselves up.** `/operators` ("For rental companies") leads to `/auth/operator`: one form creates the account and, once the email is confirmed, the company. The database function `register_operator` (not the browser) sets the role and the company, and only for a plain customer account. The company starts `pending` and is shown to renters only after an admin approves it at `/admin/operators` (the `review_operator` function checks the move and that a "no" has a reason). A company's people sign in at the same `/auth` pages and land on `/console`; they must use an authenticator code once the company is approved, not before.
+
+**Settings and the second step.** `/settings` (profile, picture, offers and news, appearance, security) is where a signed-in person manages their account. Two-step sign-in (an authenticator app) is a setting: required and not removable for staff and admin (`isSecondFactorRequired`), optional and off by default for everyone else. Once someone has turned it on, a password alone is not enough anywhere: the website sends them to the code step, and the API refuses a first-step session on every route except "who am I" (`authenticateFirstStep`, `GET /me`, which reports `has_second_factor`). Turning it off asks for a code. Changing the password asks for the current one and signs out other devices; "sign out of all devices" ends every session. The authenticator secret is made once per visit (in the browser side of the page), because making it while the page is drawn replaced it after every wrong code.
+
+**The header shows who is signed in.** A flag cookie tells the browser someone is signed in; the header then asks `/auth/session` for their name, picture, and area, and offers a small menu with their account, their own area (`/admin` or `/console`), and Sign out. The public pages stay the same for everyone. A profile picture is uploaded straight to the public bucket under `avatars/{user id}/` on a signed link (`POST /me/avatar-upload`, then `PUT /me/avatar`; `DELETE /me/avatar` removes it). The database column only accepts a path in the person's own folder.
+
+**The sign-in pages have their own frame** (`apps/web/components/AuthShell.js`): no site menu, search, currency switch, footer, or phone tab bar, because a person there has one job. A logo, a way back, and on wide screens a brand panel are all that surround the form.
 
 **DRY within each end**
 

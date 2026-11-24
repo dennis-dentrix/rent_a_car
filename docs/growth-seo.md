@@ -69,11 +69,46 @@ These are starting themes. Confirm each against Search Console and a keyword too
 
 City and destination names listed by the owner (for example Westlands, Karen, Kilimani, Upper Hill, Mombasa, Nakuru, Kisumu, Eldoret, Naivasha) are used only where the company serves them.
 
+### 5.1 Keyword map (23 November 2026)
+
+One page owns each main term, and other pages support it with a link and a natural mention. No search-volume figures are held yet: confirm each term in Search Console and a keyword tool before writing more (section 5 rule), and re-rank this table by what the data says.
+
+| Term | Owning page | Supported by | Status |
+| --- | --- | --- | --- |
+| car hire in Kenya, car hire Kenya | `/car-hire` and the home page | `/blog/car-hire-in-kenya-guide`, service pages | Built |
+| car rental in Kenya, car rental Kenya | Home page (title and intro) | `/blog/how-much-does-car-rental-cost-in-kenya` | Built |
+| self-drive car hire Kenya | `/car-hire` | `/blog/self-drive-or-chauffeur-driven-car-hire-kenya` | Built |
+| chauffeur-driven car hire, car hire with driver Kenya | `/car-hire` | The same guide | Built |
+| documents needed to rent a car in Kenya | `/blog/documents-needed-to-rent-a-car-in-kenya` | Guide to car hire | Built |
+| car rental prices Kenya, cost of car hire Kenya | `/blog/how-much-does-car-rental-cost-in-kenya` | `/cars` | Built |
+| SUV hire, van hire, tour van and safari vehicle hire Kenya | `/cars/[slug]` for each car type | `/car-hire` | Built for car types that exist; add the Tour van type |
+| airport transfer Nairobi, airport pickup | `/transfers` | Guide to come | Page built, guide planned |
+| wedding car hire Kenya, car hire for video shoots | `/events` | Guide to come | Page built, guide planned |
+| monthly car hire Kenya, long-term car rental | `/car-hire` (length section) | Guide to come | Planned |
+| car hire Nairobi, Mombasa, Kisumu and other cities | City pages, only where we serve | | Waiting on the list of cities served |
+
+How the terms are used: the main term appears once in the title and once in the first paragraph, and naturally in the page text; it is never repeated to fill space (section 10). The publishing rules in `packages/shared/src/posts.js` refuse to publish a guide that does not name its main term in the title and the opening paragraph. Guides are written in the admin (`content-management.md`).
+
 ## 6. Content plan
 
 - Launch set: homepage, four service pages, class pages, FAQ, office pages, and city and airport pages for served places.
+- Started 23 November 2026 (owner request to rank early): `/blog` with four guides (car hire in Kenya, self-drive or chauffeur, documents needed, what decides the price), each with `Article`, `FAQPage` and breadcrumb markup. They are drafts for owner approval before launch. Next in order: airport transfers in Nairobi, wedding car hire, monthly car hire, safari and tour van hire.
 - Month 1 to 3: one article per month on a real question (documents, pickup, pricing logic, airport arrivals), approved by the owner.
 - Month 3 onward: refresh pages whose rates or FAQs changed; add pages only when there is real content.
+
+### 6.1 Free tools that earn traffic before operators join (23 November 2026)
+
+Each tool answers a real question, works with no operators on the platform, uses no invented data, and links to the search. Build in this order; each ships with its own page, title, and markup.
+
+1. **Which car type do I need?** A short chooser (people, luggage, trip type) that recommends a car type from the types we hold, and links to it. Matches the guided choice in the UX spec.
+2. **Hire document checklist.** A printable and shareable list of what to bring, built from the same rules the site states.
+3. **Handover inspection checklist.** A printable sheet for the pickup walk-around and return, useful on any hire, with our branding.
+4. **Self-drive or chauffeur: which should I choose?** A five-question tool that points to the right service page.
+5. **Trip cost estimator for the renter's own numbers.** The renter enters days, car type, driver and delivery; the tool shows the lines of a quote using rates from the API, labelled as an estimate. Only after the pricing rules are confirmed for display.
+6. **Airport transfer planner.** What to tell the rental company (flight number, passengers, luggage, drop-off), with a form that sends an enquiry.
+7. **Event car planner** for weddings, shoots, and convoys: how many cars, timings, a checklist, and an enquiry form.
+
+For rental companies, free before they onboard: a public application and "talk to us" route (built at `/operators`), and later a free fleet and owner-records tool as the console opens.
 
 ## 7. Reviews and trust
 

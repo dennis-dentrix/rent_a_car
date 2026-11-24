@@ -1,16 +1,19 @@
 import { z } from 'zod'
-import { fileDeclaration } from './common.js'
+import { inspectionPurpose } from '../file-purposes.js'
+import { fileDeclaration, fileTypeMatchesPurpose } from './common.js'
 
 export const FUEL_LEVELS = ['empty', 'quarter', 'half', 'three_quarters', 'full']
 
-const fileSchema = z.strictObject({
-  kind: z.enum(['photo', 'document']),
-  label: z.string().trim().min(1).max(80).optional(),
-  caption: z.string().trim().min(1).max(300).optional(),
-  // Object key in the private bucket. The file itself is uploaded with a signed link.
-  storage_path: z.string().trim().min(3).max(300),
-  ...fileDeclaration,
-})
+const fileSchema = z
+  .strictObject({
+    kind: z.enum(['photo', 'document']),
+    label: z.string().trim().min(1).max(80).optional(),
+    caption: z.string().trim().min(1).max(300).optional(),
+    // Object key in the private bucket. The file itself is uploaded with a signed link.
+    storage_path: z.string().trim().min(3).max(300),
+    ...fileDeclaration,
+  })
+  .refine(...fileTypeMatchesPurpose((declared) => inspectionPurpose(declared.kind)))
 
 export const createInspectionSchema = z.strictObject({
   booking_id: z.uuid(),

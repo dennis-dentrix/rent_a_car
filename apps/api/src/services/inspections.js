@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto'
+import { inspectionPurpose } from '@rent-a-car/shared'
 import { AppError, fieldError } from '../lib/errors.js'
 import {
   assertUploaded,
@@ -29,7 +30,7 @@ export async function createInspectionUploads({ db }, bookingId, { files }) {
         contentType: file.content_type,
         sizeBytes: file.size_bytes,
       })
-      return { storage_path: key, ...link }
+      return { storage_path: key, kind: file.kind, ...link }
     }),
   )
 }
@@ -45,6 +46,7 @@ async function verifyFiles({ booking_id, files }) {
       assertUploaded(file.storage_path, {
         sizeBytes: file.size_bytes,
         contentType: file.content_type,
+        purpose: inspectionPurpose(file.kind),
       }),
     ),
   )
@@ -52,8 +54,8 @@ async function verifyFiles({ booking_id, files }) {
 
 /** A link to open one inspection file. The customer who rented and staff can open it; others cannot see it. */
 export async function getInspectionFileUrl({ db }, id) {
-  const file = await findOne(db, 'inspection_files', 'storage_path', id)
-  return createDownloadUrl(file.storage_path)
+  const file = await findOne(db, 'inspection_files', 'storage_path, content_type', id)
+  return createDownloadUrl(file.storage_path, file.content_type)
 }
 
 /** Save an inspection report and its photos and documents together, for the booking's vehicle. */

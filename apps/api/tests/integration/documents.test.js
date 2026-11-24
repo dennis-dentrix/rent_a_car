@@ -7,6 +7,8 @@ import {
   call,
   changeStatus,
   reviewDocument,
+  putFile,
+  sampleFile,
   staff,
   uploadDocument,
   withApi,
@@ -71,6 +73,37 @@ describe('what a customer may upload', () => {
       accounts.other,
     )
     expect(status).toBe(404)
+  })
+})
+
+describe('a file must be what it says it is', () => {
+  const confirm = async (bytes, declared = declare()) => {
+    const created = await asCustomer('POST', '/documents', declared)
+    await putFile(created.body.data, bytes)
+    return asCustomer('POST', `/documents/${created.body.data.id}/complete`)
+  }
+
+  it.each([
+    ['plain text declared as a PDF', Buffer.alloc(2048, 'a')],
+    ['a web page declared as a PDF', Buffer.concat([Buffer.from('<html>'), Buffer.alloc(2042)])],
+    ['a PNG declared as a PDF', sampleFile('image/png')],
+  ])('refuses %s', async (_name, bytes) => {
+    expect((await confirm(bytes)).status).toBe(400)
+  })
+
+  it('accepts a real image where an image is declared', async () => {
+    const declared = declare({ content_type: 'image/jpeg' })
+    expect((await confirm(sampleFile('image/jpeg'), declared)).status).toBe(200)
+  })
+
+  it('stops opening a file that was replaced after it was checked', async () => {
+    const created = await asCustomer('POST', '/documents', declare())
+    const link = created.body.data
+    await putFile(link, sampleFile('application/pdf', 2048, 'a'))
+    await asCustomer('POST', `/documents/${link.id}/complete`)
+    expect((await asCustomer('GET', `/documents/${link.id}/url`)).status).toBe(200)
+    await putFile(link, sampleFile('application/pdf', 2048, 'b'))
+    expect((await asCustomer('GET', `/documents/${link.id}/url`)).status).toBe(404)
   })
 })
 

@@ -29,3 +29,10 @@ export const nairobiDayRange = (date) => {
   const start = new Date(`${date}T00:00:00+03:00`)
   return [start.toISOString(), new Date(start.getTime() + 24 * 60 * 60 * 1000).toISOString()]
 }
+
+/** A stay as Nairobi-time instants: from the start of the first day to the end of the last. The times default
+ *  to a working day (08:00 to 18:00); a screen that lets the customer pick times passes them as "HH:MM". */
+export const nairobiDayBounds = (from, to, { startTime = '08:00', endTime = '18:00' } = {}) => ({
+  from: `${from}T${startTime}:00+03:00`,
+  to: `${to}T${endTime}:00+03:00`,
+})

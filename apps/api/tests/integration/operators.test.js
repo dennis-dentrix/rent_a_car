@@ -268,3 +268,69 @@ describe('the rules of a review', () => {
     expect((await review(opIds.opA, 'approved')).error).toBeNull()
   })
 })
+
+const setServices = (operatorId, services) =>
+  attempt(client, 'select set_operator_services($1, $2) as offered', [operatorId, services])
+const offeredBy = async (operatorId) =>
+  (
+    await client.query(
+      'select service_id from operator_services where operator_id = $1 order by service_id',
+      [operatorId],
+    )
+  ).rows.map((row) => row.service_id)
+
+describe('setting the services an operator offers', () => {
+  it('lets an operator set its own, replacing the set each time', async () => {
+    await actAs(client, opIds.userA)
+    expect((await setServices(opIds.opA, ['convoy', 'wedding_car'])).error).toBeNull()
+    expect((await setServices(opIds.opA, ['convoy'])).error).toBeNull()
+    expect(await offeredBy(opIds.opA)).toEqual(['convoy'])
+  })
+
+  it("does not let an operator set another operator's", async () => {
+    await actAs(client, opIds.userA)
+    expect((await setServices(opIds.opB, ['convoy'])).error?.message).toContain('FORBIDDEN')
+  })
+
+  it('lets an admin set any operator, and refuses an unknown service without changing anything', async () => {
+    await actAs(client, ids.admin)
+    expect((await setServices(opIds.opB, ['airport_transfer'])).error).toBeNull()
+    const refused = await setServices(opIds.opB, ['convoy', 'submarine'])
+    expect(refused.error?.message).toContain('VALIDATION_FAILED')
+    expect(await offeredBy(opIds.opB)).toEqual(['airport_transfer'])
+  })
+})
+
+describe('what renters can see of services', () => {
+  const OWN_CLASS = '00000000-0000-4000-8000-000000000199'
+  // Only this test's own classes: the local seed has classes with platform-fleet cars of its own, which every
+  // service offers, and they would otherwise be in every answer.
+  const classesFor = async (service) =>
+    (await client.query('select class_id from classes_offering_service($1)', [service])).rows
+      .map((row) => row.class_id)
+      .filter((id) => [ids.cls, OWN_CLASS].includes(id))
+      .sort()
+
+  it('shows the list of services but not what any operator offers', async () => {
+    await actAsOwner(client)
+    await client.query("insert into operator_services values ($1, 'convoy')", [opIds.opA])
+    await actAs(client, null)
+    expect((await client.query('select id from services')).rowCount).toBe(8)
+    expect((await client.query('select * from operator_services')).rowCount).toBe(0)
+  })
+
+  it('finds the classes whose operators offer a service, and the platform fleet for all', async () => {
+    await client.query(
+      "insert into vehicle_classes (id, name, slug, seats) values ($1, 'Convoy Class', 'convoy-class', 4)",
+      [OWN_CLASS],
+    )
+    await client.query(
+      'insert into vehicles (registration, chassis_number, class_id, operator_id) values ($1, $2, $3, $4)',
+      ['CVY 001A', 'CHASSIS-CVY001A', OWN_CLASS, opIds.opB],
+    )
+    await client.query("insert into operator_services values ($1, 'convoy')", [opIds.opB])
+    await actAs(client, null)
+    expect(await classesFor('convoy')).toEqual([ids.cls, OWN_CLASS].sort())
+    expect(await classesFor('video_shoot')).toEqual([ids.cls])
+  })
+})

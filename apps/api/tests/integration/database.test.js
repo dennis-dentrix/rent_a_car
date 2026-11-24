@@ -7,12 +7,14 @@ import {
   bookingInsert,
   ids,
   insertBooking,
+  insertDocument,
   insertVerifiedDocuments,
   isBlocked,
   requestRefund,
   transition,
   withSeededTransaction,
 } from './helpers.js'
+import { opIds, seedOperators } from './operators-helpers.js'
 
 const EXCLUSION_VIOLATION = '23P01'
 const INSUFFICIENT_PRIVILEGE = '42501'
@@ -138,9 +140,27 @@ describe('RLS: customer', () => {
 })
 
 describe('RLS: corporate approver', () => {
+  it("sees a company booking's agreement but not the renter's ID or licence", async () => {
+    const booking = ids.bookingB
+    await insertDocument(client, { owner: ids.custB, booking, type: 'national_id' })
+    await insertDocument(client, { owner: ids.custB, booking, type: 'agreement' })
+    await actAs(client, ids.approver)
+    const { rows } = await client.query('select type from documents')
+    expect(rows).toEqual([{ type: 'agreement' }])
+  })
+
   it('sees only their company bookings', async () => {
     await actAs(client, ids.approver)
     expect(await selectIds('bookings')).toEqual([{ id: ids.bookingB }])
+  })
+})
+
+describe('RLS: operator', () => {
+  it("never sees its renters' identity documents", async () => {
+    await seedOperators(client)
+    await insertDocument(client, { owner: ids.custA, booking: opIds.bookingA })
+    await actAs(client, opIds.userA)
+    expect(await countRows('documents')).toBe(0)
   })
 })
 
@@ -211,5 +231,20 @@ describe('seed helpers', () => {
     })
     const { rowCount } = await client.query('select 1 from bookings where reference = $1', ['Z9'])
     expect(rowCount).toBe(1)
+  })
+})
+
+describe('a profile picture', () => {
+  it('may only name a file in the person’s own folder', async () => {
+    const own = await attempt(client, 'update profiles set avatar_path = $2 where id = $1', [
+      ids.custA,
+      `avatars/${ids.custA}/a.jpg`,
+    ])
+    const theirs = await attempt(client, 'update profiles set avatar_path = $2 where id = $1', [
+      ids.custA,
+      `avatars/${ids.custB}/a.jpg`,
+    ])
+    expect(own.error).toBeNull()
+    expect(theirs.error?.code).toBe('23514')
   })
 })

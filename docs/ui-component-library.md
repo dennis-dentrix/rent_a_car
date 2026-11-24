@@ -1,6 +1,6 @@
 # UI Component Library
 
-**Purpose:** Defines each reusable component: its purpose, variants, props, states, and where it is used. Components are built with the tokens in the Design System Specification. Each component is built once, in `components/`, and reused everywhere (DRY rule, pack section 14). The audit behind the latest changes is in `design-system-audit.md`.
+**Purpose:** Defines each reusable component: its purpose, variants, props, states, and where it is used. Components are built with the tokens in the Design System Specification. Each component is built once, in `components/`, and reused everywhere (DRY rule, pack section 14). Token names and patterns come from `design-system.md`.
 
 ## 1. Foundations
 
@@ -16,7 +16,7 @@
 
 | Component          | Variants                                         | Props                                                                | States                                            | Used on                                |
 | ------------------ | ------------------------------------------------ | -------------------------------------------------------------------- | ------------------------------------------------- | -------------------------------------- |
-| `Button`           | primary, tonal, secondary, tertiary, destructive | `size` (md 44 px, sm 36 px on staff), `icon`, `loading`, `fullWidth` | default, hover, pressed, focus, disabled, loading | Everywhere                             |
+| `Button`           | primary, tonal, plain, destructive               | `size` (md 48 px, sm 36 px on staff), `icon`, `loading`, `fullWidth` | default, hover, pressed, focus, disabled, loading | Everywhere                             |
 | `LinkButton`       | default, subtle                                  | `href`                                                               | default, hover, focus, visited                    | Navigation to other pages              |
 | `StickyBookingBar` | single                                           | `price` (a `Price` input), `ctaLabel`, `onAction`                    | default, disabled (no class selected)             | Vehicle and quote screens on phone     |
 | `IconButton`       | default, subtle                                  | `label` (required for screen readers), `icon`                        | default, pressed, focus, disabled                 | Toolbars, staff rows                   |
@@ -32,7 +32,7 @@
 | `TextField`        | `label`, `helper`, `error`, `type` (text, email, tel)             | Label always visible; error text linked by `aria-describedby`                                                            |
 | `MoneyField`       | `valueKes`, `onChange`                                            | Staff use only. Numeric keypad on phones; formats as KES                                                                 |
 | `PhoneField`       | `value`, `countryCode` (default +254, selectable)                 | Accepts Kenyan and international formats; normalises to E.164                                                            |
-| `DateRangePicker`  | `start`, `end`, `minDate`, `minDays`, `blockedRanges`, `onChange` | Touch-first calendar; keyboard arrows on desktop; blocked dates shown. The service supplies `minDays` and blocked ranges |
+| `DateRangePicker`  | `start`, `end`, `minDate`, `blockedRanges`, `onChange` | Touch-first calendar; keyboard arrows on desktop; blocked dates shown. The service supplies the minimum date and blocked ranges; the minimum-hire rule is shown as helper text on the screen |
 | `Select`           | `options`, `value`, `label`                                       | Bottom sheet on phone, menu on desktop. No more than five items before filtering                                         |
 | `Chip`             | `label`, `selected`, `onToggle`                                   | Filters and guided-choice answers; selected state uses `accent.subtle` plus a check icon                                 |
 | `SegmentedControl` | `options` (2 to 4), `value`, `onChange`, `label`                  | Short exclusive choices such as passengers or office versus delivery                                                     |
@@ -95,12 +95,18 @@ All inputs also define error, disabled, and focus states.
 
 | Component          | Variants                        | Props                                                                         | Used on                                                           |
 | ------------------ | ------------------------------- | ----------------------------------------------------------------------------- | ----------------------------------------------------------------- |
-| `Header`           | public, account, company, staff | `nav`, `currencySelector` (optional), `languageSwitcher` (optional)           | Every page                                                        |
+| `Header`           | public, account, company, staff | `nav`, `currencySelector`, `languageSwitcher` (both optional). Page titles use `LargeTitle` (the collapse on scroll is not built yet) | Every page                                  |
+| `Logo`             | mark, wordmark, tile            | `variant`, `size`                                                             | Header (mark and word), footer (with descriptor), app icon        |
+| `InsetList`        | default                         | `items[]` with `title`, `detail`, `href` or `onSelect`, `trailing` (swipe actions arrive with the operator inbox, Phase 4)       | Settings, bookings, documents, operator inbox                     |
+| `ActionSheet`      | default                         | `title`, `actions[]` (one destructive allowed), `onCancel`                    | Confirm cancel, delete, decline                                   |
+| `Menu`             | default                         | `label`, `triggerIcon`, `items[]` (`label`, `icon`, `isSelected`, `onSelect`) | Appearance switch; closes on Escape, outside tap, or choice       |
+| `IconButton`       | default                         | `label` (required)                                                            | Round 40 px icon control on a soft fill                           |
+| `ThemeToggle`      | default                         | none (reads and saves the choice on the device)                               | Header and console rail; a `Menu` with Light, Dark, System        |
 | `CurrencySelector` | default                         | `currencies` (KES, USD), `value`, `onChange`                                  | Header on all public pages, when enabled                          |
 | `LanguageSwitcher` | default                         | `locales[]`, `value`                                                          | Header; hidden while English is the only locale                   |
 | `BottomBar`        | customer, staff                 | `items[]` (customer 3, staff 4), `activeId` (shows accent bar and bold label) | Phone                                                             |
 | `SidebarRail`      | rail, expanded                  | `items[]` (two levels), `collapsed`, `activeId`                               | Staff desktop                                                     |
-| `Sheet`            | bottom (phone), panel (desktop) | `open`, `title`, `onClose`                                                    | Filters, choices, confirmations                                   |
+| `Sheet`            | bottom (phone, with grabber, radius 20), centred dialog (desktop) | `open`, `title`, `onClose`, `detents` (half, full)           | Filters, pickers, currency, quote breakdown                       |
 | `Dialog`           | default                         | `title`, `description`, `actions`                                             | Confirmations of irreversible actions                             |
 | `Section`          | default                         | `title`, `children`                                                           | Page structure                                                    |
 | `Container`        | default, narrow, wide           | `size`                                                                        | All pages                                                         |
@@ -118,7 +124,7 @@ All inputs also define error, disabled, and focus states.
 
 | Component           | Props                                          | Notes                                                                                                                  |
 | ------------------- | ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `DataTable`         | `columns`, `rows`, `onRowClick`, `sortable`    | 32 px rows on desktop; card list on phone; keyboard row navigation with Enter to open                                  |
+| `DataTable`         | `columns`, `rows`, `getRowId`, `getRowHref`    | 32 px rows on desktop; card list on phone; a row is a link, so Enter opens it and the URL changes                                  |
 | `KpiCard`           | `label`, `value`, `change`, `period`           | Dashboard home                                                                                                         |
 | `ActivityFeed`      | `items[]` with `time`, `text`, `link`          | Dashboard home                                                                                                         |
 | `CalendarGrid`      | `days`, `vehicles`, `bookings`                 | Fleet calendar; horizontal scroll on phone                                                                             |

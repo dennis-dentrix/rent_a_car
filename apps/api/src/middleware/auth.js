@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { AppError } from '../lib/errors.js'
 import { createAnonClient, createUserClient } from '../lib/supabase.js'
+import { hasVerifiedFactor } from '../lib/factors.js'
 import { findProfile } from '../services/accounts.js'
 
 // The access token was already verified with Supabase, so its claims can be read safely.
@@ -21,16 +22,42 @@ const bearerToken = (req) => {
   return header.startsWith('Bearer ') ? header.slice(7) : null
 }
 
-/**
- * Check the Supabase access token on a request. Sets `req.auth` to the user and a database
- * client that acts as that user, so Row Level Security applies to everything the route does.
- */
-export async function authenticate(req, _res, next) {
+/** Checks the token with Supabase and sets `req.auth`: the user, a database client acting as them, and their session's strength. */
+async function readSession(req) {
   const token = bearerToken(req)
   if (!token) throw new AppError('UNAUTHENTICATED')
   const { data, error } = await createAnonClient().auth.getUser(token)
   if (error || !data.user) throw new AppError('UNAUTHENTICATED')
-  req.auth = { user: data.user, db: createUserClient(token), aal: assuranceLevel(token) }
+  req.auth = {
+    user: data.user,
+    db: createUserClient(token),
+    aal: assuranceLevel(token),
+    hasSecondFactor: hasVerifiedFactor(data.user),
+  }
+}
+
+/**
+ * Check the Supabase access token on a request. Sets `req.auth` to the user and a database
+ * client that acts as that user, so Row Level Security applies to everything the route does.
+ * Someone who has turned on the authenticator app must have used it (aal2): a password alone gets them nowhere.
+ */
+export async function authenticate(req, _res, next) {
+  await readSession(req)
+  if (req.auth.hasSecondFactor && req.auth.aal !== 'aal2') {
+    throw new AppError('FORBIDDEN', {
+      message: 'Enter the code from your authenticator app to continue.',
+      details: { reason: 'mfa_required' },
+    })
+  }
+  next()
+}
+
+/**
+ * Like `authenticate`, but lets a session that has only used the password through. Only for "who am I", which the
+ * website asks right after the password to find out whether to ask for the authenticator code.
+ */
+export async function authenticateFirstStep(req, _res, next) {
+  await readSession(req)
   next()
 }
 

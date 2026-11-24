@@ -1,3 +1,4 @@
+import { SERVICE_IDS } from '@rent-a-car/shared'
 import { afterEach, describe, expect, it } from 'vitest'
 import { IDS, accounts, call, get, officeQuote, postQuote, withApi } from './api-client.js'
 
@@ -235,5 +236,65 @@ describe('the USD rate', () => {
     expect(
       (await admin('PUT', '/admin/exchange-rates/USD', { ...body, rate_to_kes: 0 })).status,
     ).toBe(400)
+  })
+})
+
+const offeredBy = (operatorId) => admin('GET', `/admin/operators/${operatorId}/services`)
+const setServices = (operatorId, services) =>
+  admin('PUT', `/admin/operators/${operatorId}/services`, { services })
+const listedFor = async (service) =>
+  (await get(`/classes?service=${service}`)).body.data.map((item) => item.id)
+
+// An approved operator whose only vehicle is in a class of its own, so the class list shows what the
+// service filter does (the platform's own fleet offers every service and would hide it).
+// Named "API ..." with a number of its own, so the test data cleanup finds it and one test never collides with another.
+let ownClassCount = 0
+async function operatorWithOwnClass() {
+  ownClassCount += 1
+  const cls = await addClass()
+  const { rows } = await db.query(
+    "insert into operators (business_name, slug, status) values ($1, $2, 'approved') returning id",
+    [`API Services Test ${ownClassCount}`, `api-services-test-${ownClassCount}`],
+  )
+  await db.query(
+    'insert into vehicles (registration, chassis_number, class_id, operator_id) values ($1, $2, $3, $4)',
+    [`API-SVC-${ownClassCount}`, `API-SVC-CHASSIS-${ownClassCount}`, cls.id, rows[0].id],
+  )
+  return { classId: cls.id, operatorId: rows[0].id }
+}
+
+describe('who sees and sets services', () => {
+  it('lists every service for guests, in display order', async () => {
+    const { status, body } = await get('/services')
+    expect(status).toBe(200)
+    expect(body.data.map((item) => item.id)).toEqual(SERVICE_IDS)
+  })
+
+  it('lets only an admin say what an operator offers', async () => {
+    const { operatorId } = await operatorWithOwnClass()
+    for (const token of [accounts.staff, accounts.customer]) {
+      const path = `/admin/operators/${operatorId}/services`
+      expect((await call('PUT', path, { token, body: { services: [] } })).status).toBe(403)
+    }
+    expect((await call('GET', `/admin/operators/${operatorId}/services`)).status).toBe(401)
+  })
+})
+
+describe('filtering by service', () => {
+  it('narrows the class list to cars whose operator offers the service', async () => {
+    const { classId, operatorId } = await operatorWithOwnClass()
+    expect(await listedFor('convoy')).not.toContain(classId)
+    const set = await setServices(operatorId, ['convoy', 'convoy', 'wedding_car'])
+    expect(set.body.data).toEqual(['convoy', 'wedding_car'])
+    expect(await listedFor('convoy')).toContain(classId)
+    expect(await listedFor('video_shoot')).not.toContain(classId)
+    expect((await offeredBy(operatorId)).body.data).toEqual(['convoy', 'wedding_car'])
+  })
+
+  it('refuses an unknown service and keeps what was set', async () => {
+    const { operatorId } = await operatorWithOwnClass()
+    await setServices(operatorId, ['convoy'])
+    expect((await setServices(operatorId, ['convoy', 'submarine'])).status).toBe(400)
+    expect((await offeredBy(operatorId)).body.data).toEqual(['convoy'])
   })
 })

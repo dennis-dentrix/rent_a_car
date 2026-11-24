@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { formatShortDate, formatTime, nairobiDayRange, toUtcIso } from './dates.js'
+import {
+  formatShortDate,
+  formatTime,
+  nairobiDayBounds,
+  nairobiDayRange,
+  toUtcIso,
+} from './dates.js'
 
 describe('dates', () => {
   it('shows Nairobi time for a UTC instant', () => {
@@ -19,5 +25,18 @@ describe('dates', () => {
       '2026-11-09T21:00:00.000Z',
       '2026-11-10T21:00:00.000Z',
     ])
+  })
+
+  it('uses the times the customer picked instead of the working day', () => {
+    expect(
+      nairobiDayBounds('2026-11-10', '2026-11-12', { startTime: '09:30', endTime: '14:00' }),
+    ).toEqual({ from: '2026-11-10T09:30:00+03:00', to: '2026-11-12T14:00:00+03:00' })
+  })
+
+  it('turns picked days into a working-day stay in Nairobi time', () => {
+    expect(nairobiDayBounds('2026-11-10', '2026-11-12')).toEqual({
+      from: '2026-11-10T08:00:00+03:00',
+      to: '2026-11-12T18:00:00+03:00',
+    })
   })
 })

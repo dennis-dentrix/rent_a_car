@@ -109,7 +109,20 @@ describe('inspection file uploads', () => {
       ...link,
       required_headers: { ...link.required_headers, 'Content-Length': '5000' },
     }
-    expect(await putFile(bigger, sampleFile(5000))).toBe(403)
+    expect(await putFile(bigger, sampleFile('image/jpeg', 5000))).toBe(403)
+  })
+})
+
+describe('what an inspection file may be', () => {
+  it.each([
+    ['a photo that is a PDF', { kind: 'photo', content_type: 'application/pdf' }],
+    ['a document that is an image', { kind: 'document', content_type: 'image/jpeg' }],
+  ])('refuses %s', async (_name, file) => {
+    const bookingId = await newBookingId()
+    const { status } = await staff('POST', `/staff/bookings/${bookingId}/inspection-uploads`, {
+      files: [{ ...file, size_bytes: 2048 }],
+    })
+    expect(status).toBe(400)
   })
 })
 

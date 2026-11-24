@@ -29,3 +29,10 @@ export const MAX_FILE_BYTES = 10 * 1024 * 1024
 // Documents a customer uploads themselves, and the ones staff can also add (a scanned signed agreement).
 export const CUSTOMER_DOCUMENT_TYPES = ['national_id', 'driving_licence']
 export const STAFF_DOCUMENT_TYPES = [...CUSTOMER_DOCUMENT_TYPES, 'agreement']
+
+// Images in a blog or guide: JPEG, PNG, or WebP up to 5 MB. Never SVG, which can carry scripts.
+export const BLOG_IMAGE_CONTENT_TYPES = ['image/jpeg', 'image/png', 'image/webp']
+export const MAX_BLOG_IMAGE_BYTES = 5 * 1024 * 1024
+
+// A profile picture: the same picture types as a guide's, but a smaller file.
+export const MAX_AVATAR_BYTES = 2 * 1024 * 1024

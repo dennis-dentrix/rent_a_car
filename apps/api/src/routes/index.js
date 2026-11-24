@@ -6,6 +6,7 @@ import { bookingsRouter } from './bookings.js'
 import { catalogueRouter } from './catalogue.js'
 import { documentsRouter, inspectionFilesRouter } from './documents.js'
 import { internalRouter } from './internal.js'
+import { publicPostsRouter } from './posts.js'
 import { staffRouter } from './staff.js'
 
 export const router = Router()
@@ -15,6 +16,7 @@ router.get(
   handle(async () => ({ data: { status: 'ok' } })),
 )
 router.use(catalogueRouter)
+router.use(publicPostsRouter)
 router.use('/me', accountsRouter)
 router.use('/bookings', bookingsRouter)
 router.use('/documents', documentsRouter)

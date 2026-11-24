@@ -84,6 +84,13 @@ describe('calculateQuote', () => {
     )
   })
 
+  it('takes no deposit when the deposit percent is 0: no deposit line, and the whole total is the balance', () => {
+    const quote = calculateQuote({ ...worked, depositPercent: 0 })
+    expect(quote.depositKes).toBe(0)
+    expect(quote.balanceKes).toBe(45000)
+    expect(lineOfKind(quote, 'refundable_deposit')).toBeUndefined()
+  })
+
   it('shows the VAT already included in the total, without adding to it', () => {
     const quote = calculateQuote({ ...worked, vatPercent: 16 })
     expect(lineOfKind(quote, 'tax').amountKes).toBe(6207)
