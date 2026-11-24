@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import posthog from 'posthog-js'
 import Alert from '@/components/Alert'
 import Button from '@/components/Button'
 import TextField from '@/components/Field'
@@ -24,6 +25,7 @@ function useAskForm({ classId, defaultMessage }) {
     if (Object.keys(found).length > 0) return
     setStatus('sending')
     const { isSent } = await sendEnquiry(buildEnquiry({ ...values, classId }))
+    if (isSent) posthog.capture('enquiry_submitted', { has_vehicle_class: Boolean(classId) })
     setStatus(isSent ? 'sent' : 'error')
   }
   return { values, errors, status, change, submit }

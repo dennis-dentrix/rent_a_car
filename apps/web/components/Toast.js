@@ -1,6 +1,8 @@
 'use client'
 
-import { createContext, useCallback, useContext, useRef, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
+import { usePathname } from 'next/navigation'
+import posthog from 'posthog-js'
 
 const ToastContext = createContext(() => {})
 
@@ -8,6 +10,42 @@ const ToastContext = createContext(() => {})
 export const useToast = () => useContext(ToastContext)
 
 const DURATION_MS = 4000
+
+function PostHogIdentity() {
+  const pathname = usePathname()
+  const identifiedId = useRef(null)
+
+  useEffect(() => {
+    const resetIdentifiedPerson = () => {
+      if (posthog.get_distinct_id() === identifiedId.current) posthog.reset()
+      identifiedId.current = null
+    }
+    let isCurrent = true
+    fetch('/auth/session', { cache: 'no-store' })
+      .then((response) => response.json())
+      .then((person) => {
+        if (!isCurrent) return
+        if (!person.isSignedIn || !person.id) {
+          resetIdentifiedPerson()
+          return
+        }
+        if (identifiedId.current === person.id) return
+        resetIdentifiedPerson()
+        posthog.identify(person.id, {
+          email: person.email,
+          name: person.name,
+          role: person.role,
+        })
+        identifiedId.current = person.id
+      })
+      .catch(() => {})
+    return () => {
+      isCurrent = false
+    }
+  }, [pathname])
+
+  return null
+}
 
 export function ToastProvider({ children }) {
   const [message, setMessage] = useState(null)
@@ -21,6 +59,7 @@ export function ToastProvider({ children }) {
 
   return (
     <ToastContext.Provider value={show}>
+      <PostHogIdentity />
       {children}
       <div
         role="status"

@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useCallback, useRef, useState } from 'react'
+import posthog from 'posthog-js'
 import { signOutAction } from '@/app/auth/actions'
 import Avatar from '@/components/Avatar'
 import Button from '@/components/Button'
@@ -35,7 +36,12 @@ function MenuPanel({ who, onClose }) {
           {area.label}
         </Link>
       )}
-      <form action={signOutAction}>
+      <form
+        action={signOutAction}
+        onSubmit={() => {
+          posthog.reset()
+        }}
+      >
         <button type="submit" role="menuitem" className={ITEM_CLASS}>
           {text.signOut}
         </button>

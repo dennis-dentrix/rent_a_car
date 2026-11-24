@@ -27,6 +27,7 @@ export default async function OperatorSignUpPage() {
           action={operatorSignUpAction}
           fields={operatorSignUpFields}
           submitLabel={text.submit}
+          eventName="operator_sign_up_submitted"
         />
         <p className="text-callout text-label-2">
           {text.haveAccount}{' '}
