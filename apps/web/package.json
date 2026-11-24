@@ -15,7 +15,9 @@
     "start": "next start",
     "test": "vitest run",
     "preview": "opennextjs-cloudflare build --openNextConfigPath open-next.config.js && opennextjs-cloudflare preview",
-    "deploy:staging": "opennextjs-cloudflare build --env staging --openNextConfigPath open-next.config.js && opennextjs-cloudflare deploy --env staging"
+    "build:staging": "opennextjs-cloudflare build --env staging --openNextConfigPath open-next.config.js",
+    "release:staging": "opennextjs-cloudflare deploy --env staging",
+    "deploy:staging": "npm run build:staging && npm run release:staging"
   },
   "dependencies": {
     "@carvo/shared": "0.1.0",
