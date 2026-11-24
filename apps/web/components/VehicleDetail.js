@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { formatShortDate } from '@rent-a-car/shared'
+import { formatShortDate } from '@carvo/shared'
 import AdminPage from '@/components/AdminPage'
 import InsetList from '@/components/InsetList'
 import ResourceForm from '@/components/ResourceForm'

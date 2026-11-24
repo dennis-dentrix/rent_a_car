@@ -40,7 +40,7 @@ The API is at `http://localhost:4000/api/v1`. Check it with `http://localhost:40
 ## 2. Postman
 
 1. In Postman choose **Import** and select both files in `docs/postman/`:
-   - `rent-a-car.postman_collection.json`
+   - `carvo.postman_collection.json`
    - `local.postman_environment.json`
 2. Pick the environment **Car Rental: local** (top right).
 3. In the environment, set `supabase_anon_key` to the `ANON_KEY` printed by `npx supabase status`. Everything else is already filled in.

@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { listQuerySchema } from '@rent-a-car/shared'
+import { listQuerySchema } from '@carvo/shared'
 import { handle } from '../middleware/respond.js'
 import { getOverview, listAudit } from '../services/admin-overview.js'
 

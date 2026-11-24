@@ -1,4 +1,4 @@
-import { brand } from '@rent-a-car/shared/brand'
+import { brand } from '@carvo/shared/brand'
 import { signedInClient } from '@/lib/auth/supabase'
 
 // The second factor for staff and admin: a code from an authenticator app (time-based, six digits).

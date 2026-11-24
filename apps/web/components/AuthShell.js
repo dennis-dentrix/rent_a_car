@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { ArrowLeft, Check } from 'lucide-react'
-import { brand } from '@rent-a-car/shared/brand'
+import { brand } from '@carvo/shared/brand'
 import ArcBackdrop from '@/components/ArcBackdrop'
 import Logo from '@/components/Logo'
 import { copy } from '@/copy/en'

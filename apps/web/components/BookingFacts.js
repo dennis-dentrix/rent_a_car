@@ -1,4 +1,4 @@
-import { formatMoney } from '@rent-a-car/shared'
+import { formatMoney } from '@carvo/shared'
 import InsetList from '@/components/InsetList'
 import { copy } from '@/copy/en'
 import { momentText, personName } from '@/lib/admin-format'

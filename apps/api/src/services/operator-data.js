@@ -8,7 +8,7 @@ import {
   updateOperatorPlaceSchema,
   updateRateSchema,
   updateVehicleSchema,
-} from '@rent-a-car/shared'
+} from '@carvo/shared'
 import { resource } from './resources.js'
 import { getVehicle } from './vehicles.js'
 

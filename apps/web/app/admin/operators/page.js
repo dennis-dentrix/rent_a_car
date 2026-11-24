@@ -1,5 +1,5 @@
 import AdminPage from '@/components/AdminPage'
-import { formatFullDate } from '@rent-a-car/shared'
+import { formatFullDate } from '@carvo/shared'
 import AdminCardList from '@/components/AdminCardList'
 import AdminDecision from '@/components/AdminDecision'
 import { reviewOperatorAction } from '@/app/admin/operators/actions'

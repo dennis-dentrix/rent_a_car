@@ -14,7 +14,7 @@ import {
   reviewDocumentSchema,
   staffBookingsQuerySchema,
   updateBookingStatusSchema,
-} from '@rent-a-car/shared'
+} from '@carvo/shared'
 import { idParam, requireRoles } from '../middleware/auth.js'
 import { handle } from '../middleware/respond.js'
 import {

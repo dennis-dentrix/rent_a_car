@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
-import { ERROR_CODES } from '@rent-a-car/shared'
+import { ERROR_CODES } from '@carvo/shared'
 import { AppError } from './errors.js'
 import { logger } from './logger.js'
 

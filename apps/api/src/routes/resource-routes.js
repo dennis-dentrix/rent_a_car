@@ -1,4 +1,4 @@
-import { listQuerySchema } from '@rent-a-car/shared'
+import { listQuerySchema } from '@carvo/shared'
 import { idParam } from '../middleware/auth.js'
 import { handle } from '../middleware/respond.js'
 import { createResource, getResource, listResource, updateResource } from '../services/resources.js'

@@ -1,4 +1,4 @@
-import { nairobiDate } from '@rent-a-car/shared'
+import { nairobiDate } from '@carvo/shared'
 import AdminBookingList from '@/components/AdminBookingList'
 import Alert from '@/components/Alert'
 import ConsoleStatus from '@/components/ConsoleStatus'

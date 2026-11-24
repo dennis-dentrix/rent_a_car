@@ -1,7 +1,7 @@
 'use client'
 
 import { ChevronDown, Tag } from 'lucide-react'
-import { SERVICE_GROUPS } from '@rent-a-car/shared'
+import { SERVICE_GROUPS } from '@carvo/shared'
 import Options from '@/components/Options'
 import { copy } from '@/copy/en'
 

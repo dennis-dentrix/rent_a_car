@@ -1,5 +1,5 @@
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib'
-import { brand, formatMoney } from '@rent-a-car/shared'
+import { brand, formatMoney } from '@carvo/shared'
 import { when } from './agreement-terms.js'
 
 // The agreement as a PDF: the booking details, the numbered terms, and a signature block. Unsigned, the block has

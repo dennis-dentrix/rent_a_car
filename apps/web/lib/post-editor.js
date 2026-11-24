@@ -1,4 +1,4 @@
-import { publishProblems, slugify } from '@rent-a-car/shared/posts'
+import { publishProblems, slugify } from '@carvo/shared/posts'
 
 // The editor keeps a guide as text boxes: a paragraph box is one string, a list box is one item per line. These
 // helpers turn that into what the API takes (and back), so the screen never has to think in arrays.

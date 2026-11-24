@@ -1,4 +1,4 @@
-import { brand } from '@rent-a-car/shared/brand'
+import { brand } from '@carvo/shared/brand'
 import { ARC_PATH, ARC_WIDTH, DOT, FAVICON_ARC_WIDTH, GRID } from '@/lib/logo-geometry'
 
 const TONES = { accent: 'text-accent', inverse: 'text-on-accent', current: '' }

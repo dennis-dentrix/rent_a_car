@@ -1,9 +1,5 @@
 import { Router } from 'express'
-import {
-  setOperatorServicesSchema,
-  setPlaceServedSchema,
-  updateCompanySchema,
-} from '@rent-a-car/shared'
+import { setOperatorServicesSchema, setPlaceServedSchema, updateCompanySchema } from '@carvo/shared'
 import { idParam, requireRoles } from '../middleware/auth.js'
 import { handle } from '../middleware/respond.js'
 import { listStaffBookings, getStaffBooking } from '../services/staff-bookings.js'
@@ -16,7 +12,7 @@ import {
   updateCompany,
 } from '../services/operator-console.js'
 import { getOperatorServices, setOperatorServices } from '../services/services.js'
-import { staffBookingsQuerySchema } from '@rent-a-car/shared'
+import { staffBookingsQuerySchema } from '@carvo/shared'
 import { mountFleetDetails } from './fleet-details.js'
 import { mountResources } from './resource-routes.js'
 

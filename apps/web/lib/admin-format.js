@@ -1,4 +1,4 @@
-import { formatFullDate, formatTime } from '@rent-a-car/shared'
+import { formatFullDate, formatTime } from '@carvo/shared'
 
 /** "Tue 24 Nov, 10:00" for a moment, in Nairobi time. */
 export const momentText = (date) => `${formatFullDate(date)}, ${formatTime(date)}`

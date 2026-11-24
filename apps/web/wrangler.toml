@@ -1,0 +1,40 @@
+# The web app on Cloudflare Workers, built by @opennextjs/cloudflare (`npm run deploy:staging`). Secrets are never
+# written here: set each with `npx wrangler secret put NAME --env staging`, and use `.dev.vars` (git-ignored) for
+# local previews. The NEXT_PUBLIC_ values are not read here: Next.js writes them into the browser code at build
+# time, from `.env.production.local`. See apps/web/.env.example.
+name = "carvo-web"
+main = ".open-next/worker.js"
+compatibility_date = "2025-11-01"
+# nodejs_compat lets Next.js run; global_fetch_strictly_public sends every fetch over the public internet, so a call
+# to the API's own domain is an ordinary request and not a shortcut inside Cloudflare's network.
+compatibility_flags = ["nodejs_compat", "global_fetch_strictly_public"]
+
+[assets]
+directory = ".open-next/assets"
+binding = "ASSETS"
+
+# next/image: Workers cannot run Next's own image optimizer, so Cloudflare Images does it.
+[images]
+binding = "IMAGES"
+
+[observability]
+enabled = true
+
+# Staging: its own Worker and domain, deployed with `--env staging`. Wrangler does not copy every top-level setting
+# into an environment, so what staging needs is written out below.
+[env.staging]
+name = "carvo-web-staging"
+routes = [{ pattern = "stage.carvo.co.ke", custom_domain = true }]
+compatibility_flags = ["nodejs_compat", "global_fetch_strictly_public"]
+
+[env.staging.assets]
+directory = ".open-next/assets"
+binding = "ASSETS"
+
+[env.staging.images]
+binding = "IMAGES"
+
+# Not secret, so it may sit here. The web server calls the API on this address, and the browser's /api calls are
+# passed on to it (see next.config.mjs).
+[env.staging.vars]
+API_URL = "https://stage.api.carvo.co.ke"

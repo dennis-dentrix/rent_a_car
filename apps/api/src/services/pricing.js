@@ -1,4 +1,4 @@
-import { assertKes } from '@rent-a-car/shared'
+import { assertKes } from '@carvo/shared'
 
 // The pricing service: the only place prices and totals are calculated.
 // Pure functions. Rates, extras, discounts, and percentages are passed in from the database.

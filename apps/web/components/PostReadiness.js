@@ -1,7 +1,7 @@
 'use client'
 
 import { Check, X } from 'lucide-react'
-import { readingMinutes, wordCount } from '@rent-a-car/shared/posts'
+import { readingMinutes, wordCount } from '@carvo/shared/posts'
 import { copy } from '@/copy/en'
 import { payloadFromDraft, readinessOf } from '@/lib/post-editor'
 

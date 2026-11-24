@@ -1,5 +1,5 @@
 import { SITE_NAME, absoluteUrl } from '@/lib/site'
-import { brand } from '@rent-a-car/shared/brand'
+import { brand } from '@carvo/shared/brand'
 
 // schema.org markup (JSON-LD). Every value is something visible on the page or in the brand file; no
 // ratings, review counts, prices, or phone numbers are invented.

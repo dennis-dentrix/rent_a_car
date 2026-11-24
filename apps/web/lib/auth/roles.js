@@ -1,4 +1,4 @@
-import { STAFF_ROLES } from '@rent-a-car/shared'
+import { STAFF_ROLES } from '@carvo/shared'
 
 export const isStaffRole = (role) => STAFF_ROLES.includes(role)
 

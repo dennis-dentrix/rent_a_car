@@ -1,4 +1,4 @@
-import { nairobiDayRange } from '@rent-a-car/shared'
+import { nairobiDayRange } from '@carvo/shared'
 import { nextStatuses } from '../domain/booking-status.js'
 import { listPage } from '../lib/pagination.js'
 import { unwrap, withServiceRole } from '../lib/supabase.js'

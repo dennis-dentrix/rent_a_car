@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto'
-import { publishProblems, readingMinutes } from '@rent-a-car/shared'
+import { publishProblems, readingMinutes } from '@carvo/shared'
 import { AppError, fieldError } from '../lib/errors.js'
 import { listPage } from '../lib/pagination.js'
 import { assertUploaded, blogImageKey, createUploadUrl, removeStoredFiles } from '../lib/storage.js'

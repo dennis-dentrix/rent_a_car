@@ -1,6 +1,6 @@
 import { AppError, fieldError } from '../lib/errors.js'
 import { withServiceRole, unwrap } from '../lib/supabase.js'
-import { convertFromKes, nairobiDate } from '@rent-a-car/shared'
+import { convertFromKes, nairobiDate } from '@carvo/shared'
 
 import { availableCount, exchangeRate, findPublicClass, rateOn } from './catalogue.js'
 import { calculateQuote, minimumHireDays, rentalDays } from './pricing.js'

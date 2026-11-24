@@ -1,4 +1,4 @@
-import { brand, formatMoney, formatShortDate, formatTime } from '@rent-a-car/shared'
+import { brand, formatMoney, formatShortDate, formatTime } from '@carvo/shared'
 
 // The wording of every email. One entry per kind: a subject and the paragraphs of the body. The context holds
 // the notification's saved details and the booking as it is now, so a cancellation shows the refund as recorded.

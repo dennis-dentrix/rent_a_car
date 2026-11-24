@@ -1,4 +1,4 @@
-import { isSiteAddress } from '@rent-a-car/shared'
+import { isSiteAddress } from '@carvo/shared'
 
 /**
  * What the access token says about the session: when it ends, and whether a second factor was used (aal2).

@@ -1,5 +1,5 @@
 {
-  "name": "rent-a-car",
+  "name": "carvo",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -11,14 +11,14 @@
     "packages/*"
   ],
   "scripts": {
-    "dev:api": "npm run dev -w @rent-a-car/api",
-    "dev:api:local": "npm run dev:local -w @rent-a-car/api",
-    "dev:web": "npm run dev -w @rent-a-car/web",
+    "dev:api": "npm run dev -w @carvo/api",
+    "dev:api:local": "npm run dev:local -w @carvo/api",
+    "dev:web": "npm run dev -w @carvo/web",
     "lint": "eslint .",
     "format": "prettier --check .",
     "dup": "jscpd",
     "test": "npm run test --workspaces --if-present",
-    "test:db": "npm run test:db -w @rent-a-car/api",
+    "test:db": "npm run test:db -w @carvo/api",
     "check": "npm run lint && npm run format && npm run dup && npm test",
     "db:start": "supabase start",
     "db:reset": "supabase db reset"

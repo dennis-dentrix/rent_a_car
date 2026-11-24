@@ -1,4 +1,4 @@
-import { isAirportType } from '@rent-a-car/shared'
+import { isAirportType } from '@carvo/shared'
 import { apiGet } from '@/lib/api'
 import { classPhoto } from '@/lib/photos'
 

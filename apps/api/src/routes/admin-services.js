@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { setOperatorServicesSchema } from '@rent-a-car/shared'
+import { setOperatorServicesSchema } from '@carvo/shared'
 import { idParam } from '../middleware/auth.js'
 import { handle } from '../middleware/respond.js'
 import { getOperatorServices, setOperatorServices } from '../services/services.js'

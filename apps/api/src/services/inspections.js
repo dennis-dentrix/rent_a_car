@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto'
-import { inspectionPurpose } from '@rent-a-car/shared'
+import { inspectionPurpose } from '@carvo/shared'
 import { AppError, fieldError } from '../lib/errors.js'
 import {
   assertUploaded,

@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { createDocumentSchema, listQuerySchema } from '@rent-a-car/shared'
+import { createDocumentSchema, listQuerySchema } from '@carvo/shared'
 import { authenticate, idParam } from '../middleware/auth.js'
 import { handle } from '../middleware/respond.js'
 import {

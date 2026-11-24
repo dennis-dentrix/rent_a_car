@@ -6,7 +6,7 @@ import {
   listQuerySchema,
   updateStaffSchema,
   updateVehicleSchema,
-} from '@rent-a-car/shared'
+} from '@carvo/shared'
 import { idParam, requireRoles } from '../middleware/auth.js'
 import { handle } from '../middleware/respond.js'
 import { adminDataRouter } from './admin-data.js'

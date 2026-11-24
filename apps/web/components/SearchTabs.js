@@ -1,7 +1,7 @@
 'use client'
 
 import { CarFront, PartyPopper, Plane } from 'lucide-react'
-import { SERVICE_GROUP_IDS } from '@rent-a-car/shared'
+import { SERVICE_GROUP_IDS } from '@carvo/shared'
 import { copy } from '@/copy/en'
 import { cx } from '@/lib/cx'
 

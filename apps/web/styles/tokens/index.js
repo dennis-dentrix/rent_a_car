@@ -1,4 +1,4 @@
-import { brand } from '@rent-a-car/shared/brand'
+import { brand } from '@carvo/shared/brand'
 
 const toRgb = (hex) => {
   const n = parseInt(hex.slice(1), 16)

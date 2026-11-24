@@ -1,4 +1,4 @@
-import { LOCATION_TYPES, formatMoney, formatShortDate } from '@rent-a-car/shared'
+import { LOCATION_TYPES, formatMoney, formatShortDate } from '@carvo/shared'
 import { copy } from '@/copy/en'
 import { FLEET_RESOURCES } from '@/lib/admin-fleet-resources'
 

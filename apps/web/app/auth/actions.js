@@ -10,7 +10,7 @@ import {
   resetPasswordSchema,
   signInSchema,
   signUpSchema,
-} from '@rent-a-car/shared'
+} from '@carvo/shared'
 import { copy } from '@/copy/en'
 import { apiGet, apiSend } from '@/lib/api'
 import {

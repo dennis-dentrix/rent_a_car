@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { splitLinks } from '@rent-a-car/shared'
+import { splitLinks } from '@carvo/shared'
 
 /** A sentence from an article, with its links to other pages on this site drawn as links. */
 export default function ArticleText({ text }) {

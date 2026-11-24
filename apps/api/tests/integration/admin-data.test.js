@@ -1,4 +1,4 @@
-import { SERVICE_IDS } from '@rent-a-car/shared'
+import { SERVICE_IDS } from '@carvo/shared'
 import { afterEach, describe, expect, it } from 'vitest'
 import { IDS, accounts, call, get, officeQuote, postQuote, withApi } from './api-client.js'
 

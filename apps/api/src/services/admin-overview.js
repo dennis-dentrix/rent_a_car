@@ -1,4 +1,4 @@
-import { nairobiDate, nairobiDayRange } from '@rent-a-car/shared'
+import { nairobiDate, nairobiDayRange } from '@carvo/shared'
 import { listPage } from '../lib/pagination.js'
 import { countRows } from '../lib/counts.js'
 

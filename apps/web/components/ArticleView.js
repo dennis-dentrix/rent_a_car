@@ -1,4 +1,4 @@
-import { formatFullDate, readingMinutes } from '@rent-a-car/shared'
+import { formatFullDate, readingMinutes } from '@carvo/shared'
 import Breadcrumbs from '@/components/Breadcrumbs'
 import Button from '@/components/Button'
 import ArticleText from '@/components/ArticleText'

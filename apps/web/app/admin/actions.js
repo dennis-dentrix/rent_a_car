@@ -7,7 +7,7 @@ import {
   reviewDocumentSchema,
   updateBookingStatusSchema,
   updateStaffSchema,
-} from '@rent-a-car/shared'
+} from '@carvo/shared'
 import { copy } from '@/copy/en'
 import { adminSend } from '@/lib/admin-send'
 

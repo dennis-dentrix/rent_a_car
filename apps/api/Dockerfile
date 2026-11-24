@@ -5,7 +5,7 @@ COPY package.json package-lock.json .npmrc ./
 COPY apps/api/package.json apps/api/
 COPY apps/web/package.json apps/web/
 COPY packages/shared/package.json packages/shared/
-RUN npm ci --omit=dev --ignore-scripts -w @rent-a-car/api -w @rent-a-car/shared
+RUN npm ci --omit=dev --ignore-scripts -w @carvo/api -w @carvo/shared
 
 FROM node:22-alpine
 WORKDIR /app

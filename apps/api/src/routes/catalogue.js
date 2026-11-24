@@ -5,7 +5,7 @@ import {
   createEnquirySchema,
   placeQuerySchema,
   quoteBodySchema,
-} from '@rent-a-car/shared'
+} from '@carvo/shared'
 import { idParam } from '../middleware/auth.js'
 import { publicCache } from '../middleware/cache.js'
 import { handle } from '../middleware/respond.js'

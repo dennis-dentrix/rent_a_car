@@ -1,4 +1,4 @@
-import { formatShortDate } from '@rent-a-car/shared'
+import { formatShortDate } from '@carvo/shared'
 
 const day = (iso) => formatShortDate(`${iso}T12:00:00+03:00`)
 

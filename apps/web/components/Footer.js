@@ -1,4 +1,4 @@
-import { brand } from '@rent-a-car/shared/brand'
+import { brand } from '@carvo/shared/brand'
 import Link from 'next/link'
 import AskButton from '@/components/AskButton'
 import Logo from '@/components/Logo'

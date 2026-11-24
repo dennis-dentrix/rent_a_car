@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { signAgreementSchema } from '@rent-a-car/shared'
+import { signAgreementSchema } from '@carvo/shared'
 import { handle } from '../middleware/respond.js'
 import { getAgreement, getAgreementPdf, signAgreement } from '../services/agreements.js'
 

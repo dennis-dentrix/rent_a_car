@@ -1,6 +1,6 @@
 'use client'
 
-import { convertFromKes, formatMoney, formatShortDate } from '@rent-a-car/shared'
+import { convertFromKes, formatMoney, formatShortDate } from '@carvo/shared'
 import { useCurrency } from '@/components/CurrencyProvider'
 import { copy } from '@/copy/en'
 import { cx } from '@/lib/cx'

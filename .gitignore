@@ -18,6 +18,7 @@ supabase/.env*
 # Dependencies and build output
 node_modules/
 .next/
+.open-next/
 out/
 build/
 coverage/

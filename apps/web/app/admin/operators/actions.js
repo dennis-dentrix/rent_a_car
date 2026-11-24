@@ -2,7 +2,7 @@
 
 import { cookies } from 'next/headers'
 import { revalidatePath } from 'next/cache'
-import { reviewOperatorSchema } from '@rent-a-car/shared'
+import { reviewOperatorSchema } from '@carvo/shared'
 import { copy } from '@/copy/en'
 import { apiSend } from '@/lib/api'
 import { readTokens } from '@/lib/auth/cookies'

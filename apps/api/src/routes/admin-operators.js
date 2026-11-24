@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { operatorsQuerySchema, reviewOperatorSchema } from '@rent-a-car/shared'
+import { operatorsQuerySchema, reviewOperatorSchema } from '@carvo/shared'
 import { idParam } from '../middleware/auth.js'
 import { handle } from '../middleware/respond.js'
 import { getOperator, listOperators, reviewOperator } from '../services/operators.js'

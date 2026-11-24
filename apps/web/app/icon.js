@@ -1,5 +1,5 @@
 import { ImageResponse } from 'next/og'
-import { brand } from '@rent-a-car/shared/brand'
+import { brand } from '@carvo/shared/brand'
 import { ARC_PATH, FAVICON_ARC_WIDTH, GRID } from '@/lib/logo-geometry'
 
 export const size = { width: 64, height: 64 }

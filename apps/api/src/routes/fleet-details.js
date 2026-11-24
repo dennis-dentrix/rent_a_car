@@ -1,4 +1,4 @@
-import { createAgreementSchema, createTrackerSchema, updateTrackerSchema } from '@rent-a-car/shared'
+import { createAgreementSchema, createTrackerSchema, updateTrackerSchema } from '@carvo/shared'
 import { handle } from '../middleware/respond.js'
 import { createAgreement } from '../services/owners.js'
 import { addTracker, updateTracker } from '../services/trackers.js'

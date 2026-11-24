@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
-import { formatTime } from '@rent-a-car/shared'
+import { formatTime } from '@carvo/shared'
 import Badge from '@/components/Badge'
 import Button from '@/components/Button'
 import { copy } from '@/copy/en'

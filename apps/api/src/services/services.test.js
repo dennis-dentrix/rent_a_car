@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs'
-import { SERVICE_GROUPS } from '@rent-a-car/shared'
+import { SERVICE_GROUPS } from '@carvo/shared'
 import { describe, expect, it } from 'vitest'
 
 // The database holds the services as rows and the shared package as a list; one test keeps the two equal.

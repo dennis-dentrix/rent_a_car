@@ -1,4 +1,4 @@
-import { SERVICE_GROUPS } from '@rent-a-car/shared'
+import { SERVICE_GROUPS } from '@carvo/shared'
 import { copy } from '@/copy/en'
 import { withParams } from '@/lib/query'
 

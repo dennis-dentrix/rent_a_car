@@ -13,7 +13,7 @@ import {
   updateLocationSchema,
   updateRateSchema,
   updateZoneSchema,
-} from '@rent-a-car/shared'
+} from '@carvo/shared'
 import { AppError } from '../lib/errors.js'
 import { unwrap } from '../lib/supabase.js'
 import { resource } from './resources.js'

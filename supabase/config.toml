@@ -3,7 +3,7 @@
 # https://supabase.com/docs/guides/local-development/cli/config
 # A string used to distinguish different Supabase projects on the same host. Defaults to the
 # working directory name when running `supabase init`.
-project_id = "rent_a_car"
+project_id = "carvo"
 
 [api]
 enabled = true
@@ -131,12 +131,12 @@ file_size_limit = "11MiB"
 enabled = true
 
 # Stands in for the private Cloudflare R2 bucket in local development.
-[storage.buckets.rent-a-car-private]
+[storage.buckets.carvo-private]
 public = false
 file_size_limit = "11MiB"
 
 # Stands in for the public media bucket (blog and guide images) in local development.
-[storage.buckets.rent-a-car-public]
+[storage.buckets.carvo-public]
 public = true
 file_size_limit = "6MiB"
 

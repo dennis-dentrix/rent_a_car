@@ -1,4 +1,4 @@
-import { MAX_AVATAR_BYTES } from '@rent-a-car/shared'
+import { MAX_AVATAR_BYTES } from '@carvo/shared'
 import { requestAvatarUploadAction, setAvatarAction } from '@/app/(site)/account/actions'
 import { checkPicture, sendToLink } from '@/lib/upload'
 

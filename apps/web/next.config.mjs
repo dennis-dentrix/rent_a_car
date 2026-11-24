@@ -30,7 +30,7 @@ const nextConfig = {
   // shared package is included.
   output: 'standalone',
   outputFileTracingRoot: repositoryRoot,
-  transpilePackages: ['@rent-a-car/shared'],
+  transpilePackages: ['@carvo/shared'],
   poweredByHeader: false,
   // Photos and guide images kept on a separate host (the media base address) may be served through next/image.
   // In development that host is the local storage on 127.0.0.1, which next/image refuses unless told to allow it.

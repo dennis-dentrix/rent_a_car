@@ -1,4 +1,4 @@
-import { brand } from '@rent-a-car/shared'
+import { brand } from '@carvo/shared'
 import { unwrap, withServiceRole } from '../lib/supabase.js'
 
 const BOOKING_COLUMNS =

@@ -1,4 +1,4 @@
-import { BLOG_IMAGE_CONTENT_TYPES } from '@rent-a-car/shared'
+import { BLOG_IMAGE_CONTENT_TYPES } from '@carvo/shared'
 
 // Sending a picture from the browser to a signed link, shared by guide pictures and profile pictures.
 

@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { updateSettingSchema } from '@rent-a-car/shared'
+import { updateSettingSchema } from '@carvo/shared'
 import { idParam } from '../middleware/auth.js'
 import { handle } from '../middleware/respond.js'
 import {

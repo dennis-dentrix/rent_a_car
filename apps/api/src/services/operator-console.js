@@ -1,4 +1,4 @@
-import { nairobiDate, nairobiDayRange } from '@rent-a-car/shared'
+import { nairobiDate, nairobiDayRange } from '@carvo/shared'
 import { countRows } from '../lib/counts.js'
 import { AppError } from '../lib/errors.js'
 import { unwrap } from '../lib/supabase.js'

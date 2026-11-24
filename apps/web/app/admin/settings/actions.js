@@ -1,7 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { exchangeRateSchema } from '@rent-a-car/shared'
+import { exchangeRateSchema } from '@carvo/shared'
 import { copy } from '@/copy/en'
 import { adminSend } from '@/lib/admin-send'
 

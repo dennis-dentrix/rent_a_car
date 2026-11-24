@@ -5,7 +5,7 @@ import AdminToday from '@/components/AdminToday'
 import Alert from '@/components/Alert'
 import LargeTitle from '@/components/LargeTitle'
 import AdminAuditList from '@/components/AdminAuditList'
-import { nairobiDate } from '@rent-a-car/shared'
+import { nairobiDate } from '@carvo/shared'
 import { copy } from '@/copy/en'
 import { adminGet, getClassNames, requireAdmin } from '@/lib/admin'
 

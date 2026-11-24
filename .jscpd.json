@@ -1,7 +1,7 @@
 {
   "path": ["apps", "packages", "supabase/migrations"],
   "format": ["javascript", "sql"],
-  "ignore": ["**/node_modules/**", "**/.next/**"],
+  "ignore": ["**/node_modules/**", "**/.next/**", "**/.open-next/**"],
   "minLines": 4,
   "minTokens": 40,
   "threshold": 0,

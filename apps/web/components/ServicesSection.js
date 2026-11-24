@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { CarFront, PartyPopper, Plane } from 'lucide-react'
-import { SERVICE_GROUPS } from '@rent-a-car/shared'
+import { SERVICE_GROUPS } from '@carvo/shared'
 import Button from '@/components/Button'
 import Eyebrow from '@/components/Eyebrow'
 import IconTile from '@/components/IconTile'

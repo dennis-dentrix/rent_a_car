@@ -1,4 +1,4 @@
-import { ERROR_CODES } from '@rent-a-car/shared'
+import { ERROR_CODES } from '@carvo/shared'
 
 export class AppError extends Error {
   /**

@@ -1,4 +1,4 @@
-import { formatShortDate } from '@rent-a-car/shared'
+import { formatShortDate } from '@carvo/shared'
 import { copy } from '@/copy/en'
 
 const text = copy.adminFleet

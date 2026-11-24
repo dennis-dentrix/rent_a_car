@@ -11,7 +11,7 @@ import {
 } from 'lucide-react'
 
 // Each booking status gets a tone and an icon, so it never relies on colour alone. The words come
-// from copy.status. Keys follow BOOKING_STATUSES in @rent-a-car/shared.
+// from copy.status. Keys follow BOOKING_STATUSES in @carvo/shared.
 export const STATUS_BADGES = {
   quoted: { tone: 'neutral', icon: FileText },
   pending_payment: { tone: 'warning', icon: Hourglass },

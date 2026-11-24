@@ -1,7 +1,7 @@
 # The whole site on one Oracle VM: Caddy in front, the API and the web app behind it.
 # Run from this folder:  docker compose up -d --build
 # Settings come from deploy/.env (copy .env.example); each app's secrets from its own .env.local file.
-name: rent-a-car
+name: carvo
 
 x-hardening: &hardening
   restart: unless-stopped

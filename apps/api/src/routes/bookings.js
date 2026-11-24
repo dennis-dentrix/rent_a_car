@@ -4,7 +4,7 @@ import {
   changeDatesSchema,
   createBookingSchema,
   listBookingsQuerySchema,
-} from '@rent-a-car/shared'
+} from '@carvo/shared'
 import { authenticate, idParam } from '../middleware/auth.js'
 import { handle } from '../middleware/respond.js'
 import {

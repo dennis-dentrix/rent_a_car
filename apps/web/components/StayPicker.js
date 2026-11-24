@@ -1,6 +1,6 @@
 'use client'
 
-import { nairobiDate } from '@rent-a-car/shared'
+import { nairobiDate } from '@carvo/shared'
 import Chip from '@/components/Chip'
 import DateRangePicker from '@/components/DateRangePicker'
 import Select from '@/components/Select'

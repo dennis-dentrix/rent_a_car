@@ -7,7 +7,7 @@ import {
   S3Client,
 } from '@aws-sdk/client-s3'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
-import { allowsContentType } from '@rent-a-car/shared'
+import { allowsContentType } from '@carvo/shared'
 import { AppError } from './errors.js'
 import { logger } from './logger.js'
 import { SNIFF_BYTES, detectContentType } from './file-sniff.js'

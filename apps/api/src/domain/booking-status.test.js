@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs'
-import { BOOKING_STATUSES as SHARED_STATUSES } from '@rent-a-car/shared'
+import { BOOKING_STATUSES as SHARED_STATUSES } from '@carvo/shared'
 import { describe, expect, it } from 'vitest'
 import { TRANSITIONS, assertTransition, canTransition } from './booking-status.js'
 

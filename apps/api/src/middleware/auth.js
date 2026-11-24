@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { STAFF_ROLES } from '@rent-a-car/shared'
+import { STAFF_ROLES } from '@carvo/shared'
 import { AppError } from '../lib/errors.js'
 import { createAnonClient, createUserClient } from '../lib/supabase.js'
 import { hasVerifiedFactor } from '../lib/factors.js'

@@ -81,3 +81,16 @@ Local values are looser (`supabase/config.toml`). On the hosted project, set the
 4. Sending: SMTP through ZeptoMail, or reset and confirmation emails will not arrive at any volume.
 5. Rate limits for sign-in and reset emails are set in the dashboard and at Cloudflare.
 
+## 6. Web app on Cloudflare Workers (staging)
+
+The web app runs as its own Worker, `carvo-web-staging`, built by `@opennextjs/cloudflare` from `apps/web`. The API stays its own Worker. The browser calls `/api/...` on the site's own address; the web Worker passes those calls to the API (`next.config.mjs`), so there is no cross-site call and no CORS rule to add.
+
+1. The API Worker must already answer at `https://stage.api.carvo.co.ke`. Sign in to Cloudflare once with `npx wrangler login`.
+2. Copy `apps/web/.env.example` to `apps/web/.env.production.local` and fill in the hosted values: `NEXT_PUBLIC_SITE_URL=https://stage.carvo.co.ke`, the hosted Supabase URL and anon key, the media base address, the Maps and PostHog keys, and `API_URL=https://stage.api.carvo.co.ke`. Every value here is public. If the web app later needs a server-side secret, set it with `npx wrangler secret put NAME --env staging` (run in `apps/web`).
+3. Try it locally first: `npm run preview -w @carvo/web` serves the built Worker on http://localhost:8787.
+4. Deploy: `npm run deploy:staging -w @carvo/web`. The first deploy creates the custom domain `stage.carvo.co.ke`, which needs the domain's DNS to be on Cloudflare. Change the name in `apps/web/wrangler.toml` if you use another address.
+5. In Supabase Auth (section 5), set the Site URL to `https://stage.carvo.co.ke` and add `https://stage.carvo.co.ke/**` as a redirect URL. In the R2 CORS rules (section 2), allow the same address.
+6. Check: the home page, `https://stage.carvo.co.ke/api/v1/health`, a car photo (served through Cloudflare Images), sign in and out, and an enquiry.
+
+Good to know: the Worker is about 2.7 MiB compressed, under the free plan's 3 MiB limit but close, and production needs the paid plan anyway. There is no incremental cache yet, so pages that ask to `revalidate` read from the API each time. The adapter calls Node middleware (`proxy.js`) experimental, so test sign-in and the currency cookie again after upgrading Next.js or the adapter. Production needs its own `[env.production]` block and domain.
+

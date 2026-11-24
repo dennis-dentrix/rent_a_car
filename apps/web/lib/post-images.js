@@ -1,4 +1,4 @@
-import { MAX_BLOG_IMAGE_BYTES } from '@rent-a-car/shared'
+import { MAX_BLOG_IMAGE_BYTES } from '@carvo/shared'
 import { addImageAction, requestImageUploadAction } from '@/app/admin/posts/actions'
 import { checkPicture, sendToLink } from '@/lib/upload'
 

@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto'
-import { brand, formatFullDate, formatMoney, formatTime } from '@rent-a-car/shared'
+import { brand, formatFullDate, formatMoney, formatTime } from '@carvo/shared'
 
 // The wording of the rental agreement. Numbers that are business rules (grace period, cancellation window,
 // minimum age) come from the settings table through `facts.rules`, so the agreement never disagrees with the

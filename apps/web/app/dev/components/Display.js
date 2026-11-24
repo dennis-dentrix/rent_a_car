@@ -11,7 +11,7 @@ import ProgressSteps from '@/components/ProgressSteps'
 import QuoteBreakdown from '@/components/QuoteBreakdown'
 import Skeleton from '@/components/Skeleton'
 import StatusBadge from '@/components/StatusBadge'
-import { BOOKING_STATUSES } from '@rent-a-car/shared'
+import { BOOKING_STATUSES } from '@carvo/shared'
 
 const QUOTE_LINES = [
   { kind: 'charge', label: 'Car hire', detail: '3 days × KES 4,500', kes: 13500 },

@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { formatFullDate } from '@rent-a-car/shared'
+import { formatFullDate } from '@carvo/shared'
 import { createPostAction } from '@/app/admin/posts/actions'
 import Alert from '@/components/Alert'
 import AuthForm from '@/components/AuthForm'

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { CalendarDays } from 'lucide-react'
-import { nairobiDate } from '@rent-a-car/shared'
+import { nairobiDate } from '@carvo/shared'
 import Button from '@/components/Button'
 import DateRangePicker from '@/components/DateRangePicker'
 import CellButton from '@/components/CellButton'

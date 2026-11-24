@@ -1,4 +1,4 @@
-import { brand } from '@rent-a-car/shared/brand'
+import { brand } from '@carvo/shared/brand'
 
 // The public address of the site, for canonical links, the sitemap, and structured data. Set
 // NEXT_PUBLIC_SITE_URL in each environment; localhost is only the development fallback.

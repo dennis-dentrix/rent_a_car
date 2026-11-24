@@ -1,5 +1,5 @@
 import { ImageResponse } from 'next/og'
-import { brand } from '@rent-a-car/shared/brand'
+import { brand } from '@carvo/shared/brand'
 import { copy } from '@/copy/en'
 import { ARC_PATH, DOT, GRID } from '@/lib/logo-geometry'
 

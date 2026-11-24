@@ -1,4 +1,4 @@
-import { MAX_FILE_BYTES } from '@rent-a-car/shared'
+import { MAX_FILE_BYTES } from '@carvo/shared'
 import TellAndRules from '@/components/TellAndRules'
 import { copy } from '@/copy/en'
 

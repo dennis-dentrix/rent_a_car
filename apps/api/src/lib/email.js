@@ -1,4 +1,4 @@
-import { brand } from '@rent-a-car/shared'
+import { brand } from '@carvo/shared'
 import { AppError } from './errors.js'
 
 const ZEPTOMAIL_URL = 'https://api.zeptomail.com/v1.1/email'

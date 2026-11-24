@@ -1,7 +1,7 @@
 import { AppError } from '../lib/errors.js'
 import { unwrap } from '../lib/supabase.js'
 import { findOne } from './records.js'
-import { convertFromKes, nairobiDate } from '@rent-a-car/shared'
+import { convertFromKes, nairobiDate } from '@carvo/shared'
 
 /**
  * The daily rates in force on a date, as a Map of class id to rate. One query for any number of classes;

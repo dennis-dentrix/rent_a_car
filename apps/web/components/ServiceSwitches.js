@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef } from 'react'
-import { SERVICE_GROUPS } from '@rent-a-car/shared'
+import { SERVICE_GROUPS } from '@carvo/shared'
 import { setServicesAction } from '@/app/console/actions'
 import Switch from '@/components/Switch'
 import { copy } from '@/copy/en'

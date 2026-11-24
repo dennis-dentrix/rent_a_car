@@ -1,4 +1,4 @@
-import { nairobiDayBounds } from '@rent-a-car/shared'
+import { nairobiDayBounds } from '@carvo/shared'
 import Alert from '@/components/Alert'
 import Button from '@/components/Button'
 import Chip from '@/components/Chip'

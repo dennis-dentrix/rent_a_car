@@ -2,7 +2,7 @@ import AdminPage from '@/components/AdminPage'
 import Alert from '@/components/Alert'
 import SettingRow from '@/components/SettingRow'
 import UsdRateForm from '@/components/UsdRateForm'
-import { nairobiDate } from '@rent-a-car/shared'
+import { nairobiDate } from '@carvo/shared'
 import { copy } from '@/copy/en'
 import { adminGet, requireAdmin } from '@/lib/admin'
 

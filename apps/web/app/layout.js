@@ -1,6 +1,6 @@
 import './globals.css'
 import { Inter } from 'next/font/google'
-import { brand } from '@rent-a-car/shared/brand'
+import { brand } from '@carvo/shared/brand'
 import JsonLd from '@/components/JsonLd'
 import { ToastProvider } from '@/components/Toast'
 import { SITE_URL } from '@/lib/site'

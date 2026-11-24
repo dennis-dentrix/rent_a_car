@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation'
-import { formatMoney } from '@rent-a-car/shared'
+import { formatMoney } from '@carvo/shared'
 import Breadcrumbs from '@/components/Breadcrumbs'
 import Button from '@/components/Button'
 import ClassFacts from '@/components/ClassFacts'

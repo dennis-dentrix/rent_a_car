@@ -2,7 +2,7 @@
 
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { authCodeSchema, changePasswordSchema, updateProfileSchema } from '@rent-a-car/shared'
+import { authCodeSchema, changePasswordSchema, updateProfileSchema } from '@carvo/shared'
 import { copy } from '@/copy/en'
 import { apiSend } from '@/lib/api'
 import { clearSession, readTokens, writeSession } from '@/lib/auth/cookies'

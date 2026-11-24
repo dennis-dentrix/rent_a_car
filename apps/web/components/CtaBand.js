@@ -1,4 +1,4 @@
-import { brand } from '@rent-a-car/shared/brand'
+import { brand } from '@carvo/shared/brand'
 import { ArrowRight, CalendarSearch, MessageCircle, Phone } from 'lucide-react'
 import Link from 'next/link'
 import ArcBackdrop from '@/components/ArcBackdrop'
