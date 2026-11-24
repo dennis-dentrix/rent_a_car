@@ -15,6 +15,9 @@ export async function ratesOn(db, classIds, date) {
       .select('class_id, price_kes, usd_override')
       .in('class_id', classIds)
       .eq('duration_type', 'day')
+      // Renters are priced from Carvo's rates. An operator's own rates are not read here until request-and-accept
+      // prices a booking from the operator (product pack section 25.9).
+      .is('operator_id', null)
       .lte('effective_from', day)
       .or(`effective_to.is.null,effective_to.gte.${day}`),
   )

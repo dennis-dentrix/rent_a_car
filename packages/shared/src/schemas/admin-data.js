@@ -30,13 +30,18 @@ export function updateSchemaFrom(shape, { clearable = [], locked = [] } = {}) {
     .refine(...hasAtLeastOneField)
 }
 
-const classFields = {
+// What describes a class to a renter. A rental company enters these for a class of its own.
+export const classBasics = {
   name: text(80),
-  slug,
   seats: z.number().int().min(1).max(60),
   luggage_capacity: z.number().int().min(0).max(100).optional(),
   description: text(2000).optional(),
   best_for: z.array(text(60)).max(10).optional(),
+}
+
+const classFields = {
+  ...classBasics,
+  slug,
   is_public: z.boolean().optional(),
   sort_order: z.number().int().optional(),
   security_deposit_enabled: z.boolean().optional(),

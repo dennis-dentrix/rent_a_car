@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import {
+  assignBookingSchema,
   inviteStaffSchema,
   reviewDocumentSchema,
   updateBookingStatusSchema,
@@ -80,5 +81,16 @@ export async function updateStaffAction(_state, formData) {
   const result = await adminSend('PATCH', `/admin/staff/${field(formData, 'id')}`, input.data)
   if (result.error) return result
   revalidatePath('/admin/team')
+  return { status: 'done' }
+}
+
+/** Puts a vehicle on a booking. The database refuses a car that is busy on those dates, and the form says so. */
+export async function assignVehicleAction(_state, formData) {
+  const id = field(formData, 'id')
+  const input = assignBookingSchema.safeParse({ vehicle_id: field(formData, 'vehicle_id') })
+  if (!input.success) return { error: copy.adminFleet.assign.failed }
+  const result = await adminSend('POST', `/staff/bookings/${id}/assign`, input.data)
+  if (result.error) return { error: copy.adminFleet.assign.failed }
+  revalidatePath(`/admin/bookings/${id}`)
   return { status: 'done' }
 }

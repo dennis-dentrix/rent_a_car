@@ -259,7 +259,10 @@ export async function resetTestData(client) {
   await client.query(
     "delete from auth.users where email like 'walkin-%' or email like 'signup-%' or email like 'invite-%' or email like 'trigger-%'",
   )
-  // Companies started through the API come after the accounts that belong to them.
+  // Companies started through the API come after the accounts and rates that belong to them.
+  await client.query(
+    "delete from rates where operator_id in (select id from operators where business_name like 'API %')",
+  )
   await client.query("delete from operators where business_name like 'API %'")
   await client.query('delete from auth.mfa_factors')
 }

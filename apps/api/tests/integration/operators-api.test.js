@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { accounts, call, errorOf, signUpCustomer, withApi } from './api-client.js'
+import { IDS, accounts, call, errorOf, get, signUpCustomer, withApi } from './api-client.js'
 
 withApi()
 
@@ -79,5 +79,115 @@ describe('who may review', () => {
       403,
       'FORBIDDEN',
     ])
+  })
+})
+
+// A pending company may set up before it is approved, so a fresh sign-up is enough to try the console.
+const newOperator = async (name) => {
+  const { token } = await signUpCustomer()
+  await start(token, name)
+  return token
+}
+const mine = (token, method, path, body) => call(method, `/operator${path}`, { body, token })
+const vehicle = (suffix) => ({
+  registration: `API-${suffix}`,
+  chassis_number: `API-CHASSIS-${suffix}`,
+  class_id: IDS.SEDAN,
+})
+
+describe('the operator console', () => {
+  it('is only for a rental company', async () => {
+    expect(errorOf(await mine(accounts.staff, 'GET', '/overview'))[0]).toBe(403)
+    expect(errorOf(await mine(accounts.customer, 'GET', '/vehicles'))[0]).toBe(403)
+    const token = await newOperator('API Console Guard')
+    expect((await call('GET', '/admin/overview', { token })).status).toBe(403)
+  })
+
+  it('shows a new company where it stands and what is left to set up', async () => {
+    const token = await newOperator('API Console Today')
+    await mine(token, 'POST', '/vehicles', vehicle('CON-T'))
+    const { body } = await mine(token, 'GET', '/overview')
+    expect(body.data).toMatchObject({
+      company: { status: 'pending', is_complete: false },
+      vehicles: 1,
+      vehicles_total: 1,
+      rates: 0,
+      services: 0,
+      vehicles_without_rate: 1,
+      pickups_today: 0,
+    })
+  })
+})
+
+describe('the operator console: fleet and classes', () => {
+  it('adds a vehicle for its own company and lists only its own', async () => {
+    const [one, two] = await Promise.all([
+      newOperator('API Console A'),
+      newOperator('API Console B'),
+    ])
+    const created = await mine(one, 'POST', '/vehicles', vehicle('CON-1'))
+    expect(created.status).toBe(201)
+    expect((await mine(one, 'GET', '/vehicles')).body.data).toHaveLength(1)
+    expect((await mine(two, 'GET', '/vehicles')).body.data).toHaveLength(0)
+    expect(
+      errorOf(await mine(two, 'PATCH', `/vehicles/${created.body.data.id}`, { mileage_km: 5 }))[0],
+    ).toBe(404)
+  })
+
+  it('adds a class of its own that starts private, beside the platform list', async () => {
+    const token = await newOperator('API Console Classes')
+    const made = await mine(token, 'POST', '/classes', { name: 'API Safari Cruiser', seats: 7 })
+    expect(made.body.data).toMatchObject({
+      is_public: false,
+      slug: 'api-console-classes-api-safari-cruiser',
+    })
+    expect(
+      (await mine(token, 'PATCH', `/classes/${made.body.data.id}`, { is_public: true })).status,
+    ).toBe(400)
+    const names = (await mine(token, 'GET', '/classes')).body.data.map((item) => item.name)
+    expect(names).toContain('API Safari Cruiser')
+    expect(names.length).toBeGreaterThan(1)
+  })
+})
+
+describe('the operator console: prices and places', () => {
+  it('prices its own classes and leaves what renters are charged alone', async () => {
+    const [one, two] = await Promise.all([
+      newOperator('API Console R1'),
+      newOperator('API Console R2'),
+    ])
+    const before = JSON.stringify((await get('/classes')).body)
+    const rate = { class_id: IDS.SEDAN, price_kes: 1000, effective_from: '2026-01-01' }
+    expect((await mine(one, 'POST', '/rates', rate)).status).toBe(201)
+    expect((await mine(two, 'POST', '/rates', rate)).status).toBe(201)
+    expect(errorOf(await mine(one, 'POST', '/rates', { ...rate, price_kes: 2000 }))[0]).toBe(409)
+    expect(JSON.stringify((await get('/classes')).body)).toBe(before)
+  }, 20_000)
+
+  it('serves every airport by default, and stops serving one when switched off', async () => {
+    const token = await newOperator('API Console Places')
+    const all = (await mine(token, 'GET', '/airports')).body.data
+    expect(all.length).toBeGreaterThan(20)
+    expect(all.every((place) => place.is_served)).toBe(true)
+    const off = await mine(token, 'PUT', `/airports/${all[0].id}`, { is_served: false })
+    expect(off.body.data).toMatchObject({ is_served: false })
+    expect(
+      (await mine(token, 'GET', '/airports')).body.data.filter((p) => !p.is_served),
+    ).toHaveLength(1)
+    await mine(token, 'PUT', `/airports/${all[0].id}`, { is_served: true })
+    expect((await mine(token, 'GET', '/airports')).body.data.every((p) => p.is_served)).toBe(true)
+  })
+
+  it('adds its own airstrip without showing it to renters, and changes its details but not its status', async () => {
+    const token = await newOperator('API Console Own')
+    const place = { name: 'API Private Strip', type: 'airstrip', address: 'Laikipia' }
+    const made = await mine(token, 'POST', '/places', place)
+    expect(made.body.data).toMatchObject({ is_served: false, type: 'airstrip' })
+    expect((await get('/locations')).body.data.map((item) => item.name)).not.toContain(
+      'API Private Strip',
+    )
+    const company = await mine(token, 'PATCH', '/company', { phone: '+254700000999' })
+    expect(company.body.data.phone).toBe('+254700000999')
+    expect((await mine(token, 'PATCH', '/company', { status: 'approved' })).status).toBe(400)
   })
 })

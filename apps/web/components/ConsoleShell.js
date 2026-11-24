@@ -1,4 +1,5 @@
 import SidebarRail from '@/components/SidebarRail'
+import SignOutForm from '@/components/SignOutForm'
 import TabBar from '@/components/TabBar'
 import { copy } from '@/copy/en'
 
@@ -9,7 +10,7 @@ import { copy } from '@/copy/en'
 export default function ConsoleShell({ items, tabs = items, children }) {
   return (
     <div className="flex min-h-dvh pb-[calc(theme(spacing.tabbar)+env(safe-area-inset-bottom))] md:pb-0">
-      <SidebarRail items={items} label={copy.nav.main} />
+      <SidebarRail items={items} label={copy.nav.main} footer={<SignOutForm />} />
       <main className="min-w-0 flex-1 px-4 py-6 md:px-6 lg:px-10">{children}</main>
       <TabBar items={tabs} label={copy.nav.main} />
     </div>

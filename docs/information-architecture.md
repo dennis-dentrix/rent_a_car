@@ -93,7 +93,7 @@ A guest who pays is asked to create an account after confirmation, with the book
 
 ## 7. Admin routes (`/admin`)
 
-Built (24 November 2026): `/admin` (what needs the admin, today's movement, latest changes), `/admin/bookings` and `/admin/bookings/{id}` (status moves), `/admin/enquiries`, `/admin/documents` (open with a logged reason, verify or reject), `/admin/operators` (company review), `/admin/posts` (guides), `/admin/team`, `/admin/audit`, and `/admin/menu` (the phone's list of sections). A side rail with Work, Content and Setup groups from tablet up; four tabs on phones, the last opening `/admin/menu`. Still to build below: prices, places, settings, and fleet screens (their API exists).
+Built (24 November 2026): `/admin` (what needs the admin, today's movement, latest changes), `/admin/bookings` and `/admin/bookings/{id}` (status moves), `/admin/enquiries`, `/admin/documents` (open with a logged reason, verify or reject), `/admin/operators` (company review), `/admin/posts` (guides), `/admin/team`, `/admin/audit`, and `/admin/menu` (the phone's list of sections). A side rail with Work, Content and Setup groups from tablet up; four tabs on phones, the last opening `/admin/menu`. Also built: `/admin/setup/{classes,rates,discounts,extras,delivery-zones,locations}` (add and edit; nothing is deleted, items are switched off) and `/admin/settings` (every setting, with the USD rate). Fleet: `/admin/setup/vehicles` (add and edit), `/admin/vehicles/{id}` (trackers and ownership agreements), `/admin/setup/vehicle-owners` (add; contact details only, the private ID and payout details are not shown), and a vehicle can be assigned to a booking from its page. Still to build: turning an enquiry into a booking from the admin (its API exists). The route table below is the original plan; the screens above replace its prices, places, and settings rows.
 
 | Route              | Purpose                                               |
 | ------------------ | ----------------------------------------------------- |
@@ -105,6 +105,10 @@ Built (24 November 2026): `/admin` (what needs the admin, today's movement, late
 | `/admin/refunds`   | Refund approvals                                      |
 | `/admin/settings`  | Feature flags: currency selector, eTIMS, reviews      |
 | `/admin/audit`     | Audit log: rate changes, document reads, role changes |
+
+## 7a. Operator console routes (`/console`)
+
+Built (24 November 2026, `operator-console.md`): `/console` (review status, what is left to set up, today's movement), `/console/bookings` and `/console/bookings/{id}` (read-only), `/console/fleet` and `/console/fleet/{id}` (vehicles, trackers, owner agreements), `/console/owners`, `/console/classes` (Carvo's list plus the company's own), `/console/rates`, `/console/places` (airports and airstrips served, and its own places), `/console/services`, `/console/company`, and `/console/menu` (the phone's list). A side rail with Run, Fleet, Pricing and Setup groups from tablet up; four tabs on phones, the last opening `/console/menu`.
 
 ## 8. Navigation by device
 

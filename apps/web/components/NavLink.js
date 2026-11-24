@@ -13,8 +13,11 @@ import {
   Inbox,
   LayoutDashboard,
   LayoutGrid,
+  MapPin,
   Newspaper,
   ScrollText,
+  Settings,
+  Tag,
   User,
   Users,
 } from 'lucide-react'
@@ -36,6 +39,9 @@ const ICONS = {
   team: Users,
   audit: ScrollText,
   more: LayoutGrid,
+  prices: Tag,
+  places: MapPin,
+  settings: Settings,
 }
 
 // `isExact` is for a section's home page, which would otherwise count as current on every page inside the section.

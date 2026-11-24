@@ -1,0 +1,20 @@
+'use server'
+
+import { revalidatePath } from 'next/cache'
+import { adminSend } from '@/lib/admin-send'
+
+/** Serve or stop serving one of Carvo's airports or airstrips. Resolves true when the server kept the change. */
+export async function setAirportServedAction(id, isServed) {
+  const result = await adminSend('PUT', `/operator/airports/${encodeURIComponent(id)}`, {
+    is_served: isServed,
+  })
+  return !result.error
+}
+
+/** Replaces the set of services the company offers. Resolves true when the server kept it. */
+export async function setServicesAction(serviceIds) {
+  const result = await adminSend('PUT', '/operator/services', { services: serviceIds })
+  if (result.error) return false
+  revalidatePath('/console')
+  return true
+}

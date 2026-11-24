@@ -13,7 +13,6 @@ export const admin = {
     more: 'More',
     groupWork: 'Work',
     groupContent: 'Content',
-    groupSetup: 'Setup',
   },
   back: 'Admin home',
   loadError: 'We could not load this. Check the connection and try again.',

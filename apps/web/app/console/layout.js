@@ -1,9 +1,15 @@
-import { requireRole } from '@/lib/auth/session'
+import ConsoleShell from '@/components/ConsoleShell'
+import { consoleRail, consoleTabs } from '@/lib/console'
+import { requireOperator } from '@/lib/console'
 
 // The rental company's area. Nothing here is for search engines, or for anyone who is not a company's person.
 export const metadata = { robots: { index: false, follow: false } }
 
 export default async function ConsoleLayout({ children }) {
-  await requireRole(['operator'], '/console')
-  return <main className="mx-auto w-full max-w-3xl px-4 py-8 md:py-12">{children}</main>
+  await requireOperator()
+  return (
+    <ConsoleShell items={consoleRail} tabs={consoleTabs}>
+      <div className="mx-auto w-full max-w-5xl">{children}</div>
+    </ConsoleShell>
+  )
 }

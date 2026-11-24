@@ -6,6 +6,7 @@ import { bookingsRouter } from './bookings.js'
 import { catalogueRouter } from './catalogue.js'
 import { documentsRouter, inspectionFilesRouter } from './documents.js'
 import { internalRouter } from './internal.js'
+import { operatorRouter } from './operator.js'
 import { publicPostsRouter } from './posts.js'
 import { staffRouter } from './staff.js'
 
@@ -23,4 +24,5 @@ router.use('/documents', documentsRouter)
 router.use('/inspection-files', inspectionFilesRouter)
 router.use('/staff', staffRouter)
 router.use('/admin', adminRouter)
+router.use('/operator', operatorRouter)
 router.use('/internal', internalRouter)

@@ -1,5 +1,6 @@
 import InsetList from '@/components/InsetList'
 import LargeTitle from '@/components/LargeTitle'
+import SignOutForm from '@/components/SignOutForm'
 import { adminRail } from '@/lib/admin'
 import { copy } from '@/copy/en'
 
@@ -12,6 +13,7 @@ export default function AdminMenuPage() {
     <div className="flex flex-col gap-5">
       <LargeTitle>{copy.admin.nav.more}</LargeTitle>
       <InsetList items={items} />
+      <SignOutForm />
     </div>
   )
 }

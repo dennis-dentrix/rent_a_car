@@ -6,10 +6,10 @@ import { momentText, personName } from '@/lib/admin-format'
 const text = copy.admin.bookings
 
 /** Bookings as rows: reference and customer, when and where, and the status. Each opens the booking. */
-export default function AdminBookingList({ bookings, classNames }) {
+export default function AdminBookingList({ bookings, classNames, basePath = '/admin/bookings' }) {
   const items = bookings.map((booking) => ({
     id: booking.id,
-    href: `/admin/bookings/${booking.id}`,
+    href: `${basePath}/${booking.id}`,
     title: `${booking.reference} · ${personName(booking.customer)}`,
     detail: [
       classNames.get(booking.class_id),

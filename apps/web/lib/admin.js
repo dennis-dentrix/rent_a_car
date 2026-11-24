@@ -1,9 +1,12 @@
+import { notFound } from 'next/navigation'
 import { copy } from '@/copy/en'
 import { apiGet } from '@/lib/api'
 import { requireRole } from '@/lib/auth/session'
 import { getClasses } from '@/lib/catalogue'
 
 const text = copy.admin.nav
+const setup = copy.adminSetup
+const fleet = copy.adminFleet
 
 // The admin's navigation: a labelled side rail from tablet up, and on phones four tabs, the last of which opens the
 // full list.
@@ -14,8 +17,50 @@ export const adminRail = [
   { href: '/admin/documents', label: text.documents, icon: 'documents', group: text.groupWork },
   { href: '/admin/operators', label: text.companies, icon: 'companies', group: text.groupWork },
   { href: '/admin/posts', label: text.guides, icon: 'guides', group: text.groupContent },
-  { href: '/admin/team', label: text.team, icon: 'team', group: text.groupSetup },
-  { href: '/admin/audit', label: text.audit, icon: 'audit', group: text.groupSetup },
+  {
+    href: '/admin/setup/classes',
+    label: setup.nav.classes,
+    icon: 'prices',
+    group: setup.groups.prices,
+  },
+  {
+    href: '/admin/setup/rates',
+    label: setup.nav.rates,
+    icon: 'prices',
+    group: setup.groups.prices,
+  },
+  {
+    href: '/admin/setup/discounts',
+    label: setup.nav.discounts,
+    icon: 'prices',
+    group: setup.groups.prices,
+  },
+  {
+    href: '/admin/setup/extras',
+    label: setup.nav.extras,
+    icon: 'prices',
+    group: setup.groups.prices,
+  },
+  {
+    href: '/admin/setup/delivery-zones',
+    label: setup.nav.zones,
+    icon: 'places',
+    group: setup.groups.places,
+  },
+  {
+    href: '/admin/setup/locations',
+    label: setup.nav.locations,
+    icon: 'places',
+    group: setup.groups.places,
+  },
+  {
+    href: '/admin/settings',
+    label: setup.nav.settings,
+    icon: 'settings',
+    group: setup.groups.places,
+  },
+  { href: '/admin/team', label: text.team, icon: 'team', group: setup.groups.places },
+  { href: '/admin/audit', label: text.audit, icon: 'audit', group: setup.groups.places },
 ]
 
 export const adminTabs = [
@@ -39,3 +84,9 @@ export async function getClassNames() {
  * layout, so it asks too and never runs with nobody signed in.
  */
 export const requireAdmin = () => requireRole(['admin'], '/admin')
+
+/** An API answer for one record. "Not found" (or an address that is not an id) shows the not-found page. */
+export function orNotFound(result) {
+  if (result.error === 'NOT_FOUND' || result.error === 'VALIDATION_FAILED') notFound()
+  return result
+}

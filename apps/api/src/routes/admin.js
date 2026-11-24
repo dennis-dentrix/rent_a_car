@@ -1,25 +1,22 @@
 import { Router } from 'express'
 import {
-  createAgreementSchema,
   createOwnerSchema,
-  createTrackerSchema,
   createVehicleSchema,
   inviteStaffSchema,
   listQuerySchema,
   updateStaffSchema,
-  updateTrackerSchema,
   updateVehicleSchema,
 } from '@rent-a-car/shared'
 import { idParam, requireRoles } from '../middleware/auth.js'
 import { handle } from '../middleware/respond.js'
 import { adminDataRouter } from './admin-data.js'
+import { mountFleetDetails } from './fleet-details.js'
 import { adminOverviewRouter } from './admin-overview.js'
 import { adminOperatorsRouter } from './admin-operators.js'
 import { adminPostsRouter } from './posts.js'
 import { adminServicesRouter } from './admin-services.js'
-import { createAgreement, createOwner, getOwner, listOwners } from '../services/owners.js'
+import { createOwner, getOwner, listOwners } from '../services/owners.js'
 import { inviteStaff, listStaff, updateStaff } from '../services/staff-accounts.js'
-import { addTracker, updateTracker } from '../services/trackers.js'
 import { createVehicle, updateVehicle } from '../services/vehicles.js'
 
 // Admin only.
@@ -31,6 +28,7 @@ adminRouter.use(adminDataRouter)
 adminRouter.use(adminServicesRouter)
 adminRouter.use(adminPostsRouter)
 adminRouter.use(adminOperatorsRouter)
+mountFleetDetails(adminRouter)
 
 adminRouter.post(
   '/vehicles',
@@ -44,21 +42,6 @@ adminRouter.patch(
   '/vehicles/:id',
   handle(async (req) => ({
     data: await updateVehicle(req.auth.db, req.params.id, updateVehicleSchema.parse(req.body)),
-  })),
-)
-
-adminRouter.post(
-  '/vehicles/:id/trackers',
-  handle(async (req) => ({
-    data: await addTracker(req.auth.db, req.params.id, createTrackerSchema.parse(req.body)),
-    status: 201,
-  })),
-)
-
-adminRouter.patch(
-  '/trackers/:id',
-  handle(async (req) => ({
-    data: await updateTracker(req.auth.db, req.params.id, updateTrackerSchema.parse(req.body)),
   })),
 )
 
@@ -78,14 +61,6 @@ adminRouter.get(
 adminRouter.get(
   '/vehicle-owners/:id',
   handle(async (req) => ({ data: await getOwner(req.auth.db, req.params.id) })),
-)
-
-adminRouter.post(
-  '/vehicle-owners/:id/agreements',
-  handle(async (req) => ({
-    data: await createAgreement(req.auth.db, req.params.id, createAgreementSchema.parse(req.body)),
-    status: 201,
-  })),
 )
 
 adminRouter.get(

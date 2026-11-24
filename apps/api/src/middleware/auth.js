@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { STAFF_ROLES } from '@rent-a-car/shared'
 import { AppError } from '../lib/errors.js'
 import { createAnonClient, createUserClient } from '../lib/supabase.js'
 import { hasVerifiedFactor } from '../lib/factors.js'
@@ -66,15 +67,22 @@ export const requireRoles = (...roles) => [
   authenticate,
   async (req, _res, next) => {
     const { db, user } = req.auth
-    const profile = await findProfile(db, user.id, 'role')
+    const profile = await findProfile(
+      db,
+      user.id,
+      'role, operator_id, operator:operators!operator_id(slug)',
+    )
     if (!profile || !roles.includes(profile.role)) throw new AppError('FORBIDDEN')
-    if (mfaRequired() && req.auth.aal !== 'aal2') {
+    // A second factor is required of staff and admin; a rental company's people may choose it (and then must use it).
+    if (mfaRequired() && STAFF_ROLES.includes(profile.role) && req.auth.aal !== 'aal2') {
       throw new AppError('FORBIDDEN', {
         message: 'Sign in with your second factor to use this.',
         details: { reason: 'mfa_required' },
       })
     }
     req.auth.role = profile.role
+    req.auth.operatorId = profile.operator_id
+    req.auth.operatorSlug = profile.operator?.slug
     next()
   },
 ]
