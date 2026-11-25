@@ -14,8 +14,8 @@ function Group({ group, settings }) {
   if (!settings.length) return null
   return (
     <section className="flex flex-col gap-4">
-      <h2 className="text-title-3">{text.groups[group]}</h2>
-      <ul className="flex flex-col gap-5 rounded-card bg-bg-grouped p-4">
+      <h2 className="text-section">{text.groups[group]}</h2>
+      <ul className="flex flex-col gap-5 rounded-panel border border-separator bg-surface p-5 shadow-1">
         {settings.map((setting) => (
           <li key={setting.key}>
             <SettingRow settingKey={setting.key} value={setting.value} />

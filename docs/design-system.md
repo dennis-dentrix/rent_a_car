@@ -54,6 +54,10 @@ Names are meaning-based. Tailwind utilities use the same names (`bg-bg-grouped`,
 
 ## 3. Typography
 
+### One type ramp (owner, 25 November 2026)
+
+Every page uses six sizes: 12, 14, 16, 20, 28, and 40 px (40 for the desktop hero only). Body text is 14/22. Text typed into a field is 16 px on phones, so iOS does not zoom. This replaces the sizes in the table below and principle 5's 16 px body; `apps/web/styles/tokens/index.js` is the source.
+
 **Nunito Sans**, one family, variable (weights 400 to 700 used), loaded with `next/font/google` (self-hosted, `display: swap`, only this family). Owner decision, 23 November 2026, replacing the monospace choice of the same day. The fallback is the system sans stack: `-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`. Large text is tightened a little and small uppercase text opened a little (the tracking column below). `.num` sets the tabular figures for money, plates, dates, and durations, so columns line up. Sizes are in `rem` so the user's text-size setting scales them. The header links appear from `lg` and the phone tab bar covers smaller screens.
 
 | Token      | Phone / desktop        | Weight | Tracking | Use                                     |
@@ -183,3 +187,46 @@ The app keeps people by being useful: saved vehicles, a trip checklist, booking 
 - Tokens are defined once in `styles/tokens`, built from `brand.js`, and mapped to Tailwind names in one table. A lint rule bans raw hex and arbitrary colour or size classes outside `styles/tokens` and `brand.js`.
 - A token change is reviewed against both themes and the contrast check. New tokens and components arrive with an update to this document and the component library.
 - Open: the logo drawing (the mark is specified, the SVG is a Phase 0 deliverable); a second brand colour for corporate pages, deferred with B2B.
+
+## Working screens: operator console and admin
+
+Owner request, 25 November 2026: follow the Stitch operator screens (fleet, bookings, admin review queue, component sheet). Nunito Sans stays (the ruling of 23 November 2026), where the Stitch file names Inter.
+
+| Part | Rule |
+| --- | --- |
+| Type | The one ramp above. Working screens add names by job (`page`, `section`, `metric`, `cell`, `meta`) at the same sizes. |
+| Frame | `ConsoleShell`: from tablet up a sidebar (logo, area, who is signed in, every page under its group with its own icon, website link, sign out, appearance). Phones keep a slim top bar and the four-item tab bar; More lists the same groups. Pressing a page changes colour only: no movement between pages. |
+| Page | `PageHeader`: uppercase label, title, one line, actions. |
+| Motion | Figures, the phone menu, and the renter's dashboard arrive 40 ms apart (`stagger`), once per visit to the page. Reduced motion shows them at once. |
+| Figures | `StatCard`: label, icon tile, number, share bar, context. `warm` when someone is waiting; one `strong` navy card per row. |
+| Lists | `DataTable` inside a card: uppercase header row, status pills with a dot, cards on phones. `ResourceTable` adds search, filter pills, and a drawer to add or edit. |
+
+Left out on purpose, because no data stands behind them: telematics and maps, escrow and revenue figures, chauffeur vetting, and countdown request cards.
+
+## Plain pages and scalable sizes (owner, 25 November 2026)
+
+Public pages follow the restraint of Apple and Google product pages. This replaces the layering, eyebrow-label, and icon-tile lines in section 2.
+
+| Part | Rule |
+| --- | --- |
+| Cards | Only for a thing someone can pick or act on: a car, the search, a price. Everything else is grouped by space and a hairline (`RuledItem`). |
+| Headings | One `SectionHeading` per section: 20 px on phones, 28 px from tablet up. Card and item titles stay smaller. No label above a title. |
+| Decoration | No icon tiles, arrows on links, hover lifts, or fade-in on scroll. The hero keeps its badge and the logo's arc and pulsing arrival dot (`ArcBackdrop`), at the owner's request. |
+| Colour | The navy panels keep the brand gradient (navy, primary, accent). |
+| Words | A title says what the section is. A fact is stated once on a screen where possible. |
+| Units | Spacing, control heights, and radius are in `rem`; breakpoints are in `em`; hairlines and shadows stay in px; touch targets are `max(44px, 2.75rem)`; phone side margins (`gutter`) stop growing with the text. |
+| Large text | Check every public page at 375 px with text at 200%: nothing scrolls sideways. |
+
+## Choosing and deciding (owner, 25 November 2026)
+
+| Principle | Rule |
+| --- | --- |
+| Choice overload | At most five links in a named group, about seven choices in one view. A home section offers one way into each item. |
+| Cognitive load | Familiar layouts. A fact is not repeated on the same screen. Ask only for what the next step needs. |
+| Stand-out | One filled button per view, for the main action. Buttons repeated down a list are tonal. |
+| Trust | Only true signals: "Approved company" on a listed car (an admin reviewed it). No ratings, counts, or logos we cannot show evidence for. |
+| Serial position | The most used item comes first, the next most memorable last, in menus and question lists. |
+| Grouping | Related things sit closer than unrelated ones; like things look alike. |
+
+The appearance switch sits in the footer and in Settings, not in the public header (this replaces the header line in section 10).
+

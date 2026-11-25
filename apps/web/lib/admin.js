@@ -8,59 +8,34 @@ const text = copy.admin.nav
 const setup = copy.adminSetup
 const fleet = copy.adminFleet
 
-// The admin's navigation: a labelled side rail from tablet up, and on phones four tabs, the last of which opens the
-// full list.
+const entry = (group) => (href, label, icon) => ({ href, label, icon, group })
+const work = entry(text.groupWork)
+const supply = entry(text.groupSupply)
+const price = entry(setup.groups.prices)
+const place = entry(text.groupPlaces)
+const content = entry(text.groupContent)
+const system = entry(text.groupSystem)
+
+// The admin's navigation, ordered by how often it is needed: what is waiting today, who supplies the cars, what
+// they cost, where they go, then content and the system itself. From tablet up a labelled sidebar; on phones four
+// tabs, the last of which opens the full list.
 export const adminRail = [
-  { href: '/admin', label: text.overview, icon: 'today', isExact: true, group: text.groupWork },
-  { href: '/admin/bookings', label: text.bookings, icon: 'requests', group: text.groupWork },
-  { href: '/admin/enquiries', label: text.enquiries, icon: 'inbox', group: text.groupWork },
-  { href: '/admin/documents', label: text.documents, icon: 'documents', group: text.groupWork },
-  { href: '/admin/operators', label: text.companies, icon: 'companies', group: text.groupWork },
-  { href: '/admin/posts', label: text.guides, icon: 'guides', group: text.groupContent },
-  {
-    href: '/admin/setup/classes',
-    label: setup.nav.classes,
-    icon: 'prices',
-    group: setup.groups.prices,
-  },
-  {
-    href: '/admin/setup/rates',
-    label: setup.nav.rates,
-    icon: 'prices',
-    group: setup.groups.prices,
-  },
-  {
-    href: '/admin/setup/discounts',
-    label: setup.nav.discounts,
-    icon: 'prices',
-    group: setup.groups.prices,
-  },
-  {
-    href: '/admin/setup/extras',
-    label: setup.nav.extras,
-    icon: 'prices',
-    group: setup.groups.prices,
-  },
-  {
-    href: '/admin/setup/delivery-zones',
-    label: setup.nav.zones,
-    icon: 'places',
-    group: setup.groups.places,
-  },
-  {
-    href: '/admin/setup/locations',
-    label: setup.nav.locations,
-    icon: 'places',
-    group: setup.groups.places,
-  },
-  {
-    href: '/admin/settings',
-    label: setup.nav.settings,
-    icon: 'settings',
-    group: setup.groups.places,
-  },
-  { href: '/admin/team', label: text.team, icon: 'team', group: setup.groups.places },
-  { href: '/admin/audit', label: text.audit, icon: 'audit', group: setup.groups.places },
+  { ...work('/admin', text.overview, 'today'), isExact: true },
+  work('/admin/enquiries', text.enquiries, 'inbox'),
+  work('/admin/bookings', text.bookings, 'requests'),
+  work('/admin/documents', text.documents, 'documents'),
+  supply('/admin/operators', text.companies, 'companies'),
+  supply('/admin/setup/drivers', fleet.nav.drivers, 'drivers'),
+  price('/admin/setup/classes', setup.nav.classes, 'classes'),
+  price('/admin/setup/rates', setup.nav.rates, 'rates'),
+  price('/admin/setup/discounts', setup.nav.discounts, 'discounts'),
+  price('/admin/setup/extras', setup.nav.extras, 'extras'),
+  place('/admin/setup/locations', setup.nav.locations, 'locations'),
+  place('/admin/setup/delivery-zones', setup.nav.zones, 'zones'),
+  content('/admin/posts', text.guides, 'guides'),
+  system('/admin/team', text.team, 'team'),
+  system('/admin/settings', setup.nav.settings, 'settings'),
+  system('/admin/audit', text.audit, 'audit'),
 ]
 
 export const adminTabs = [

@@ -19,7 +19,6 @@ export const classPage = {
   sticky: 'Check dates',
   ask: 'Ask about this car',
   askMessage: (name) => `Hello, I would like to ask about the ${name}.`,
-  similarEyebrow: 'More to consider',
   similarTitle: 'Other car types',
   errorTitle: 'We could not load this car type',
   errorText: 'Check your connection and try again.',

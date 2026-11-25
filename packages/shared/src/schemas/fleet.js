@@ -1,10 +1,35 @@
 import { z } from 'zod'
+import {
+  BLOG_IMAGE_CONTENT_TYPES,
+  CHAUFFEUR_OPTIONS,
+  DRIVE_TYPES,
+  FUEL_TYPES,
+  MAX_VEHICLE_PHOTO_BYTES,
+  TRANSMISSIONS,
+} from '../constants.js'
 import { e164Phone, hasAtLeastOneField, pageFields } from './common.js'
 
 const text = (max = 200) => z.string().trim().min(1).max(max)
 const optionalText = (max = 200) => text(max).optional()
 
 export const VEHICLE_STATUSES = ['active', 'maintenance', 'retired']
+
+const blankable = (field) => field.nullable().optional()
+
+// What a renter wants to know about the car. Each may be left empty, or cleared later.
+const vehicleDetails = {
+  seats: blankable(z.number().int().min(1).max(60)),
+  luggage_capacity: blankable(z.number().int().min(0).max(100)),
+  transmission: blankable(z.enum(TRANSMISSIONS)),
+  fuel_type: blankable(z.enum(FUEL_TYPES)),
+  drive_type: blankable(z.enum(DRIVE_TYPES)),
+  engine_cc: blankable(z.number().int().min(50).max(10_000)),
+  colour: blankable(text(40)),
+  description: blankable(text(1000)),
+  features: z.array(text(60)).max(20).optional(),
+  chauffeur_option: blankable(z.enum(CHAUFFEUR_OPTIONS)),
+  chauffeur_daily_kes: blankable(z.number().int().min(1).max(100_000_000)),
+}
 
 const vehicleFields = {
   registration: text(20),
@@ -16,7 +41,22 @@ const vehicleFields = {
   mileage_km: z.number().int().min(0).optional(),
   home_location_id: z.uuid().optional(),
   owner_id: z.uuid().nullable().optional(),
+  // The car's own price per day; empty means the class rate.
+  daily_rate_kes: z.number().int().min(1).max(100_000_000).nullable().optional(),
+  ...vehicleDetails,
 }
+
+const photoFile = {
+  content_type: z.enum(BLOG_IMAGE_CONTENT_TYPES),
+  size_bytes: z.number().int().min(1).max(MAX_VEHICLE_PHOTO_BYTES),
+}
+const photoPath = z.string().trim().min(3).max(300)
+
+/** What the browser says it is about to upload as a car photo; the signed link accepts exactly this file. */
+export const createVehiclePhotoUploadSchema = z.strictObject(photoFile)
+/** Saves a photo once it is in storage. */
+export const addVehiclePhotoSchema = z.strictObject({ ...photoFile, storage_path: photoPath })
+export const removeVehiclePhotoSchema = z.strictObject({ storage_path: photoPath })
 
 export const createVehicleSchema = z.strictObject(vehicleFields)
 

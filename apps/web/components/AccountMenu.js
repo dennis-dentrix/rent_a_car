@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useCallback, useRef, useState } from 'react'
+import { LayoutDashboard, LogIn, LogOut, Settings } from 'lucide-react'
 import { signOutAction } from '@/app/auth/actions'
 import Avatar from '@/components/Avatar'
 import Button from '@/components/Button'
@@ -13,10 +14,18 @@ import { useWho } from '@/lib/use-who'
 const text = copy.auth.menu
 
 const ITEM_CLASS =
-  'state-layer flex min-h-touch w-full items-center rounded-control px-3 text-left text-body'
+  'state-layer flex min-h-touch w-full items-center gap-3 rounded-control px-3 text-left text-body'
+
+function MenuLink({ href, icon: Icon, onClose, children }) {
+  return (
+    <Link href={href} role="menuitem" className={ITEM_CLASS} onClick={onClose}>
+      <Icon size={18} className="text-label-2" aria-hidden="true" />
+      {children}
+    </Link>
+  )
+}
 
 function MenuPanel({ who, onClose }) {
-  const area = areaFor(who.role)
   return (
     <div
       role="menu"
@@ -24,19 +33,15 @@ function MenuPanel({ who, onClose }) {
       className="animate-pop-in absolute right-0 top-full z-sheet mt-2 w-64 origin-top-right rounded-panel border border-separator bg-surface p-1 shadow-2"
     >
       <p className="truncate px-3 py-2 text-callout font-semibold">{who.name}</p>
-      <Link href="/account" role="menuitem" className={ITEM_CLASS} onClick={onClose}>
-        {text.account}
-      </Link>
-      <Link href="/settings" role="menuitem" className={ITEM_CLASS} onClick={onClose}>
+      <MenuLink href={who.home} icon={LayoutDashboard} onClose={onClose}>
+        {areaFor(who.role)?.label ?? copy.nav.dashboard}
+      </MenuLink>
+      <MenuLink href="/settings" icon={Settings} onClose={onClose}>
         {text.settings}
-      </Link>
-      {area && (
-        <Link href={area.href} role="menuitem" className={ITEM_CLASS} onClick={onClose}>
-          {area.label}
-        </Link>
-      )}
+      </MenuLink>
       <form action={signOutAction}>
         <button type="submit" role="menuitem" className={ITEM_CLASS}>
+          <LogOut size={18} className="text-label-2" aria-hidden="true" />
           {text.signOut}
         </button>
       </form>
@@ -62,8 +67,9 @@ export default function AccountMenu() {
         href={hasHint ? '/account' : '/auth'}
         variant="tonal"
         size="compact"
-        className="hidden md:inline-flex"
+        className="whitespace-nowrap"
       >
+        {!hasHint && <LogIn size={16} aria-hidden="true" />}
         {hasHint ? copy.nav.account : copy.nav.signIn}
       </Button>
     )

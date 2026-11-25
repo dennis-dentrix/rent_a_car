@@ -6,11 +6,12 @@ import ClassGrid from '@/components/ClassGrid'
 import EmptyState from '@/components/EmptyState'
 import LargeTitle from '@/components/LargeTitle'
 import { copy } from '@/copy/en'
-import { getClasses } from '@/lib/catalogue'
+import { getShowroom } from '@/lib/catalogue'
 import { pageMetadata } from '@/lib/seo'
 import { withParams } from '@/lib/query'
 import { breadcrumbJsonLd } from '@/lib/structured-data'
 import JsonLd from '@/components/JsonLd'
+import LiveCars from '@/components/LiveCars'
 import ServiceFilter from '@/components/ServiceFilter'
 import { END_OF_DAY, TIME_VALUES } from '@/lib/stay-times'
 import { formatStayRange } from '@/lib/stay-range'
@@ -127,6 +128,8 @@ const paramsFrom = (query, stay) => ({
   q: query.q,
   tag: query.tag,
   class: query.class,
+  type: query.type,
+  gear: query.gear,
 })
 
 const pageSubtitle = (text, stay) => {
@@ -137,19 +140,17 @@ const pageSubtitle = (text, stay) => {
 export default async function CarsPage({ searchParams }) {
   const query = await searchParams
   const stay = readStay(query)
-  const result = await getClasses({ from: stay.from, to: stay.to })
+  // Which particular cars are free on given dates is not known yet, so they are shown only before dates are chosen.
+  const { classes, cars, error } = await getShowroom({ from: stay.from, to: stay.to })
   const params = paramsFrom(query, stay)
   const subtitle = pageSubtitle(query.q, stay)
   return (
     <>
       <JsonLd data={breadcrumbJsonLd(CRUMBS)} />
       <LargeTitle subtitle={subtitle}>{copy.cars.title}</LargeTitle>
+      <LiveCars cars={stay.start ? [] : cars} params={params} />
       <ServiceFilter params={params} />
-      {result.error ? (
-        <LoadError params={params} />
-      ) : (
-        <Results items={result.data} params={params} />
-      )}
+      {error ? <LoadError params={params} /> : <Results items={classes} params={params} />}
     </>
   )
 }

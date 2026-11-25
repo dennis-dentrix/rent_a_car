@@ -22,7 +22,6 @@ export const blogCopy = {
   ctaTitle: 'Ready to hire a car?',
   ctaText: 'See the full price before you ask. No deposit is taken.',
   ctaAction: 'Find a car',
-  homeEyebrow: 'Guides',
   homeTitle: 'Before you hire',
   homeAll: 'All guides',
   by: 'Carvo',

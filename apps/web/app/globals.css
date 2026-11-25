@@ -25,6 +25,7 @@
       animation-duration: 0.01ms !important;
       /* Without this an endless animation (the hero's pulse) would flicker at 0.01 ms instead of stopping. */
       animation-iteration-count: 1 !important;
+      animation-delay: 0s !important;
       transition-duration: 0.01ms !important;
       scroll-behavior: auto !important;
     }
@@ -105,6 +106,27 @@
   }
   .animate-rise {
     animation: rise theme('transitionDuration.standard') theme('transitionTimingFunction.standard');
+  }
+  /* A group that arrives together comes in one after another, 40 ms apart. Past the sixth they arrive together, so
+     a long list is never kept waiting. Nothing is blocked while it plays. */
+  .stagger > * {
+    animation: rise theme('transitionDuration.slow') cubic-bezier(0.23, 1, 0.32, 1) backwards;
+    animation-delay: 200ms;
+  }
+  .stagger > :nth-child(1) {
+    animation-delay: 0ms;
+  }
+  .stagger > :nth-child(2) {
+    animation-delay: 40ms;
+  }
+  .stagger > :nth-child(3) {
+    animation-delay: 80ms;
+  }
+  .stagger > :nth-child(4) {
+    animation-delay: 120ms;
+  }
+  .stagger > :nth-child(5) {
+    animation-delay: 160ms;
   }
 }
 

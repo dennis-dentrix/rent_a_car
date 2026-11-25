@@ -4,18 +4,18 @@ import CurrencySelector from '@/components/CurrencySelector'
 import HeaderSearch from '@/components/HeaderSearch'
 import Logo from '@/components/Logo'
 import NavLink from '@/components/NavLink'
-import ThemeToggle from '@/components/ThemeToggle'
 import { copy } from '@/copy/en'
 import { topLinks } from '@/lib/nav'
 
 /**
- * Phone: the mark and name on the left, the settings link on the right (the tab bar carries the
- * navigation). Tablet and up: links in the middle, sign in on the right.
+ * Phone and tablet: the mark and name on the left, controls on the right (the tab bar carries the
+ * navigation). Desktop: links in the middle. Sign in shows from tablet up. With very large text on a phone the
+ * header wraps and scrolls away instead of covering a quarter of the screen.
  */
 export default function Header({ suggestions }) {
   return (
-    <header className="glass pt-safe sticky top-0 z-header border-b border-separator">
-      <div className="mx-auto flex h-header max-w-[1280px] items-center gap-4 px-4 md:h-header-wide md:gap-8 md:px-6 lg:px-10">
+    <header className="glass pt-safe sticky top-0 z-header border-b border-separator max-[20em]:static">
+      <div className="mx-auto flex min-h-[theme(spacing.header)] max-w-page flex-wrap items-center gap-x-4 gap-y-2 px-gutter py-2 md:min-h-[theme(spacing.header-wide)] md:gap-x-8 md:px-6 lg:px-10">
         <Link href="/" aria-label={copy.nav.home} className="shrink-0">
           <Logo />
         </Link>
@@ -26,10 +26,9 @@ export default function Header({ suggestions }) {
             </NavLink>
           ))}
         </nav>
-        <div className="ml-auto flex items-center gap-2 md:ml-0">
+        <div className="ml-auto flex flex-wrap items-center justify-end gap-2 md:ml-0">
           <HeaderSearch suggestions={suggestions} />
           <CurrencySelector />
-          <ThemeToggle />
           <AccountMenu />
         </div>
       </div>

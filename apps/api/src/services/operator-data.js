@@ -2,15 +2,18 @@ import {
   createOperatorClassSchema,
   createOperatorOwnerSchema,
   createOperatorPlaceSchema,
+  createPolicySchema,
   createRateSchema,
   createVehicleSchema,
   updateOperatorClassSchema,
   updateOperatorPlaceSchema,
+  updatePolicySchema,
   updateRateSchema,
   updateVehicleSchema,
 } from '@carvo/shared'
+import { createClass } from './operator-classes.js'
 import { resource } from './resources.js'
-import { getVehicle } from './vehicles.js'
+import { VEHICLE_DETAIL_COLUMNS, getVehicle } from './vehicles.js'
 
 // What a rental company fills in. Every list is narrowed to its own rows, and every new row is stamped with its
 // operator by the server, so a company can never write for another one. Row Level Security is the real rule.
@@ -31,7 +34,8 @@ const ownSlug = (input, { operatorSlug }) => `${operatorSlug}-${wordFrom(input.n
 export const OPERATOR_RESOURCES = {
   vehicles: resource(
     'vehicles',
-    'registration, chassis_number, make, model, year, class_id, status, mileage_km, home_location_id, owner_id',
+    'registration, chassis_number, make, model, year, class_id, status, mileage_km, home_location_id, owner_id, ' +
+      `daily_rate_kes, photo_paths, ${VEHICLE_DETAIL_COLUMNS}`,
     {
       create: createVehicleSchema,
       update: updateVehicleSchema,
@@ -57,6 +61,7 @@ export const OPERATOR_RESOURCES = {
         slug: ownSlug(input, auth),
         is_public: false,
       }),
+      insert: createClass,
     },
   ),
   rates: resource('rates', 'class_id, price_kes, usd_override, effective_from, effective_to', {
@@ -65,6 +70,11 @@ export const OPERATOR_RESOURCES = {
     scope: ownRows,
     prepare: stamp,
   }),
+  policies: resource(
+    'operator_policies',
+    'class_id, min_hire_days, min_age, cross_border, daily_km_limit, fuel_policy, rules',
+    { create: createPolicySchema, update: updatePolicySchema, scope: ownRows, prepare: stamp },
+  ),
   places: resource(
     'locations',
     'name, type, address, slug, latitude, longitude, entrance_note, is_served',

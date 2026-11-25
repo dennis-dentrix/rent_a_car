@@ -6,19 +6,25 @@ export const operatorConsole = {
     bookings: 'Bookings',
     fleet: 'Fleet',
     owners: 'Owners',
-    classes: 'Classes',
-    rates: 'Daily rates',
     places: 'Places',
     services: 'Services',
     company: 'Company',
     more: 'More',
-    groupRun: 'Run',
-    groupFleet: 'Fleet',
-    groupPricing: 'Pricing',
-    groupSetup: 'Setup',
+    groupRun: 'Operations',
+    groupFleet: 'Cars and prices',
+    groupSetup: 'Your business',
   },
   today: {
-    eyebrow: 'Your company',
+    eyebrow: 'Operations today',
+    subtitle: 'Your cars, today’s handovers, and what is still needed before renters can book.',
+    ready: 'Ready to rent',
+    readyDone: 'Setup complete',
+    readyLeft: (n) => `${n} ${n === 1 ? 'step' : 'steps'} to go`,
+    done: 'Done',
+    dueToday: 'Due today',
+    ofFleet: (n) => `of ${n} in your fleet`,
+    ofActive: (n) => `of ${n} active`,
+    unpricedShort: (n) => `${n} without a daily rate`,
     pickups: 'Pickups today',
     returns: 'Returns today',
     onHire: 'On hire now',
@@ -43,7 +49,7 @@ export const operatorConsole = {
       rate: {
         title: 'Set a daily rate',
         hint: 'The price per day for a class.',
-        href: '/console/rates',
+        href: '/console/classes',
       },
       service: {
         title: 'Choose what you offer',
@@ -70,16 +76,6 @@ export const operatorConsole = {
     'vehicle-owners': {
       title: 'Owners',
       subtitle: 'People and companies whose cars you manage. Contact details only.',
-    },
-    classes: {
-      title: 'Classes',
-      subtitle:
-        'Pick from the classes Carvo lists, or add your own. Your own class is shown to renters once Carvo lists it.',
-    },
-    rates: {
-      title: 'Daily rates',
-      subtitle:
-        'Your price per day for a class, from a date. Renters are priced from Carvo’s rates until booking requests are open.',
     },
     places: {
       title: 'Your own places',

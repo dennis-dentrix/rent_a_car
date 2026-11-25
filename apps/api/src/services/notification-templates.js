@@ -81,6 +81,21 @@ export const TEMPLATES = {
       'Please upload a clear copy from your account.',
     ],
   },
+  // Sent at once and never saved: the code lets its holder sign a report.
+  inspection_code: {
+    subject: () => 'Your code to sign the inspection report',
+    body: ({ payload }) => [
+      `Your code is ${payload.code}. It works for ${payload.minutes} minutes.`,
+      'Read the report first. Give the code only to the person handing you the car.',
+    ],
+  },
+  inspection_report: {
+    subject: ({ booking }) => `Your inspection report for booking ${booking.reference}`,
+    body: (ctx) => [
+      `Both sides have signed the ${ctx.payload.type} inspection report. Your copy is attached, and it is also in your account.`,
+      stay(ctx),
+    ],
+  },
   enquiry_received: {
     subject: () => 'We received your enquiry',
     body: () => [

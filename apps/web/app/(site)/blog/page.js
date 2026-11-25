@@ -1,5 +1,4 @@
 import Breadcrumbs from '@/components/Breadcrumbs'
-import Eyebrow from '@/components/Eyebrow'
 import GuideCards from '@/components/GuideCards'
 import JsonLd from '@/components/JsonLd'
 import { copy } from '@/copy/en'
@@ -23,7 +22,6 @@ export default async function BlogPage() {
       <JsonLd data={breadcrumbJsonLd(TRAIL)} />
       <Breadcrumbs trail={TRAIL} />
       <header className="max-w-2xl">
-        <Eyebrow>{text.eyebrow}</Eyebrow>
         <h1 className="text-display md:text-display-lg">{text.title}</h1>
         <p className="mt-3 text-body text-label-2">{text.subtitle}</p>
       </header>

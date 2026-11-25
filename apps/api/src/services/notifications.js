@@ -1,4 +1,5 @@
 import { logger } from '../lib/logger.js'
+import { readFile } from '../lib/storage.js'
 import { emailConfigured, sendEmail } from '../lib/email.js'
 import { unwrap, withServiceRole } from '../lib/supabase.js'
 import { renderEmail } from './notification-templates.js'
@@ -42,6 +43,13 @@ async function recordFailure(notification, error, { admin, now }) {
   return false
 }
 
+// The sealed inspection report travels with its email.
+async function attachmentsFor({ kind, payload }) {
+  if (kind !== 'inspection_report') return {}
+  const content = (await readFile(payload.storage_path)).toString('base64')
+  return { attachments: [{ name: 'inspection-report.pdf', mime_type: 'application/pdf', content }] }
+}
+
 /** Send one claimed notification and record the result. Returns true when it was sent. */
 async function deliver(notification, bookings, context) {
   const { admin, send } = context
@@ -49,7 +57,7 @@ async function deliver(notification, bookings, context) {
     const booking = bookings.get(notification.booking_id) ?? null
     const email = renderEmail(notification.kind, { payload: notification.payload, booking })
     if (!email) throw new Error(`No template for ${notification.kind}`)
-    await send({ to: notification.to_email, ...email })
+    await send({ to: notification.to_email, ...email, ...(await attachmentsFor(notification)) })
     await finish(admin, notification.id, { sent: true })
     return true
   } catch (error) {

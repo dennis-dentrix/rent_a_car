@@ -19,18 +19,18 @@ export default async function ConsolePlacesPage() {
   ])
   const failed = airports.error || mine.error
   return (
-    <AdminPage title={text.title} subtitle={text.subtitle} isNarrow hasError={Boolean(failed)}>
+    <AdminPage title={text.title} subtitle={text.subtitle} hasError={Boolean(failed)}>
       <section className="flex flex-col gap-3">
         <div>
-          <h2 className="text-title-3">{text.airportsTitle}</h2>
-          <p className="text-callout text-label-2">{text.airportsHint}</p>
+          <h2 className="text-section">{text.airportsTitle}</h2>
+          <p className="text-meta text-label-2">{text.airportsHint}</p>
         </div>
         <AirportSwitches airports={airports.data ?? []} />
       </section>
       <section className="flex flex-col gap-3">
         <div>
-          <h2 className="text-title-3">{own.title}</h2>
-          <p className="text-callout text-label-2">{own.subtitle}</p>
+          <h2 className="text-section">{own.title}</h2>
+          <p className="text-meta text-label-2">{own.subtitle}</p>
         </div>
         <ResourceList
           rows={mine.data ?? []}

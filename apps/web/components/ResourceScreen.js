@@ -6,37 +6,22 @@ import { copy } from '@/copy/en'
 import { adminGet } from '@/lib/admin'
 import { nextPageHref } from '@/lib/admin-format'
 import { resourcePaths } from '@/lib/admin-resources'
-import { refPath, registryFor } from '@/lib/resource-scopes'
-
-// Other records a screen refers to (the classes a rate belongs to), as an id and something to show.
-async function loadRefs(scope, needs = [], token) {
-  const lists = await Promise.all(
-    needs.map((name) => adminGet(refPath(scope, name), token, { limit: 100 })),
-  )
-  return Object.fromEntries(
-    needs.map((name, index) => [
-      name,
-      (lists[index].data ?? []).map((record) => ({
-        id: record.id,
-        name: record.name ?? record.full_name,
-      })),
-    ]),
-  )
-}
+import { loadRefs } from '@/lib/resource-refs'
+import { registryFor } from '@/lib/resource-scopes'
 
 const nameMaps = (refs) =>
   Object.fromEntries(
-    Object.entries(refs).map(([key, records]) => [
-      key,
-      new Map(records.map((record) => [record.id, record.name])),
-    ]),
+    Object.entries(refs)
+      .filter(([, records]) => Array.isArray(records))
+      .map(([key, records]) => [key, new Map(records.map((record) => [record.id, record.name]))]),
   )
 
 /**
  * A whole list-and-edit screen for one kind of record, for the admin or for an operator: the title, the "Add new" form,
  * each record with its edit form, and the link to older ones. `labels` is the screen's copy ({ title, subtitle, fields }).
  */
-export default async function ResourceScreen({ scope, resource, labels, token, cursor, basePath }) {
+export default async function ResourceScreen(props) {
+  const { scope, resource, labels, token, cursor, basePath } = props
   const definition = registryFor(scope)[resource]
   const [list, refs] = await Promise.all([
     adminGet(resourcePaths(resource, definition, scope).list, token, { cursor }),
@@ -44,10 +29,12 @@ export default async function ResourceScreen({ scope, resource, labels, token, c
   ])
   const names = nameMaps(refs)
   return (
-    <AdminPage title={labels.title} subtitle={labels.subtitle} isNarrow>
+    <AdminPage eyebrow={props.eyebrow} title={labels.title} subtitle={labels.subtitle}>
       {list.error && <Alert tone="error" title={copy.admin.loadError} />}
       <ResourceList
         isReadOnly={definition.isReadOnly}
+        columns={definition.columns}
+        filters={definition.filters}
         rows={list.data ?? []}
         summarize={(row) => definition.summarize(row, names)}
         formProps={{ resource, scope, fields: definition.fields, labels: labels.fields, refs }}

@@ -20,7 +20,7 @@ const SIZES = {
 
 const buttonClasses = ({ variant, size, isFullWidth, className }) =>
   cx(
-    'state-layer inline-flex select-none items-center justify-center gap-2 rounded-control font-semibold',
+    'state-layer inline-flex max-w-full select-none items-center justify-center gap-2 rounded-control text-center font-semibold',
     'transition-transform duration-fast active:scale-[0.97] disabled:pointer-events-none disabled:opacity-40',
     VARIANTS[variant],
     SIZES[size],

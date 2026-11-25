@@ -3,6 +3,7 @@
 import { useId, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { CarFront, MapPin, Search, Tag } from 'lucide-react'
+import { TYPED_TEXT } from '@/components/Field'
 import { copy } from '@/copy/en'
 import { cx } from '@/lib/cx'
 import { filterSuggestions, textSearchHref } from '@/lib/suggestions'
@@ -102,7 +103,7 @@ function SuggestInput({ box, listId, isAutoFocus }) {
         onChange={(event) => box.change(event.target.value)}
         onFocus={() => box.setIsOpen(true)}
         onKeyDown={box.onKeyDown}
-        className="min-w-0 flex-1 bg-transparent py-2 text-body focus-visible:outline-none"
+        className={cx('min-w-0 flex-1 bg-transparent py-2 focus-visible:outline-none', TYPED_TEXT)}
       />
     </div>
   )

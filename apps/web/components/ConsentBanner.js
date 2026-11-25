@@ -22,7 +22,7 @@ export default function ConsentBanner() {
   return (
     <section
       aria-label={text.label}
-      className="animate-rise fixed inset-x-4 bottom-[calc(theme(spacing.tabbar)+env(safe-area-inset-bottom)+12px)] z-sheet rounded-card border border-separator bg-surface p-4 shadow-2 md:left-auto md:max-w-sm lg:bottom-4"
+      className="animate-rise fixed inset-x-4 bottom-[calc(theme(spacing.tabbar)+env(safe-area-inset-bottom)+0.75rem)] z-sheet rounded-card border border-separator bg-surface p-4 shadow-2 md:left-auto md:max-w-sm lg:bottom-4"
     >
       <p className="text-footnote text-label-2">
         {text.body} {text.privacy.before}

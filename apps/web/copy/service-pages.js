@@ -1,10 +1,9 @@
 // The three service pages. Each answers one intent (docs/growth-seo.md section 4) and says only what is true
 // of the product: no invented prices, ratings, or promises. The ids match packages/shared/src/services.js.
-const faq = (items) => ({ eyebrow: 'Questions', title: 'Your questions, answered', items })
+const faq = (items) => ({ title: 'Common questions', items })
 
 export const servicePages = {
   tellTitle: 'Before you book',
-  rulesEyebrow: 'Changes and cancellation',
   searchAction: 'Search cars',
   car_hire: {
     path: '/car-hire',
@@ -21,7 +20,6 @@ export const servicePages = {
         'Drive yourself or have a driver at the wheel. Hire by the day, week, or month, in town or upcountry, from approved rental companies.',
     },
     list: {
-      eyebrow: 'Two ways to hire',
       title: 'Self-drive or chauffeur-driven',
       services: [
         {
@@ -39,7 +37,6 @@ export const servicePages = {
       ],
     },
     lengths: {
-      eyebrow: 'How long you need it',
       title: 'By the day, the week, or the month',
       items: [
         {
@@ -67,7 +64,6 @@ export const servicePages = {
       ],
     },
     steps: {
-      eyebrow: 'The journey',
       title: 'How to hire a car',
       items: [
         {
@@ -126,7 +122,6 @@ export const servicePages = {
         'Airport pickups and drop-offs, and transfers for guests and staff, with a driver from an approved rental company.',
     },
     list: {
-      eyebrow: 'Two kinds of transfer',
       title: 'Airport and corporate',
       services: [
         {
@@ -155,7 +150,6 @@ export const servicePages = {
       note: 'A transfer can be a single day, so you are not asked to pay for more days than you need.',
     },
     steps: {
-      eyebrow: 'The journey',
       title: 'How a transfer works',
       items: [
         {
@@ -210,7 +204,6 @@ export const servicePages = {
         'Wedding cars, vehicles for video shoots, convoys, and corporate transport, from approved rental companies.',
     },
     list: {
-      eyebrow: 'What we cover',
       title: 'Four kinds of event',
       services: [
         {
@@ -250,7 +243,6 @@ export const servicePages = {
       ],
     },
     steps: {
-      eyebrow: 'The journey',
       title: 'How booking for an event works',
       items: [
         {

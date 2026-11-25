@@ -5,7 +5,6 @@
 export const privacy = {
   path: '/privacy',
   crumb: 'Privacy policy',
-  eyebrow: 'Legal',
   title: 'Privacy policy',
   updated: 'Last updated 25 November 2026',
   contents: 'In this policy',

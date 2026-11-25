@@ -8,7 +8,7 @@ import { findOpenEnquiry, markEnquiryConverted } from './enquiries.js'
 import { createQuote } from './quotes.js'
 import { findOne } from './records.js'
 
-const WITH_PEOPLE = `${LIST_COLUMNS}, customer:profiles(full_name, phone, email), vehicle:vehicles(registration, make, model)`
+const WITH_PEOPLE = `${LIST_COLUMNS}, customer:profiles(full_name, phone, email), vehicle:vehicles(id, registration, make, model)`
 
 const toStaffSummary = ({ customer, vehicle, ...booking }) => ({
   ...toSummary(booking),
@@ -29,9 +29,12 @@ export async function listStaffBookings({ db }, { status, date, handover_type, l
   return { ...page, data: page.data.map(toStaffSummary) }
 }
 
-/** One booking as staff see it: the customer, vehicle, full status history, documents, and payments. */
+const deliveryDriver = (db, bookingId) =>
+  db.from('deliveries').select('driver:drivers(id, name, phone)').eq('booking_id', bookingId)
+
+/** One booking as staff see it: the customer, vehicle, driver, status history, documents, and payments. */
 export async function getStaffBooking({ db }, id) {
-  const [booking, people, events] = await Promise.all([
+  const [booking, people, events, delivery] = await Promise.all([
     getBooking({ db }, id),
     findOne(db, 'bookings', WITH_PEOPLE, id),
     db
@@ -39,11 +42,13 @@ export async function getStaffBooking({ db }, id) {
       .select('from_status, to_status, note, created_at, actor:profiles(full_name)')
       .eq('booking_id', id)
       .order('created_at'),
+    deliveryDriver(db, id),
   ])
   return {
     ...booking,
     customer: people.customer,
     vehicle: people.vehicle,
+    driver: unwrap(delivery)[0]?.driver ?? null,
     events: unwrap(events),
     next_statuses: nextStatuses(booking.status),
   }

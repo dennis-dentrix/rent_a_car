@@ -2,9 +2,16 @@ import { useId } from 'react'
 import { CircleAlert } from 'lucide-react'
 import { cx } from '@/lib/cx'
 
+// The size of text typed or picked in a field: 16 px on phones, because iOS zooms the page for anything smaller.
+export const TYPED_TEXT = 'text-input md:text-body'
+
+// The pickers beside the search tabs. One is a real list, so both take the phone size to match each other.
+export const PICKER_TEXT = 'text-input font-medium md:text-callout md:font-medium'
+
 // Shared by TextField and Select so every input looks and behaves the same.
 export const FIELD_CLASS = cx(
-  'min-h-control w-full rounded-control border border-transparent bg-fill px-4 text-body text-label',
+  'min-h-control w-full rounded-control border border-transparent bg-fill px-4 text-label',
+  TYPED_TEXT,
   'placeholder:text-label-3 focus-visible:border-accent focus-visible:outline-none',
   'focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-40',
   'aria-[invalid=true]:border-error aria-[invalid=true]:ring-error',

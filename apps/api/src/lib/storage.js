@@ -42,10 +42,10 @@ function s3() {
   return client
 }
 
-// Blog images and profile pictures are public (search engines, share previews, and every page that shows a face must
+// Blog images, profile pictures, and car photos are public (search engines, share previews, and every page that shows a face must
 // fetch them), so everything under these folders lives in the public bucket. Every other file is private. The key
 // alone says which, so no caller can choose wrongly.
-const PUBLIC_PREFIXES = ['blog/', 'avatars/']
+const PUBLIC_PREFIXES = ['blog/', 'avatars/', 'vehicles/']
 const isPublicKey = (key) => PUBLIC_PREFIXES.some((prefix) => key.startsWith(prefix))
 const bucket = (key) => (isPublicKey(key) ? process.env.R2_PUBLIC_BUCKET : process.env.R2_BUCKET)
 
@@ -58,8 +58,17 @@ export const blogImageKey = (postId, imageId, contentType) =>
 export const avatarKey = (userId, fileId, contentType) =>
   `avatars/${userId}/${fileId}.${EXTENSIONS[contentType]}`
 
+export const vehiclePhotoKey = (vehicleId, fileId, contentType) =>
+  `vehicles/${vehicleId}/${fileId}.${EXTENSIONS[contentType]}`
+
 export const inspectionKey = (bookingId, fileId, contentType) =>
   `inspections/${bookingId}/${fileId}.${EXTENSIONS[contentType]}`
+
+// Signatures and sealed reports are made by the API, beside the booking's photos.
+export const signatureKey = (bookingId, fileId) =>
+  `inspections/${bookingId}/signature-${fileId}.png`
+export const sealedReportKey = (bookingId, recordId) =>
+  `inspections/${bookingId}/report-${recordId}.pdf`
 
 /**
  * A link the browser can PUT the file to. The type and exact size are part of the signature, so a
@@ -148,6 +157,20 @@ export async function assertUnchanged(key, etag) {
   if (!stored || stored.etag !== etag) {
     throw new AppError('NOT_FOUND', { message: 'That file is not available.' })
   }
+}
+
+/** The stored version of a file, which changes if the file is replaced. A file that is gone is refused. */
+export async function describeFile(key) {
+  const stored = await describeObject(key)
+  if (!stored)
+    throw new AppError('NOT_FOUND', { message: 'A file of this report is not available.' })
+  return stored.etag
+}
+
+/** The whole of a stored file, for putting a picture into a report or attaching one to an email. */
+export async function readFile(key) {
+  const response = await s3().send(new GetObjectCommand({ Bucket: bucket(key), Key: key }))
+  return Buffer.from(await response.Body.transformToByteArray())
 }
 
 /** Store a file the API made itself (the signed agreement), under a key it chose. Returns its version tag. */

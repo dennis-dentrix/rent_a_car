@@ -3,8 +3,10 @@ import {
   availabilityQuerySchema,
   classesQuerySchema,
   createEnquirySchema,
+  listQuerySchema,
   placeQuerySchema,
   quoteBodySchema,
+  reportFingerprintSchema,
 } from '@carvo/shared'
 import { idParam } from '../middleware/auth.js'
 import { publicCache } from '../middleware/cache.js'
@@ -19,6 +21,8 @@ import {
   listLocations,
 } from '../services/catalogue.js'
 import { createPublicEnquiry } from '../services/enquiries.js'
+import { getPublicVehicle, listPublicVehicles } from '../services/public-vehicles.js'
+import { verifySealedReport } from '../services/inspection-lists.js'
 import { createQuote } from '../services/quotes.js'
 import { listServices } from '../services/services.js'
 
@@ -28,6 +32,25 @@ catalogueRouter.param('id', idParam)
 
 // Cached at the edge: data that rarely changes. A list with dates carries live availability, so it is never cached.
 const hasDates = (req) => Boolean(req.query.from || req.query.to)
+
+// Real cars of approved companies. It carries a price, so it is never cached.
+catalogueRouter.get(
+  '/vehicles',
+  handle((req) => listPublicVehicles(createAnonClient(), listQuerySchema.parse(req.query))),
+)
+
+catalogueRouter.get(
+  '/vehicles/:id',
+  handle(async (req) => ({ data: await getPublicVehicle(createAnonClient(), req.params.id) })),
+)
+
+// Whether a copy of an inspection report is one that was sealed here.
+catalogueRouter.get(
+  '/verify/inspections/:sha256',
+  handle(async (req) => ({
+    data: await verifySealedReport(reportFingerprintSchema.parse(req.params).sha256),
+  })),
+)
 
 catalogueRouter.get(
   '/classes',

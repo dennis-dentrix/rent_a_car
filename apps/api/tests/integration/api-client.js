@@ -1,3 +1,4 @@
+import { crc32, deflateSync } from 'node:zlib'
 import { createHmac } from 'node:crypto'
 import { createClient } from '@supabase/supabase-js'
 import request from 'supertest'
@@ -204,6 +205,32 @@ export const sampleFile = (contentType = 'application/pdf', size = 2048, fill = 
     SIGNATURES[contentType],
     Buffer.alloc(size - SIGNATURES[contentType].length, fill),
   ])
+
+const pngChunk = (type, data) => {
+  const body = Buffer.concat([Buffer.from(type), data])
+  const frame = Buffer.alloc(8)
+  frame.writeUInt32BE(data.length, 0)
+  frame.writeUInt32BE(crc32(body), 4)
+  return Buffer.concat([frame.subarray(0, 4), body, frame.subarray(4)])
+}
+
+/** A real, readable PNG of the given size, for places where the picture itself is opened (a signature). */
+export function realPng(width = 120, height = 40) {
+  const header = Buffer.alloc(13)
+  header.writeUInt32BE(width, 0)
+  header.writeUInt32BE(height, 4)
+  header.set([8, 0, 0, 0, 0], 8)
+  // One filter byte, then one grey byte per pixel; the pattern keeps it from compressing to almost nothing.
+  const rows = Buffer.from(
+    Array.from({ length: height * (width + 1) }, (_, i) => (i % (width + 1) ? (i * 7) % 251 : 0)),
+  )
+  return Buffer.concat([
+    SIGNATURES['image/png'],
+    pngChunk('IHDR', header),
+    pngChunk('IDAT', deflateSync(rows)),
+    pngChunk('IEND', Buffer.alloc(0)),
+  ])
+}
 
 /** Send bytes to a signed upload link. Returns the storage's HTTP status (200 when accepted). */
 export async function putFile(link, bytes) {

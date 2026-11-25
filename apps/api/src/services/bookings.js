@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { AppError, fieldError } from '../lib/errors.js'
 import { unwrap, withServiceRole } from '../lib/supabase.js'
 import { listPage } from '../lib/pagination.js'
-import { buildTimeline } from '../domain/booking-timeline.js'
+import { getJourney } from './booking-journey.js'
 import { findOne } from './records.js'
 
 // The fields a customer sees on every booking response. Nothing else leaves the server.
@@ -79,18 +79,18 @@ const related = (db, table, columns, bookingId) =>
 export async function getBooking({ db }, id) {
   if (!z.uuid().safeParse(id).success) throw new AppError('NOT_FOUND')
   const booking = await findOne(db, 'bookings', LIST_COLUMNS, id)
-  const [events, documents, payments, deliveries] = await Promise.all([
-    related(db, 'booking_status_events', 'to_status, created_at', id),
+  const [journey, documents, payments, deliveries] = await Promise.all([
+    getJourney({ db }, id),
     related(db, 'documents', 'id, type, status, rejection_reason', id),
     related(db, 'payments', 'kind, method, amount_kes, status, paid_at', id),
     related(db, 'deliveries', 'address, window_start, window_end, status', id),
-  ]).then((results) => results.map(unwrap))
+  ])
   return {
     ...toSummary(booking),
-    timeline: buildTimeline(booking.status, events),
-    documents,
-    payments,
-    handover: { type: booking.handover_type, delivery: deliveries[0] ?? null },
+    journey,
+    documents: unwrap(documents),
+    payments: unwrap(payments),
+    handover: { type: booking.handover_type, delivery: unwrap(deliveries)[0] ?? null },
   }
 }
 

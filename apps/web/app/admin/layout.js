@@ -1,4 +1,6 @@
 import ConsoleShell from '@/components/ConsoleShell'
+import StatusPill from '@/components/StatusPill'
+import { copy } from '@/copy/en'
 import { adminRail, adminTabs } from '@/lib/admin'
 import { requireRole } from '@/lib/auth/session'
 
@@ -6,10 +8,15 @@ import { requireRole } from '@/lib/auth/session'
 export const metadata = { robots: { index: false, follow: false } }
 
 export default async function AdminLayout({ children }) {
-  await requireRole(['admin'], '/admin')
+  const { profile } = await requireRole(['admin'], '/admin')
   return (
-    <ConsoleShell items={adminRail} tabs={adminTabs}>
-      <div className="mx-auto w-full max-w-5xl">{children}</div>
+    <ConsoleShell
+      items={adminRail}
+      tabs={adminTabs}
+      area={copy.consoleUi.adminArea}
+      identity={<StatusPill tone="info">{profile.full_name}</StatusPill>}
+    >
+      {children}
     </ConsoleShell>
   )
 }

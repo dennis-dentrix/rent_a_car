@@ -1,19 +1,16 @@
 import Alert from '@/components/Alert'
-import LargeTitle from '@/components/LargeTitle'
+import PageHeader from '@/components/PageHeader'
 import { copy } from '@/copy/en'
 import { cx } from '@/lib/cx'
 
-/** The frame of an admin page: its title and one line saying what it is for, then the content. `isNarrow` for forms and cards; `hasError` says the page could not load its data. */
-export default function AdminPage({
-  title,
-  subtitle,
-  isNarrow = false,
-  hasError = false,
-  children,
-}) {
+/**
+ * The frame of a console page: its header, then the content. `isNarrow` for forms; `hasError` says the page could not
+ * load its data. `eyebrow` and `actions` go to the header.
+ */
+export default function AdminPage({ isNarrow = false, hasError = false, children, ...header }) {
   return (
-    <div className={cx('flex flex-col gap-5', isNarrow && 'max-w-3xl')}>
-      <LargeTitle subtitle={subtitle}>{title}</LargeTitle>
+    <div className={cx('flex animate-rise flex-col gap-5', isNarrow && 'max-w-3xl')}>
+      <PageHeader {...header} />
       {hasError && <Alert tone="error" title={copy.admin.loadError} />}
       {children}
     </div>

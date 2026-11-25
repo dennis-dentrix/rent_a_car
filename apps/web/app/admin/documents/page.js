@@ -36,21 +36,21 @@ function Review({ document }) {
 
 function DocumentCard({ item: document }) {
   return (
-    <li className="rounded-card bg-bg-grouped p-4">
+    <li className="rounded-panel border border-separator bg-surface p-5 shadow-1">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h2 className="text-headline">{text.types[document.type]}</h2>
-          <p className="text-callout text-label-2">
+          <h2 className="text-section">{text.types[document.type]}</h2>
+          <p className="text-cell text-label-2">
             {personName(document.owner)} · {momentText(document.created_at)}
           </p>
           {document.rejection_reason && (
-            <p className="text-footnote text-label-2">{document.rejection_reason}</p>
+            <p className="text-meta text-label-2">{document.rejection_reason}</p>
           )}
         </div>
         {document.booking_id && (
           <Link
             href={`/admin/bookings/${document.booking_id}`}
-            className="text-callout font-medium text-primary underline underline-offset-2"
+            className="text-cell font-medium text-primary underline underline-offset-2"
           >
             {copy.admin.nav.bookings}
           </Link>

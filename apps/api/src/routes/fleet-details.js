@@ -1,13 +1,50 @@
-import { createAgreementSchema, createTrackerSchema, updateTrackerSchema } from '@carvo/shared'
+import {
+  addVehiclePhotoSchema,
+  createAgreementSchema,
+  createTrackerSchema,
+  createVehiclePhotoUploadSchema,
+  removeVehiclePhotoSchema,
+  updateTrackerSchema,
+} from '@carvo/shared'
 import { handle } from '../middleware/respond.js'
 import { createAgreement } from '../services/owners.js'
 import { addTracker, updateTracker } from '../services/trackers.js'
+import { addPhoto, createPhotoUpload, removePhoto } from '../services/vehicle-photos.js'
+
+// A car's photos: ask for an upload link, save the uploaded file, remove one.
+function mountVehiclePhotos(router) {
+  router.post(
+    '/vehicles/:id/photo-uploads',
+    handle(async (req) => ({
+      data: await createPhotoUpload(
+        req.auth.db,
+        req.params.id,
+        createVehiclePhotoUploadSchema.parse(req.body),
+      ),
+      status: 201,
+    })),
+  )
+  router.post(
+    '/vehicles/:id/photos',
+    handle(async (req) => ({
+      data: await addPhoto(req.auth.db, req.params.id, addVehiclePhotoSchema.parse(req.body)),
+      status: 201,
+    })),
+  )
+  router.delete(
+    '/vehicles/:id/photos',
+    handle(async (req) => ({
+      data: await removePhoto(req.auth.db, req.params.id, removeVehiclePhotoSchema.parse(req.body)),
+    })),
+  )
+}
 
 /**
  * The parts of a vehicle that hang off it: its trackers, and the agreement that ties it to an owner. The same for the
  * admin and for an operator, and Row Level Security decides whose vehicles each may touch.
  */
 export function mountFleetDetails(router) {
+  mountVehiclePhotos(router)
   router.post(
     '/vehicles/:id/trackers',
     handle(async (req) => ({

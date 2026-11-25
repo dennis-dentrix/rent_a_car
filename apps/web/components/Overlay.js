@@ -10,7 +10,12 @@ const PLACEMENTS = {
     'fixed inset-x-0 bottom-0 top-auto m-0 max-h-[90dvh] w-full max-w-none rounded-t-sheet animate-sheet-in',
     'md:inset-0 md:m-auto md:h-fit md:max-h-[85dvh] md:max-w-lg md:rounded-panel md:animate-pop-in',
   ),
-  center: 'm-auto w-[calc(100%-32px)] max-w-sm rounded-panel animate-pop-in',
+  // A panel from the right for editing one record beside the list; a bottom sheet on phones.
+  drawer: cx(
+    'fixed inset-x-0 bottom-0 top-auto m-0 max-h-[92dvh] w-full max-w-none rounded-t-sheet animate-sheet-in',
+    'md:inset-y-0 md:left-auto md:right-0 md:h-dvh md:max-h-none md:max-w-md md:rounded-none md:animate-drawer-in',
+  ),
+  center: 'm-auto w-[calc(100%-2rem)] max-w-sm rounded-panel animate-pop-in',
 }
 
 /**

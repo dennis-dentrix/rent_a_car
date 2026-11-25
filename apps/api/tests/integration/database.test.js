@@ -99,6 +99,45 @@ describe('rates', () => {
   })
 })
 
+describe('changing the price of a class', () => {
+  const set = (price, day) =>
+    attempt(client, 'select set_operator_class_rate($1, $2, $3)', [ids.cls, price, day])
+  const own = async () =>
+    (
+      await client.query(
+        `select price_kes, effective_from::text as starts, effective_to::text as ends from rates
+         where operator_id = $1 order by effective_from`,
+        [opIds.opA],
+      )
+    ).rows
+
+  beforeEach(async () => {
+    await seedOperators(client)
+    await actAs(client, opIds.userA)
+  })
+
+  it('ends the old price the day before, and corrects a price set the same day', async () => {
+    await set(5000, '2026-03-01')
+    await set(6000, '2026-03-10')
+    await set(6500, '2026-03-10')
+    expect(await own()).toEqual([
+      { price_kes: 5000, starts: '2026-03-01', ends: '2026-03-09' },
+      { price_kes: 6500, starts: '2026-03-10', ends: null },
+    ])
+  })
+
+  it('stops a first price where a later one already starts', async () => {
+    await set(7000, '2026-05-01')
+    await set(5000, '2026-04-01')
+    expect((await own())[0]).toEqual({ price_kes: 5000, starts: '2026-04-01', ends: '2026-04-30' })
+  })
+
+  it('is refused to someone with no company, so Carvo\u2019s price cannot be touched', async () => {
+    await actAs(client, ids.admin)
+    expect((await set(1, '2026-03-01')).error?.message).toBe('FORBIDDEN')
+  })
+})
+
 describe('RLS: guest', () => {
   beforeEach(() => actAs(client, null))
 

@@ -29,7 +29,7 @@ export default function DocumentViewer({ id }) {
             href={state.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-callout font-medium text-primary underline underline-offset-2"
+            className="text-cell font-medium text-primary underline underline-offset-2"
           >
             {text.open} ↗
           </a>

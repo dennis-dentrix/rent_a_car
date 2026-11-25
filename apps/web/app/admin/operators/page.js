@@ -24,14 +24,12 @@ export default async function OperatorsReviewPage() {
 
 function CompanyCard({ item: company }) {
   return (
-    <li className="rounded-card bg-bg-grouped p-4">
-      <h2 className="text-headline">{company.business_name}</h2>
-      <p className="text-callout text-label-2">
+    <li className="rounded-panel border border-separator bg-surface p-5 shadow-1">
+      <h2 className="text-section">{company.business_name}</h2>
+      <p className="text-cell text-label-2">
         {[company.email, company.phone].filter(Boolean).join(' · ')}
       </p>
-      <p className="text-footnote text-label-2">
-        {text.appliedOn(formatFullDate(company.created_at))}
-      </p>
+      <p className="text-meta text-label-2">{text.appliedOn(formatFullDate(company.created_at))}</p>
       <AdminDecision
         action={reviewOperatorAction}
         id={company.id}

@@ -1,10 +1,20 @@
 import { copy } from '@/copy/en'
 
-// Customer navigation: tabs on phones, text links in the top bar from tablet up. Only pages that exist: a Bookings
-// tab (`/account/bookings`) joins when that page is built, or the tab bar prefetches a 404.
-export const customerTabs = [
+/**
+ * The last tab on a phone: "Sign in" for a visitor, and a way into their own dashboard for someone signed in.
+ * `who` is null until the server has answered; `hasHint` says someone seems to be signed in meanwhile.
+ */
+export function accountTab(who, hasHint) {
+  if (who) return { href: who.home, label: copy.nav.dashboard, icon: 'today' }
+  if (hasHint) return { href: '/account', label: copy.nav.account, icon: 'user' }
+  return { href: '/auth', label: copy.nav.signIn, icon: 'signIn' }
+}
+
+// Customer navigation on phones. Only pages that exist.
+export const customerTabs = (who, hasHint) => [
+  { href: '/', label: copy.nav.home, icon: 'home', isExact: true },
   { href: '/cars', label: copy.nav.cars, icon: 'car' },
-  { href: '/account', label: copy.nav.account, icon: 'user' },
+  accountTab(who, hasHint),
 ]
 
 // Only pages that exist: the three service pages and the full list of cars.

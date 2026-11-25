@@ -9,7 +9,7 @@ export default function AdminCardList({ items, error, emptyText, Card, cardProps
   return (
     <>
       {error && <Alert tone="error" title={copy.admin.loadError} />}
-      {items?.length === 0 && <p className="text-body text-label-2">{emptyText}</p>}
+      {items?.length === 0 && <p className="text-cell text-label-2">{emptyText}</p>}
       <ul className="flex flex-col gap-4">
         {(items ?? []).map((item) => (
           <Card key={item.id} item={item} {...cardProps} />

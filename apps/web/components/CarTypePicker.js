@@ -4,6 +4,7 @@ import { useRef, useState } from 'react'
 import Image from 'next/image'
 import { CarFront, Check, ChevronDown } from 'lucide-react'
 import Dropdown from '@/components/Dropdown'
+import { PICKER_TEXT } from '@/components/Field'
 import VehicleArt from '@/components/VehicleArt'
 import { copy } from '@/copy/en'
 import { cx } from '@/lib/cx'
@@ -30,7 +31,7 @@ function TypeRow({ option, isSelected, onToggle }) {
         isSelected && 'bg-accent-subtle',
       )}
     >
-      <span className="relative flex h-11 w-[72px] shrink-0 items-center justify-center overflow-hidden rounded-control bg-stage">
+      <span className="relative flex h-11 w-[4.5rem] shrink-0 items-center justify-center overflow-hidden rounded-control bg-stage">
         {option.photo ? (
           <Image src={option.photo} alt="" fill sizes="72px" className="object-cover" />
         ) : (
@@ -43,8 +44,10 @@ function TypeRow({ option, isSelected, onToggle }) {
   )
 }
 
-const PILL =
-  'state-layer relative flex min-h-compact items-center gap-2 rounded-pill bg-fill pl-4 pr-3 text-callout font-medium'
+const PILL = cx(
+  'state-layer relative flex min-h-compact max-w-full flex-wrap items-center gap-x-2 rounded-pill bg-fill pl-4 pr-3',
+  PICKER_TEXT,
+)
 
 function TypeList({ options, value, onChange }) {
   const toggle = (slug) =>
@@ -93,7 +96,7 @@ export default function CarTypePicker({ options, value, onChange }) {
         className={PILL}
       >
         <CarFront size={16} className="shrink-0 text-primary" aria-hidden="true" />
-        <span className="text-label-2">{copy.search.carType}</span>
+        <span className="whitespace-nowrap text-label-2">{copy.search.carType}</span>
         <span className="min-w-0 truncate font-semibold">{summary(options, value)}</span>
         <ChevronDown size={16} className="shrink-0 text-label-2" aria-hidden="true" />
       </button>

@@ -14,11 +14,11 @@ function Member({ item: member, viewerId }) {
   const isYou = member.id === viewerId
   const isActive = !member.deleted_at
   return (
-    <li className="rounded-card bg-bg-grouped p-4">
+    <li className="rounded-panel border border-separator bg-surface p-5 shadow-1">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="min-w-0">
-          <h2 className="truncate text-headline">{member.full_name}</h2>
-          <p className="truncate text-callout text-label-2">{member.email}</p>
+          <h2 className="truncate text-section">{member.full_name}</h2>
+          <p className="truncate text-cell text-label-2">{member.email}</p>
         </div>
         <div className="flex gap-2">
           <Badge tone={member.role === 'admin' ? 'accent' : 'neutral'}>

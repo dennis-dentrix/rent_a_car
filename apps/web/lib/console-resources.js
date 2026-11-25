@@ -1,8 +1,11 @@
+import { CROSS_BORDER_RULES, FUEL_POLICIES } from '@carvo/shared'
 import { copy } from '@/copy/en'
 import { FLEET_RESOURCES } from '@/lib/admin-fleet-resources'
 import { PRICE_RESOURCES } from '@/lib/admin-resources'
+import { policyLines } from '@/lib/policy-text'
 
 const text = copy.adminSetup
+const rules = copy.policies
 const PLACE_TYPES = ['airport', 'airstrip', 'custom']
 // A company's own place has the admin's place fields, without the web address word and the served switch (the server
 // sets those), and with the type narrowed to the kinds of place a company may add.
@@ -12,18 +15,13 @@ const placeFields = PRICE_RESOURCES.locations.fields
 
 const { vehicles, trackers, agreements } = FLEET_RESOURCES
 
-const classNote = (row) => {
-  if (!row.operator_id) return text.carvoClass
-  return row.is_public ? null : text.privateClass
-}
-
 // The operator's own screens, built from the same field lists as the admin's. The API for them is `/operator/...`, and
 // the page to refresh is the operator's own.
 export const CONSOLE_RESOURCES = {
   vehicles: {
     ...vehicles,
     listPath: undefined,
-    pagePath: () => '/console/fleet',
+    pagePath: (vehicleId) => (vehicleId ? `/console/fleet/${vehicleId}` : '/console/fleet'),
     summarize: (row, refs) => ({
       ...vehicles.summarize(row, refs),
       href: `/console/fleet/${row.id}`,
@@ -48,22 +46,53 @@ export const CONSOLE_RESOURCES = {
     pagePath: () => '/console/classes',
     fields: [
       { name: 'name', type: 'text', isRequired: true },
+      // Only a new class takes its price here; afterwards it is changed on the class's card, from a date.
+      { name: 'price_kes', type: 'number', isCreateOnly: true },
       { name: 'seats', type: 'number', isRequired: true },
       { name: 'luggage_capacity', type: 'number' },
       { name: 'description', type: 'textarea' },
       { name: 'best_for', type: 'list' },
     ],
-    // Carvo's classes can be picked but not changed; the company's own can be edited.
-    summarize: (row) => ({
-      title: row.name,
-      detail: [text.describe.seats(row.seats), classNote(row)].filter(Boolean).join(' · '),
-      isLocked: !row.operator_id,
-    }),
   },
   rates: {
     ...PRICE_RESOURCES.rates,
     needs: ['classes'],
-    pagePath: () => '/console/rates',
+    pagePath: () => '/console/classes',
+  },
+  policies: {
+    needs: ['classes'],
+    pagePath: () => '/console/policies',
+    fields: [
+      {
+        name: 'class_id',
+        type: 'select',
+        ref: 'classes',
+        isLockedOnEdit: true,
+        blankLabel: rules.allCars,
+      },
+      { name: 'min_hire_days', type: 'number', isClearable: true },
+      { name: 'min_age', type: 'number', isClearable: true },
+      {
+        name: 'cross_border',
+        type: 'select',
+        options: CROSS_BORDER_RULES,
+        optionLabels: rules.crossBorder,
+        isClearable: true,
+      },
+      { name: 'daily_km_limit', type: 'number', isClearable: true },
+      {
+        name: 'fuel_policy',
+        type: 'select',
+        options: FUEL_POLICIES,
+        optionLabels: rules.fuel,
+        isClearable: true,
+      },
+      { name: 'rules', type: 'lines' },
+    ],
+    summarize: (row, refs) => ({
+      title: refs.classes.get(row.class_id) ?? rules.allCars,
+      detail: policyLines(row).join(' · '),
+    }),
   },
   places: {
     pagePath: () => '/console/places',

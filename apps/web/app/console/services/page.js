@@ -11,7 +11,7 @@ export default async function ConsoleServicesPage() {
   const { token } = await requireOperator()
   const { data, error } = await consoleGet('/operator/services', token)
   return (
-    <AdminPage title={text.title} subtitle={text.subtitle} isNarrow hasError={Boolean(error)}>
+    <AdminPage title={text.title} subtitle={text.subtitle} hasError={Boolean(error)}>
       <ServiceSwitches selected={data ?? []} />
     </AdminPage>
   )

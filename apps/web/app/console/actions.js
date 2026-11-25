@@ -18,3 +18,31 @@ export async function setServicesAction(serviceIds) {
   revalidatePath('/console')
   return true
 }
+
+// One tap on a booking. Resolves true when the server kept it, so the button can say when it did not.
+async function tap(bookingId, path, body) {
+  const result = await adminSend(
+    'POST',
+    `/operator/bookings/${encodeURIComponent(bookingId)}/${path}`,
+    body,
+  )
+  revalidatePath(`/console/bookings/${bookingId}`)
+  return !result.error
+}
+
+export async function recordMilestoneAction(bookingId, step) {
+  return tap(bookingId, 'milestones', { step })
+}
+
+export async function markNoShowAction(bookingId) {
+  return tap(bookingId, 'no-show')
+}
+
+/** Changes the company's price per day for a class, from today. */
+export async function setClassRateAction(classId, price) {
+  const result = await adminSend('PUT', `/operator/classes/${encodeURIComponent(classId)}/rate`, {
+    price_kes: price,
+  })
+  if (!result.error) revalidatePath('/console/classes')
+  return result
+}

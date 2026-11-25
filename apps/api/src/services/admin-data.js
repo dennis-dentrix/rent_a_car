@@ -1,6 +1,7 @@
 import {
   createClassSchema,
   createDiscountSchema,
+  createDriverSchema,
   createExtraSchema,
   createLocationSchema,
   createRateSchema,
@@ -9,6 +10,7 @@ import {
   SETTING_SCHEMAS,
   updateClassSchema,
   updateDiscountSchema,
+  updateDriverSchema,
   updateExtraSchema,
   updateLocationSchema,
   updateRateSchema,
@@ -35,6 +37,10 @@ export const ADMIN_RESOURCES = {
   'delivery-zones': resource('delivery_zones', 'name, fee_kes, is_active', {
     create: createZoneSchema,
     update: updateZoneSchema,
+  }),
+  drivers: resource('drivers', 'name, phone, licence_number, is_active', {
+    create: createDriverSchema,
+    update: updateDriverSchema,
   }),
   extras: resource('extras', 'name, price_kes, pricing_type, is_active', {
     create: createExtraSchema,

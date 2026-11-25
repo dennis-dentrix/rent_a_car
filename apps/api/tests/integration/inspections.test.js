@@ -1,11 +1,16 @@
-import { describe, expect, it } from 'vitest'
+import { createHash } from 'node:crypto'
+import { describe, expect, it, vi } from 'vitest'
+import { sendQueuedNotifications } from '../../src/services/notifications.js'
 import {
   IDS,
   accounts,
   bookNewQuote,
   call,
+  errorOf,
   putFile,
+  realPng,
   sampleFile,
+  signUpCustomer,
   staff,
   uploadInspectionFiles,
   withApi,
@@ -172,4 +177,121 @@ describe('inspection report validation', () => {
     const customer = await inspect(report(await newBookingId(), []), accounts.customer)
     expect([unknown.status, customer.status]).toEqual([404, 403])
   })
+})
+
+// A rental company with one car, and a renter's booking moved onto that car: what a handover needs.
+async function companyHandover(name) {
+  const renter = await signUpCustomer('API Company Owner')
+  const operator = renter.token
+  await call('POST', '/me/operator', { body: { business_name: name }, token: operator })
+  const car = await asCompany(operator, 'POST', '/vehicles', {
+    registration: `API-${name.slice(-6)}`,
+    chassis_number: `API-CHASSIS-${name.slice(-6)}`,
+    class_id: IDS.SEDAN,
+  })
+  const company = await asCompany(operator, 'GET', '/company')
+  await call('POST', `/admin/operators/${company.body.data.id}/review`, {
+    body: { to: 'approved' },
+    token: accounts.admin,
+  })
+  const bookingId = await newBookingId()
+  await staff('POST', `/staff/bookings/${bookingId}/assign`, { vehicle_id: car.body.data.id })
+  return { operator, bookingId }
+}
+
+const asCompany = (token, method, path, body) => call(method, `/operator${path}`, { body, token })
+const asRenter = (method, path, body, token = accounts.customer) =>
+  call(method, `/renter${path}`, { body, token })
+
+async function companyPhotos({ operator, bookingId }, count) {
+  const files = Array.from({ length: count }, () => ({
+    kind: 'photo',
+    content_type: 'image/png',
+    size_bytes: realPng(64, 48).length,
+  }))
+  const path = `/bookings/${bookingId}/inspection-uploads`
+  const links = (await asCompany(operator, 'POST', path, { files })).body.data
+  await Promise.all(links.map((link) => putFile(link, realPng(64, 48))))
+  return links.map((link, index) => ({ storage_path: link.storage_path, ...files[index] }))
+}
+
+// A recorded pickup report, ready to sign.
+async function recorded(name) {
+  const setup = await companyHandover(name)
+  const files = await companyPhotos(setup, 4)
+  const body = report(setup.bookingId, files, { checklist: { tyres: 'ok', lights: 'issue' } })
+  const created = await asCompany(setup.operator, 'POST', '/inspections', body)
+  const read = await asCompany(setup.operator, 'GET', `/inspections/${created.body.data.id}`)
+  return { ...setup, id: created.body.data.id, sha: read.body.data.report_sha256 }
+}
+
+const signature = (sha, name = 'Test Signer') => ({
+  signed_name: name,
+  signature_image: realPng().toString('base64'),
+  report_sha256: sha,
+})
+
+describe('a company handover is signed and sealed', () => {
+  it('needs at least four photos', async () => {
+    const setup = await companyHandover('API Inspect Photos')
+    const body = report(setup.bookingId, await companyPhotos(setup, 3))
+    expect(errorOf(await asCompany(setup.operator, 'POST', '/inspections', body))[0]).toBe(400)
+  }, 30_000)
+
+  it('is sealed once both have signed, and the renter can fetch and check the copy', async () => {
+    const { operator, id, sha } = await recorded('API Inspect Sealed')
+    const first = await asCompany(operator, 'POST', `/inspections/${id}/sign`, signature(sha))
+    expect(first.body.data.sealed).toBeNull()
+    const again = await asCompany(operator, 'POST', `/inspections/${id}/sign`, signature(sha))
+    expect(errorOf(again)).toEqual([409, 'CONFLICT'])
+    const both = await asRenter('POST', `/inspections/${id}/sign`, signature(sha, 'Test Renter'))
+    expect(both.body.data.signatures.map((entry) => entry.party)).toEqual(['operator', 'renter'])
+    const { pdf_sha256: pdfSha } = both.body.data.sealed
+    const link = (await asRenter('GET', `/inspections/${id}/report`)).body.data.url
+    const pdf = Buffer.from(await (await fetch(link)).arrayBuffer())
+    expect(pdf.subarray(0, 5).toString()).toBe('%PDF-')
+    expect(createHash('sha256').update(pdf).digest('hex')).toBe(pdfSha)
+    const check = await call('GET', `/verify/inspections/${pdfSha}`)
+    expect(check.body.data).toMatchObject({ type: 'pickup' })
+    expect((await call('GET', `/verify/inspections/${sha}`)).status).toBe(404)
+    const { rows } = await db.query(
+      "select payload from notifications where kind = 'inspection_report'",
+    )
+    expect(rows).toHaveLength(1)
+    const send = vi.fn().mockResolvedValue(undefined)
+    await sendQueuedNotifications({ send })
+    const emailed = send.mock.calls.map(([email]) => email).find((email) => email.attachments)
+    expect(emailed.attachments).toEqual([
+      {
+        name: 'inspection-report.pdf',
+        mime_type: 'application/pdf',
+        content: pdf.toString('base64'),
+      },
+    ])
+    const listed = (await asRenter('GET', '/inspections')).body.data
+    expect(listed[0]).toMatchObject({ id, signed_by: expect.arrayContaining(['renter']) })
+  }, 40_000)
+})
+
+describe('a handover signature is refused', () => {
+  it('refuses a signature on a report that is not the one that was read', async () => {
+    const { operator, id } = await recorded('API Inspect Changed')
+    const stale = signature('0'.repeat(64))
+    const refused = await asCompany(operator, 'POST', `/inspections/${id}/sign`, stale)
+    expect(errorOf(refused)).toEqual([400, 'VALIDATION_FAILED'])
+  }, 30_000)
+
+  it('keeps other people out, and sends no code while email is not set up', async () => {
+    const { operator, id, sha } = await recorded('API Inspect Private')
+    expect((await asRenter('GET', `/inspections/${id}`, undefined, accounts.other)).status).toBe(
+      404,
+    )
+    const other = await asRenter('POST', `/inspections/${id}/sign`, signature(sha), accounts.other)
+    expect(other.status).toBe(404)
+    const code = await asCompany(operator, 'POST', `/inspections/${id}/renter-code`)
+    expect(errorOf(code)).toEqual([409, 'CONFLICT'])
+    const typed = { ...signature(sha), code: '123456' }
+    const guess = await asCompany(operator, 'POST', `/inspections/${id}/renter-sign`, typed)
+    expect(errorOf(guess)).toEqual([400, 'VALIDATION_FAILED'])
+  }, 30_000)
 })

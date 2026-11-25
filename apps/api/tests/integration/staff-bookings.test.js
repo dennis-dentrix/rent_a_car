@@ -214,8 +214,8 @@ describe('assigning a vehicle and driver', () => {
     const assign = (body) => staff('POST', `/staff/bookings/${id}/assign`, body)
     expect((await assign({ vehicle_id: IDS.KAA_002 })).status).toBe(400)
     expect((await assign({ vehicle_id: IDS.KAA_002, driver_id: IDS.DRIVER })).status).toBe(200)
-    const { rows } = await db.query('select driver_id from deliveries where booking_id = $1', [id])
-    expect(rows[0].driver_id).toBe(IDS.DRIVER)
+    const { body } = await staff('GET', `/staff/bookings/${id}`)
+    expect([body.data.vehicle.id, body.data.driver.id]).toEqual([IDS.KAA_002, IDS.DRIVER])
   })
 
   it('refuses a vehicle that another booking holds for the same dates', async () => {

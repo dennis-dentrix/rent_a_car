@@ -19,7 +19,6 @@ export const operators = {
     ask: 'Talk to our team',
   },
   why: {
-    eyebrow: 'Why join',
     title: 'Built for companies that already run a fleet',
     items: [
       {
@@ -37,9 +36,8 @@ export const operators = {
     ],
   },
   offer: {
-    eyebrow: 'What is on offer',
     title: 'Tools for running your fleet on Carvo',
-    note: 'Rental companies get access in stages while we finish the tools. Applying now puts you at the front of the line.',
+    note: 'Rental companies get access in stages while we finish the tools.',
     items: [
       {
         title: 'Your fleet, listed properly',
@@ -68,7 +66,6 @@ export const operators = {
     ],
   },
   steps: {
-    eyebrow: 'The journey',
     title: 'How joining works',
     items: [
       { title: 'Apply', text: 'Tell us about your company and your fleet using the form below.' },
@@ -92,7 +89,6 @@ export const operators = {
     note: 'You can send these after you apply. We use them only to review your company.',
   },
   join: {
-    eyebrow: 'Join',
     title: 'Start in a few minutes',
     text: 'Create your company account, confirm your email, and we start the review. You can sign in at any time to see where it stands.',
     create: 'Create a company account',
@@ -107,7 +103,6 @@ export const operators = {
     message: 'Hello, I run a rental company and would like to know what is on offer for operators.',
   },
   faq: {
-    eyebrow: 'Questions',
     title: 'Questions from rental companies',
     items: [
       {

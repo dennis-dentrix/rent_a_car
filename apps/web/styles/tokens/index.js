@@ -103,31 +103,45 @@ const dark = {
 
 export const colors = { light, dark }
 
+// Sizes are written as the pixels they measure at the standard 16 px text size, and sent out in rem, so that
+// padding and control heights grow with the reader's text. Hairlines and shadows stay in pixels.
+const rem = (px) => `${px / 16}rem`
+
 // A 4 px scale: p-1 is 4 px, p-4 is 16 px, p-6 is 24 px. The design uses 4, 8, 12, 16, 24, 32, 48, 64
 // (docs/design-system.md); the other steps fill the gaps for layout.
 const STEPS = [
   0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 16, 20, 24, 28, 32, 36, 40, 44, 48,
   52, 56, 60, 64, 72, 80, 96,
 ]
-export const space = Object.fromEntries(STEPS.map((step) => [step, `${step * 4}px`]))
+export const space = Object.fromEntries(STEPS.map((step) => [step, rem(step * 4)]))
 
 export const radius = {
-  control: '8px',
-  card: '12px',
-  panel: '16px',
-  sheet: '20px',
+  control: rem(8),
+  card: rem(12),
+  panel: rem(16),
+  sheet: rem(20),
   pill: '999px',
 }
 
 export const size = {
-  touch: '44px',
-  control: '48px',
-  compact: '40px',
-  row: '32px',
-  tabbar: '64px',
-  header: '56px',
-  'header-wide': '72px',
+  // A finger does not shrink when someone chooses smaller text.
+  touch: 'max(44px, 2.75rem)',
+  control: rem(48),
+  compact: rem(40),
+  row: rem(32),
+  tabbar: rem(64),
+  header: rem(56),
+  'header-wide': rem(72),
+  // Space at the sides on a phone. It stops growing with the text, which needs the width more than the margin does.
+  gutter: 'min(1rem, 5vw)',
+  'gutter-wide': 'min(1.25rem, 6vw)',
 }
+
+// The widest a page's content grows.
+export const maxWidth = { page: rem(1280) }
+
+// Layout changes at 768, 1024 and 1440 px at the standard text size, and sooner for larger text.
+export const screens = { md: '48em', lg: '64em', wide: '90em' }
 
 export const z = { header: 100, stickyBar: 200, sheet: 300, dialog: 400, toast: 500 }
 
@@ -161,24 +175,34 @@ export const fontFamily = {
   sans: 'var(--font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
 }
 
-const rem = (px) => `${px / 16}rem`
-
-// [size px, line height px, weight, tracking em]. Phone sizes; the `-lg` variants are for desktop. Large text
-// is tightened a little and small caps text opened a little, as Apple does with its own type.
+// One ramp of six sizes for the whole app: 12, 14, 16, 20, 28 and 40 px. A name says what the text is for; two names
+// may share a size and differ in weight. [size px, line height px, weight, tracking em]; `-lg` is for desktop.
 const scale = {
-  display: [34, 40, 700, -0.025],
-  'display-lg': [44, 52, 700, -0.03],
-  'title-1': [28, 34, 600, -0.02],
-  'title-1-lg': [32, 40, 600, -0.02],
-  'title-2': [22, 28, 600, -0.015],
-  headline: [17, 24, 600, -0.01],
-  body: [16, 24, 400, 0],
-  callout: [15, 22, 400, 0],
-  footnote: [13, 18, 400, 0],
+  display: [28, 36, 700, -0.025],
+  'display-lg': [40, 48, 700, -0.03],
+  'title-1': [20, 28, 700, -0.015],
+  'title-1-lg': [28, 36, 700, -0.025],
+  'title-2': [20, 28, 700, -0.015],
+  headline: [16, 24, 700, -0.01],
+  body: [14, 22, 400, 0],
+  // Paragraphs a visitor sits and reads: section intros, descriptions, answers.
+  reading: [14, 22, 400, 0],
+  // Typed text on phones: under 16 px, iOS zooms the page when the field is focused.
+  input: [16, 24, 400, 0],
+  callout: [14, 20, 400, 0],
+  footnote: [12, 16, 400, 0],
   caption: [12, 16, 500, 0.02],
-  price: [22, 28, 700, -0.015],
+  price: [20, 28, 700, -0.015],
   'staff-label': [14, 20, 400, 0],
   'staff-heading': [12, 16, 600, 0.04],
+  // The operator console and admin name the same sizes by their job on a working screen.
+  page: [20, 28, 700, -0.015],
+  'page-lg': [28, 36, 700, -0.025],
+  section: [16, 24, 700, -0.01],
+  metric: [28, 36, 700, -0.025],
+  cell: [14, 20, 400, 0],
+  meta: [12, 16, 500, 0],
+  micro: [12, 16, 700, 0.05],
 }
 
 export const type = Object.fromEntries(

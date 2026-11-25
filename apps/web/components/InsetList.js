@@ -4,9 +4,10 @@ import { ChevronRight } from 'lucide-react'
 function Row({ item }) {
   const content = (
     <>
+      {item.leading}
       <span className="min-w-0 flex-1">
-        <span className="block text-body">{item.title}</span>
-        {item.detail && <span className="block text-callout text-label-2">{item.detail}</span>}
+        <span className="block text-cell font-semibold">{item.title}</span>
+        {item.detail && <span className="block text-meta text-label-2">{item.detail}</span>}
       </span>
       {item.trailing}
       {(item.href || item.onSelect) && (

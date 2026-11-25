@@ -18,10 +18,10 @@ export default function StaffInviteForm() {
     <form
       key={state?.status === 'invited' ? 'sent' : 'typing'}
       action={run}
-      className="flex flex-col gap-3 rounded-card bg-bg-grouped p-4"
+      className="flex flex-col gap-3 rounded-panel border border-separator bg-surface p-5 shadow-1"
     >
-      <h2 className="text-headline">{text.inviteTitle}</h2>
-      <p className="text-callout text-label-2">{text.inviteHint}</p>
+      <h2 className="text-section">{text.inviteTitle}</h2>
+      <p className="text-cell text-label-2">{text.inviteHint}</p>
       {state?.error && <Alert tone="error" title={state.error} />}
       {state?.status === 'invited' && <Alert tone="success" title={text.invited} />}
       <TextField

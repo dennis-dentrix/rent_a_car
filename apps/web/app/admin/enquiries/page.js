@@ -45,7 +45,7 @@ export default async function AdminEnquiriesPage({ searchParams }) {
     <AdminPage title={text.title} subtitle={text.subtitle}>
       <AdminFilters base="/admin/enquiries" name="status" current={filter} options={OPTIONS} />
       {error && <Alert tone="error" title={copy.admin.loadError} />}
-      {data?.length === 0 && <p className="text-body text-label-2">{text.empty}</p>}
+      {data?.length === 0 && <p className="text-cell text-label-2">{text.empty}</p>}
       {data?.length > 0 && <InsetList items={data.map(toItem)} />}
       <AdminMoreLink href={older}>{copy.admin.bookings.more}</AdminMoreLink>
     </AdminPage>

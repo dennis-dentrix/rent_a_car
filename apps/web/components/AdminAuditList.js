@@ -6,7 +6,7 @@ const text = copy.admin.audit
 
 /** Who did what, to what, and when, as one sentence per change. */
 export default function AdminAuditList({ entries }) {
-  if (!entries.length) return <p className="text-body text-label-2">{text.empty}</p>
+  if (!entries.length) return <p className="text-cell text-label-2">{text.empty}</p>
   const items = entries.map((entry) => ({
     id: entry.id,
     title: `${entry.actor ?? text.unknownActor}: ${text.actions[entry.action] ?? entry.action} ${

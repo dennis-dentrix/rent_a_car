@@ -1,6 +1,6 @@
 import Button from '@/components/Button'
-import Eyebrow from '@/components/Eyebrow'
 import GuideCards from '@/components/GuideCards'
+import SectionHeading from '@/components/SectionHeading'
 import { copy } from '@/copy/en'
 import { getPosts } from '@/lib/blog'
 
@@ -11,22 +11,14 @@ export default async function GuidesSection() {
   const text = copy.blog
   const posts = (await getPosts()).data ?? []
   if (posts.length === 0) return null
+  const seeAll = (
+    <Button href={text.path} variant="plain" size="compact" className="shrink-0 whitespace-nowrap">
+      {text.homeAll}
+    </Button>
+  )
   return (
     <section>
-      <div className="mb-6 flex items-end justify-between gap-4">
-        <div>
-          <Eyebrow>{text.homeEyebrow}</Eyebrow>
-          <h2 className="text-title-2 md:text-title-1">{text.homeTitle}</h2>
-        </div>
-        <Button
-          href={text.path}
-          variant="plain"
-          size="compact"
-          className="shrink-0 whitespace-nowrap"
-        >
-          {text.homeAll}
-        </Button>
-      </div>
+      <SectionHeading title={text.homeTitle} action={seeAll} />
       <GuideCards posts={posts.slice(0, SHOWN)} />
     </section>
   )

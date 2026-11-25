@@ -1,5 +1,6 @@
 import Badge from '@/components/Badge'
 import InsetList from '@/components/InsetList'
+import Panel from '@/components/Panel'
 import { copy } from '@/copy/en'
 
 const text = copy.admin.overview
@@ -22,15 +23,14 @@ export default function AdminAttention({ overview }) {
     trailing: <Badge tone="warning">{overview[key]}</Badge>,
   }))
   return (
-    <section aria-labelledby="needs-you" className="flex flex-col gap-3">
-      <h2 id="needs-you" className="text-title-3">
-        {text.attentionTitle}
-      </h2>
+    <Panel title={text.attentionTitle} isFlush>
       {items.length ? (
-        <InsetList items={items} />
+        <div className="px-3 pb-3">
+          <InsetList items={items} />
+        </div>
       ) : (
-        <p className="rounded-card bg-bg-grouped p-4 text-body text-label-2">{text.allClear}</p>
+        <p className="px-5 pb-8 pt-4 text-center text-cell text-label-2">{text.allClear}</p>
       )}
-    </section>
+    </Panel>
   )
 }

@@ -1,8 +1,17 @@
 import { Router } from 'express'
-import { setOperatorServicesSchema, setPlaceServedSchema, updateCompanySchema } from '@carvo/shared'
+import {
+  milestoneSchema,
+  setClassRateSchema,
+  setOperatorServicesSchema,
+  setPlaceServedSchema,
+  staffBookingsQuerySchema,
+  updateCompanySchema,
+} from '@carvo/shared'
 import { idParam, requireRoles } from '../middleware/auth.js'
 import { handle } from '../middleware/respond.js'
+import { getJourney, markNoShow, recordMilestone } from '../services/booking-journey.js'
 import { listStaffBookings, getStaffBooking } from '../services/staff-bookings.js'
+import { setClassRate } from '../services/operator-classes.js'
 import { OPERATOR_RESOURCES } from '../services/operator-data.js'
 import {
   getCompany,
@@ -12,8 +21,8 @@ import {
   updateCompany,
 } from '../services/operator-console.js'
 import { getOperatorServices, setOperatorServices } from '../services/services.js'
-import { staffBookingsQuerySchema } from '@carvo/shared'
 import { mountFleetDetails } from './fleet-details.js'
+import { mountCompanyInspections } from './inspection-signing.js'
 import { mountResources } from './resource-routes.js'
 
 // A rental company's own area. Each call acts as the signed-in person, so Row Level Security shows and allows only
@@ -52,6 +61,11 @@ operatorRouter.put(
   ),
 )
 
+operatorRouter.put(
+  '/classes/:id/rate',
+  data((req) => setClassRate(req.auth.db, req.params.id, setClassRateSchema.parse(req.body))),
+)
+
 operatorRouter.get(
   '/airports',
   data((req) => listAirports(req.auth, req.auth.operatorId)),
@@ -73,9 +87,22 @@ operatorRouter.get(
   handle((req) => listStaffBookings(req.auth, staffBookingsQuerySchema.parse(req.query))),
 )
 operatorRouter.get(
+  '/bookings/:id/journey',
+  data((req) => getJourney(req.auth, req.params.id)),
+)
+operatorRouter.post(
+  '/bookings/:id/milestones',
+  data((req) => recordMilestone(req.auth, req.params.id, milestoneSchema.parse(req.body).step)),
+)
+operatorRouter.post(
+  '/bookings/:id/no-show',
+  data((req) => markNoShow(req.auth, req.params.id)),
+)
+operatorRouter.get(
   '/bookings/:id',
   data((req) => getStaffBooking(req.auth, req.params.id)),
 )
 
 mountFleetDetails(operatorRouter)
+mountCompanyInspections(operatorRouter)
 mountResources(operatorRouter, OPERATOR_RESOURCES)

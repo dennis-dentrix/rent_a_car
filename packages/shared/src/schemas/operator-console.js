@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { e164Phone, hasAtLeastOneField } from './common.js'
+import { CROSS_BORDER_RULES, FUEL_POLICIES } from '../constants.js'
 import { classBasics, createLocationSchema, updateSchemaFrom } from './admin-data.js'
 import { createOwnerSchema } from './fleet.js'
 
@@ -8,7 +9,14 @@ import { createOwnerSchema } from './fleet.js'
 
 const text = (max = 200) => z.string().trim().min(1).max(max)
 
-export const createOperatorClassSchema = z.strictObject(classBasics)
+const dailyPrice = z.number().int().min(1).max(100_000_000)
+/** A new class may arrive with its price per day. */
+export const createOperatorClassSchema = z.strictObject({
+  ...classBasics,
+  price_kes: dailyPrice.optional(),
+})
+/** What the company charges per day for a class, from today. */
+export const setClassRateSchema = z.strictObject({ price_kes: dailyPrice })
 export const updateOperatorClassSchema = z
   .strictObject(z.object(classBasics).partial().shape)
   .refine(...hasAtLeastOneField)
@@ -45,3 +53,19 @@ export const updateCompanySchema = z
   })
   .partial()
   .refine(...hasAtLeastOneField)
+
+const policyFields = {
+  class_id: z.uuid().optional(),
+  min_hire_days: z.number().int().min(1).max(365).optional(),
+  min_age: z.number().int().min(18).max(99).optional(),
+  cross_border: z.enum(CROSS_BORDER_RULES).optional(),
+  daily_km_limit: z.number().int().min(1).max(100_000).optional(),
+  fuel_policy: z.enum(FUEL_POLICIES).optional(),
+  rules: z.array(text(300)).max(20).optional(),
+}
+/** A company's rental rules, general (no class) or for one class. */
+export const createPolicySchema = z.strictObject(policyFields)
+export const updatePolicySchema = updateSchemaFrom(policyFields, {
+  clearable: ['min_hire_days', 'min_age', 'cross_border', 'daily_km_limit', 'fuel_policy'],
+  locked: ['class_id'],
+})

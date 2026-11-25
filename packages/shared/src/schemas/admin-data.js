@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { hasAtLeastOneField } from './common.js'
+import { e164Phone, hasAtLeastOneField } from './common.js'
 import { LOCATION_TYPES } from '../places.js'
 
 // What an admin enters to run the business: classes, rates, locations, delivery zones, extras, discounts,
@@ -79,6 +79,16 @@ const extraFields = {
 }
 export const createExtraSchema = z.strictObject(extraFields)
 export const updateExtraSchema = updateSchemaFrom(extraFields)
+
+// Someone who takes a car to a renter. Switched off when they stop driving for us.
+const driverFields = {
+  name: text(120),
+  phone: e164Phone,
+  licence_number: text(40).optional(),
+  is_active: z.boolean().optional(),
+}
+export const createDriverSchema = z.strictObject(driverFields)
+export const updateDriverSchema = updateSchemaFrom(driverFields, { clearable: ['licence_number'] })
 
 const endsAfterStart = [
   (rule) => !rule.effective_to || !rule.effective_from || rule.effective_to >= rule.effective_from,

@@ -13,6 +13,7 @@ import {
   officeQuote,
   postQuote,
   query,
+  signIn,
   withApi,
 } from './api-client.js'
 
@@ -146,9 +147,8 @@ describe('GET /bookings/{id}', () => {
   it('returns the booking with its timeline', async () => {
     const created = (await bookNewQuote()).body.data
     const { status, body } = await getOne(created.id)
-    const steps = body.data.timeline.map((step) => `${step.label}:${step.state}`)
     expect(status).toBe(200)
-    expect(steps.slice(0, 2)).toEqual(['Quote:done', 'Deposit paid:current'])
+    expect(body.data.journey.next).toEqual({ key: 'confirmed', actor: 'company' })
     expect(body.data).toMatchObject({ documents: [], payments: [], handover: { type: 'office' } })
   })
 
@@ -160,6 +160,50 @@ describe('GET /bookings/{id}', () => {
   it('returns not found for an id that is not a uuid', async () => {
     expect((await getOne('abc')).status).toBe(404)
   })
+})
+
+describe('a company moving its booking along', () => {
+  const asStaff = (method, path, body) => call(method, path, { body, token: accounts.staff })
+
+  // A confirmed booking on a car of the seeded company, and that company's token.
+  async function companyBooking() {
+    const company = await signIn('operator@example.test')
+    const car = await call('POST', '/operator/vehicles', {
+      token: company,
+      body: { registration: 'API-JRN-1', chassis_number: 'API-JRN-CHASSIS-1', class_id: IDS.SEDAN },
+    })
+    const { id } = (await bookNewQuote()).body.data
+    await asStaff('PATCH', `/staff/bookings/${id}/status`, { to_status: 'confirmed', note: 'Paid' })
+    await asStaff('POST', `/staff/bookings/${id}/assign`, { vehicle_id: car.body.data.id })
+    const tap = (path, body) =>
+      call('POST', `/operator/bookings/${id}/${path}`, { token: company, body })
+    return { id, tap }
+  }
+
+  it('records a tap once, shows it to the renter, and refuses a step out of order', async () => {
+    const { id, tap } = await companyBooking()
+    expect((await tap('milestones', { step: 'car_prepared' })).body.data.company_action).toBeNull()
+    expect((await tap('milestones', { step: 'car_prepared' })).status).toBe(200)
+    expect(errorOf(await tap('milestones', { step: 'en_route' }))[1]).toBe(
+      'INVALID_STATUS_TRANSITION',
+    )
+    const seen = (await get(`/bookings/${id}`, { token: accounts.customer })).body.data.journey
+    expect(seen.steps.find((step) => step.state === 'current').key).toBe('car_prepared')
+  }, 20_000)
+
+  it('lets only the company or staff move it, and no no-show before the start', async () => {
+    const { id, tap } = await companyBooking()
+    const asRenter = await call('POST', `/operator/bookings/${id}/milestones`, {
+      token: accounts.customer,
+      body: { step: 'car_prepared' },
+    })
+    expect(asRenter.status).toBe(403)
+    expect(errorOf(await tap('no-show'))[1]).toBe('INVALID_STATUS_TRANSITION')
+    const outcomes = await asStaff('GET', '/admin/booking-outcomes')
+    expect(outcomes.status).toBe(403)
+    const forAdmin = await call('GET', '/admin/booking-outcomes', { token: accounts.admin })
+    expect(Number(forAdmin.body.data[0].confirmed)).toBeGreaterThan(0)
+  }, 20_000)
 })
 
 describe('POST /internal/jobs/expire-holds', () => {

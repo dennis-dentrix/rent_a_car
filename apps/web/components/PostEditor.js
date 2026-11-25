@@ -90,7 +90,7 @@ function Problems({ messages }) {
 function Writing({ editor }) {
   const { draft, change, images, canChangeSlug } = editor
   return (
-    <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
+    <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start">
       <div className="flex min-w-0 flex-col gap-8">
         <PostFields draft={draft} change={change} canChangeSlug={canChangeSlug} />
         <PostSections draft={draft} change={change} images={images.images} />

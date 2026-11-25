@@ -46,7 +46,7 @@ function ValueSetting({ settingKey, item, value }) {
           {text.save}
         </Button>
         {state?.status === 'saved' && (
-          <span role="status" className="text-callout text-label-2">
+          <span role="status" className="text-cell text-label-2">
             {text.saved}
           </span>
         )}

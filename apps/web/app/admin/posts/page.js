@@ -5,7 +5,7 @@ import Alert from '@/components/Alert'
 import AuthForm from '@/components/AuthForm'
 import Badge from '@/components/Badge'
 import Button from '@/components/Button'
-import LargeTitle from '@/components/LargeTitle'
+import AdminPage from '@/components/AdminPage'
 import { copy } from '@/copy/en'
 import { requireAdmin } from '@/lib/admin'
 import { apiGet } from '@/lib/api'
@@ -22,11 +22,11 @@ function PostRow({ post }) {
     <li>
       <Link
         href={`/admin/posts/${post.id}`}
-        className="state-layer flex min-h-touch flex-wrap items-center justify-between gap-2 rounded-card bg-bg-grouped px-4 py-3"
+        className="state-layer flex min-h-touch flex-wrap items-center justify-between gap-2 rounded-panel border border-separator bg-surface px-5 py-3 shadow-1"
       >
         <span>
-          <span className="block text-headline">{post.title}</span>
-          <span className="block text-footnote text-label-2">
+          <span className="block text-section">{post.title}</span>
+          <span className="block text-meta text-label-2">
             /blog/{post.slug} · {text.updated(formatFullDate(post.updated_at))}
           </span>
         </span>
@@ -45,11 +45,10 @@ export default async function PostsPage({ searchParams }) {
     token,
   })
   return (
-    <div className="mx-auto flex max-w-3xl flex-col gap-6">
-      <LargeTitle subtitle={text.subtitle}>{text.title}</LargeTitle>
+    <AdminPage title={text.title} subtitle={text.subtitle} isNarrow>
       <AuthForm action={createPostAction} fields={NEW_GUIDE_FIELDS} submitLabel={text.newSubmit} />
       {error && <Alert tone="error" title={copy.classPage.errorTitle} />}
-      {data?.length === 0 && <p className="text-body text-label-2">{text.empty}</p>}
+      {data?.length === 0 && <p className="text-cell text-label-2">{text.empty}</p>}
       <ul className="flex flex-col gap-2">
         {(data ?? []).map((post) => (
           <PostRow key={post.id} post={post} />
@@ -63,6 +62,6 @@ export default async function PostsPage({ searchParams }) {
           {text.next}
         </Button>
       )}
-    </div>
+    </AdminPage>
   )
 }

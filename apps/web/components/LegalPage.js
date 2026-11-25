@@ -1,7 +1,6 @@
 import AskButton from '@/components/AskButton'
 import { Contents, Section } from '@/components/ArticleView'
 import Breadcrumbs from '@/components/Breadcrumbs'
-import Eyebrow from '@/components/Eyebrow'
 import { copy } from '@/copy/en'
 
 /**
@@ -17,7 +16,6 @@ export default function LegalPage({ text }) {
     <article className="mx-auto flex w-full max-w-3xl flex-col gap-10">
       <Breadcrumbs trail={trail} />
       <header>
-        <Eyebrow>{text.eyebrow}</Eyebrow>
         <h1 className="text-display md:text-display-lg">{text.title}</h1>
         <p className="mt-3 text-footnote text-label-2">{text.updated}</p>
         <p className="mt-5 text-headline font-normal text-label-2">{text.intro}</p>

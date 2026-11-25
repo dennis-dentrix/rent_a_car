@@ -1,67 +1,28 @@
-import Link from 'next/link'
-import Badge from '@/components/Badge'
-import ResourceForm from '@/components/ResourceForm'
+import ResourceTable from '@/components/ResourceTable'
 import { copy } from '@/copy/en'
 
-const text = copy.adminSetup
-
-/** One record: its summary line, opening to its form. A native disclosure, so it works without scripts and by keyboard. */
-function Row({ row, summary, formProps, isReadOnly }) {
-  if (isReadOnly || summary.isLocked) {
-    return (
-      <li className="rounded-card bg-bg-grouped p-4">
-        <span className="block text-headline">{summary.title}</span>
-        <span className="block text-callout text-label-2">{summary.detail}</span>
-      </li>
-    )
-  }
+/**
+ * The records of one kind: summed up on the server, shown in the browser as a table with an add and edit drawer.
+ * `summarize` turns a record into { title, detail } and, for a richer table, { cells, tags }.
+ */
+export default function ResourceList({
+  rows,
+  summarize,
+  formProps,
+  isReadOnly = false,
+  columns,
+  filters,
+}) {
+  const items = rows.map((row) => ({ id: row.id, row, ...summarize(row) }))
   return (
-    <li>
-      <details className="group rounded-card bg-bg-grouped p-4">
-        <summary className="flex min-h-touch cursor-pointer list-none items-center justify-between gap-3">
-          <span className="min-w-0">
-            <span className="block truncate text-headline">{summary.title}</span>
-            <span className="block text-callout text-label-2">{summary.detail}</span>
-          </span>
-          <Badge>{text.edit}</Badge>
-        </summary>
-        {summary.href && (
-          <Link
-            href={summary.href}
-            className="mt-2 inline-block text-callout font-medium text-primary underline underline-offset-2"
-          >
-            {summary.linkLabel}
-          </Link>
-        )}
-        <ResourceForm row={row} {...formProps} />
-      </details>
-    </li>
-  )
-}
-
-/** The list of records, each with its edit form, under an "Add new" form. `summarize` turns a record into its two lines. */
-export default function ResourceList({ rows, summarize, formProps, isReadOnly = false }) {
-  return (
-    <div className="flex flex-col gap-4">
-      <details className="rounded-card border border-separator p-4">
-        <summary className="flex min-h-touch cursor-pointer list-none items-center text-headline">
-          {text.add}
-        </summary>
-        <ResourceForm row={null} {...formProps} />
-      </details>
-      {rows.length === 0 && <p className="text-body text-label-2">{text.empty}</p>}
-      <ul className="flex flex-col gap-3">
-        {rows.map((row) => (
-          <Row
-            key={row.id}
-            row={row}
-            summary={summarize(row)}
-            formProps={formProps}
-            isReadOnly={isReadOnly}
-          />
-        ))}
-      </ul>
-      {!isReadOnly && <p className="text-footnote text-label-3">{text.nothingIsDeleted}</p>}
+    <div className="flex flex-col gap-2">
+      <ResourceTable
+        items={items}
+        columns={columns}
+        filters={filters}
+        formProps={isReadOnly ? undefined : formProps}
+      />
+      {!isReadOnly && <p className="text-meta text-label-3">{copy.adminSetup.nothingIsDeleted}</p>}
     </div>
   )
 }

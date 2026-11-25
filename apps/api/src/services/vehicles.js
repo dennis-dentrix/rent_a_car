@@ -2,9 +2,13 @@ import { listPage } from '../lib/pagination.js'
 import { unwrap } from '../lib/supabase.js'
 import { findOne, insertOne, updateOne } from './records.js'
 
+export const VEHICLE_DETAIL_COLUMNS =
+  'seats, luggage_capacity, transmission, fuel_type, drive_type, engine_cc, colour, description, features, ' +
+  'chauffeur_option, chauffeur_daily_kes'
+
 const VEHICLE_COLUMNS =
   'id, registration, chassis_number, make, model, year, class_id, status, mileage_km, ' +
-  'home_location_id, owner_id, created_at'
+  `home_location_id, owner_id, daily_rate_kes, photo_paths, ${VEHICLE_DETAIL_COLUMNS}, created_at`
 const OWNER_SUMMARY = 'id, owner_type, full_name, phone, email, status'
 const AGREEMENT_COLUMNS = 'id, owner_id, vehicle_id, commission_percent, starts_on, ends_on'
 export const TRACKER_COLUMNS =

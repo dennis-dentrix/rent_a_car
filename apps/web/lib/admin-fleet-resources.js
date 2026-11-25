@@ -1,5 +1,13 @@
-import { formatShortDate } from '@carvo/shared'
+import {
+  CHAUFFEUR_OPTIONS,
+  DRIVE_TYPES,
+  FUEL_TYPES,
+  TRANSMISSIONS,
+  formatMoney,
+  formatShortDate,
+} from '@carvo/shared'
 import { copy } from '@/copy/en'
+import { mediaUrl } from '@/lib/media'
 
 const text = copy.adminFleet
 const VEHICLE_STATUSES = ['active', 'maintenance', 'retired']
@@ -8,47 +16,118 @@ const TRACKER_STATUSES = ['active', 'inactive', 'faulty', 'removed']
 const vehicleTitle = (row) =>
   `${[row.make, row.model].filter(Boolean).join(' ') || text.noMake} · ${row.registration}`
 
+const STATUS_TONES = { active: 'success', maintenance: 'warning', retired: 'neutral' }
+
+const vehicleCells = (row, refs) => ({
+  vehicle: {
+    main: [row.make, row.model].filter(Boolean).join(' ') || text.noMake,
+    chip: row.year,
+    code: row.registration,
+    image: mediaUrl(row.photo_paths?.[0], process.env.NEXT_PUBLIC_MEDIA_BASE_URL),
+    hasPhotoSlot: true,
+  },
+  chassis: {
+    main: row.chassis_number,
+    sub: row.owner_id
+      ? `${copy.consoleUi.fleet.managed} · ${refs['vehicle-owners']?.get(row.owner_id) ?? ''}`
+      : copy.consoleUi.fleet.company,
+  },
+  class: refs.classes.get(row.class_id),
+  rate: row.daily_rate_kes
+    ? { main: formatMoney(row.daily_rate_kes), sub: copy.consoleUi.fleet.ownRate }
+    : { main: copy.consoleUi.fleet.classRate },
+  status: { pill: text.statuses[row.status], tone: STATUS_TONES[row.status] },
+})
+
+const choice = (name, options, optionLabels) => ({
+  name,
+  type: 'select',
+  options,
+  optionLabels,
+  isClearable: true,
+})
+const detail = (name, type = 'number') => ({ name, type, isClearable: true })
+
+// A car's form in four parts; `heading` starts a part.
+const VEHICLE_FIELDS = [
+  { name: 'registration', type: 'text', isRequired: true, heading: text.parts.car },
+  { name: 'chassis_number', type: 'text', isRequired: true },
+  { name: 'make', type: 'text' },
+  { name: 'model', type: 'text' },
+  { name: 'year', type: 'number' },
+  { name: 'class_id', type: 'select', ref: 'classes', isRequired: true },
+  {
+    name: 'status',
+    type: 'select',
+    options: VEHICLE_STATUSES,
+    optionLabels: text.statuses,
+    isEditOnly: true,
+  },
+  { ...detail('daily_rate_kes', 'rate'), heading: text.parts.pricing },
+  choice('chauffeur_option', CHAUFFEUR_OPTIONS, copy.carFacts.chauffeur),
+  detail('chauffeur_daily_kes'),
+  { ...detail('seats'), heading: text.parts.details },
+  detail('luggage_capacity'),
+  choice('transmission', TRANSMISSIONS, copy.carFacts.transmission),
+  choice('fuel_type', FUEL_TYPES, copy.carFacts.fuel_type),
+  choice('drive_type', DRIVE_TYPES, copy.carFacts.drive_type),
+  detail('engine_cc'),
+  detail('colour', 'text'),
+  { name: 'features', type: 'lines' },
+  detail('description', 'textarea'),
+  { name: 'mileage_km', type: 'number', heading: text.parts.records },
+  { name: 'home_location_id', type: 'select', ref: 'locations' },
+  {
+    name: 'owner_id',
+    type: 'select',
+    ref: 'vehicle-owners',
+    isClearable: true,
+    blankLabel: text.noOwnerOption,
+  },
+]
+
 // The fleet's kinds of record, in the same form as the price and place ones. A `parent` is the record a new one
 // belongs to (a tracker's vehicle); `pagePath` is the page to refresh once one is saved.
 export const FLEET_RESOURCES = {
   vehicles: {
-    needs: ['classes', 'locations', 'vehicle-owners'],
-    listPath: '/staff/vehicles',
-    fields: [
-      { name: 'registration', type: 'text', isRequired: true },
-      { name: 'chassis_number', type: 'text', isRequired: true },
-      { name: 'make', type: 'text' },
-      { name: 'model', type: 'text' },
-      { name: 'year', type: 'number' },
-      { name: 'class_id', type: 'select', ref: 'classes', isRequired: true },
-      { name: 'mileage_km', type: 'number' },
-      { name: 'home_location_id', type: 'select', ref: 'locations' },
-      {
-        name: 'owner_id',
-        type: 'select',
-        ref: 'vehicle-owners',
-        isClearable: true,
-        blankLabel: text.noOwnerOption,
-      },
-      {
-        name: 'status',
-        type: 'select',
-        options: VEHICLE_STATUSES,
-        optionLabels: text.statuses,
-        isEditOnly: true,
-      },
+    needs: ['classes', 'locations', 'vehicle-owners', 'classRates'],
+    columns: [
+      { key: 'vehicle', label: copy.consoleUi.fleet.vehicle },
+      { key: 'chassis', label: copy.consoleUi.fleet.chassis },
+      { key: 'class', label: copy.consoleUi.fleet.class },
+      { key: 'rate', label: copy.consoleUi.fleet.rate },
+      { key: 'status', label: copy.consoleUi.fleet.status },
     ],
+    filters: [
+      { key: 'active', label: text.statuses.active },
+      { key: 'maintenance', label: text.statuses.maintenance },
+      { key: 'retired', label: text.statuses.retired },
+      { key: 'company', label: copy.consoleUi.fleet.company },
+      { key: 'managed', label: copy.consoleUi.fleet.managed },
+    ],
+    listPath: '/staff/vehicles',
+    pagePath: (vehicleId) => (vehicleId ? `/admin/vehicles/${vehicleId}` : '/admin/setup/vehicles'),
+    fields: VEHICLE_FIELDS,
     summarize: (row, refs) => ({
       title: vehicleTitle(row),
-      detail: [
-        refs.classes.get(row.class_id),
-        text.statuses[row.status],
-        row.owner_id ? text.partner : null,
-      ]
-        .filter(Boolean)
-        .join(' · '),
+      cells: vehicleCells(row, refs),
+      tags: [row.status, row.owner_id ? 'managed' : 'company'],
       href: `/admin/vehicles/${row.id}`,
       linkLabel: text.openVehicle,
+    }),
+  },
+  drivers: {
+    fields: [
+      { name: 'name', type: 'text', isRequired: true },
+      { name: 'phone', type: 'text', isRequired: true },
+      { name: 'licence_number', type: 'text', isClearable: true },
+      { name: 'is_active', type: 'boolean', isOnByDefault: true },
+    ],
+    summarize: (row) => ({
+      title: row.name,
+      detail: [row.phone, row.is_active ? null : copy.adminSetup.switchedOff]
+        .filter(Boolean)
+        .join(' · '),
     }),
   },
   'vehicle-owners': {

@@ -2,7 +2,6 @@ import { formatFullDate, readingMinutes } from '@carvo/shared'
 import Breadcrumbs from '@/components/Breadcrumbs'
 import Button from '@/components/Button'
 import ArticleText from '@/components/ArticleText'
-import Eyebrow from '@/components/Eyebrow'
 import Faq from '@/components/Faq'
 import GuideCards from '@/components/GuideCards'
 import PostImage from '@/components/PostImage'
@@ -51,7 +50,7 @@ export function Contents({ sections, label = text.contents }) {
 export function Section({ section }) {
   return (
     <section id={section.id} className="scroll-mt-24">
-      <h2 className="mb-3 text-title-2 md:text-title-1">{section.heading}</h2>
+      <h2 className="mb-3 text-title-2 md:text-title-1-lg">{section.heading}</h2>
       <div className="flex flex-col gap-4 text-body text-label-2">
         <Picture image={section.image} />
         {section.paragraphs.map((paragraph) => (
@@ -95,7 +94,6 @@ export default function ArticleView({ post, trail, more }) {
     <article className="mx-auto flex w-full max-w-3xl flex-col gap-10">
       <Breadcrumbs trail={trail} />
       <header>
-        <Eyebrow>{text.eyebrow}</Eyebrow>
         <h1 className="text-display md:text-display-lg">{post.title}</h1>
         <p className="mt-3 text-footnote text-label-2">
           {text.published} {formatFullDate(post.published_at)} ·{' '}
@@ -111,10 +109,10 @@ export default function ArticleView({ post, trail, more }) {
         <Section key={section.id} section={section} />
       ))}
       <CallToAct links={post.related} />
-      <Faq eyebrow={copy.home.eyebrows.faq} title={copy.home.faq.title} items={post.faq} />
+      <Faq items={post.faq} />
       {more.length > 0 && (
         <section>
-          <h2 className="mb-5 text-title-2 md:text-title-1">{text.moreTitle}</h2>
+          <h2 className="mb-5 text-title-2 md:text-title-1-lg">{text.moreTitle}</h2>
           <GuideCards posts={more} />
         </section>
       )}

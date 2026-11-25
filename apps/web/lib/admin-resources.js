@@ -160,13 +160,25 @@ export const resourcePaths = (key, definition, scope = 'admin') => ({
 
 const isBlank = (value) => value === undefined || value === null || String(value).trim() === ''
 
+// One entry per line. An emptied box clears the list on edit; on create there is nothing to send.
+function linesValue(raw, isEdit) {
+  const lines = String(raw ?? '')
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean)
+  return lines.length || isEdit ? lines : undefined
+}
+
 // What one field sends. Blank means "not given" on create, and "clear it" on edit for a field that may be cleared.
 function fieldValue(field, formData, isEdit) {
   const raw = formData.get(field.name)
   if (field.type === 'boolean') return formData.has(field.name)
+  if (field.type === 'lines') return linesValue(raw, isEdit)
   if (isBlank(raw)) return isEdit && field.isClearable ? null : undefined
   const value = String(raw).trim()
-  if (field.type === 'number') return Number.isFinite(Number(value)) ? Number(value) : value
+  if (field.type === 'number' || field.type === 'rate') {
+    return Number.isFinite(Number(value)) ? Number(value) : value
+  }
   if (field.type === 'list')
     return value
       .split(',')
@@ -178,7 +190,7 @@ function fieldValue(field, formData, isEdit) {
 /** The request body for a form. A field that cannot change after creation is left out of an edit. */
 export function buildBody(fields, formData, isEdit) {
   const entries = fields
-    .filter((field) => (isEdit ? !field.isLockedOnEdit : !field.isEditOnly))
+    .filter((field) => (isEdit ? !field.isLockedOnEdit && !field.isCreateOnly : !field.isEditOnly))
     .map((field) => [field.name, fieldValue(field, formData, isEdit)])
     .filter(([, value]) => value !== undefined)
   return Object.fromEntries(entries)
@@ -188,6 +200,6 @@ export function buildBody(fields, formData, isEdit) {
 export function startingValue(field, row) {
   if (!row) return field.isOnByDefault ?? ''
   const value = row[field.name]
-  if (Array.isArray(value)) return value.join(', ')
+  if (Array.isArray(value)) return value.join(field.type === 'lines' ? '\n' : ', ')
   return value ?? (field.type === 'boolean' ? false : '')
 }

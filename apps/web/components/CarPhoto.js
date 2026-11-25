@@ -19,7 +19,7 @@ export default function CarPhoto({ src, alt, sizes, isPriority = false, classNam
         className={cx('object-cover', className)}
       />
       {isExamplePhoto(src) ? (
-        <span className="absolute bottom-2 left-2 rounded-full bg-hero px-2 py-0.5 text-xs font-semibold text-on-hero">
+        <span className="absolute bottom-2 left-2 rounded-full bg-hero px-2 py-0.5 text-footnote font-semibold text-on-hero">
           {copy.cars.exampleImage}
         </span>
       ) : null}

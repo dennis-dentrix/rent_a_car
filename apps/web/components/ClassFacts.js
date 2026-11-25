@@ -1,16 +1,11 @@
-import { Briefcase, Users } from 'lucide-react'
-import IconTile from '@/components/IconTile'
 import TagList from '@/components/TagList'
 import { copy } from '@/copy/en'
 
-function Fact({ icon, label, value }) {
+function Fact({ label, value }) {
   return (
-    <div className="flex items-center gap-3">
-      <IconTile icon={icon} />
-      <div>
-        <dt className="text-footnote text-label-2">{label}</dt>
-        <dd className="num text-headline">{value}</dd>
-      </div>
+    <div>
+      <dt className="text-footnote text-label-2">{label}</dt>
+      <dd className="num text-title-2">{value}</dd>
     </div>
   )
 }
@@ -21,9 +16,9 @@ export default function ClassFacts({ item, detail }) {
   return (
     <div className="flex flex-col gap-4">
       <dl className="flex flex-wrap gap-x-8 gap-y-4">
-        <Fact icon={Users} label={text.seats} value={item.seats} />
+        <Fact label={text.seats} value={item.seats} />
         {detail.luggage_capacity != null && (
-          <Fact icon={Briefcase} label={text.luggage} value={detail.luggage_capacity} />
+          <Fact label={text.luggage} value={detail.luggage_capacity} />
         )}
       </dl>
       {item.best_for.length > 0 && (

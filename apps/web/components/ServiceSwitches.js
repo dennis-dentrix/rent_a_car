@@ -3,6 +3,7 @@
 import { useRef } from 'react'
 import { SERVICE_GROUPS } from '@carvo/shared'
 import { setServicesAction } from '@/app/console/actions'
+import Panel from '@/components/Panel'
 import Switch from '@/components/Switch'
 import { copy } from '@/copy/en'
 
@@ -20,11 +21,10 @@ export default function ServiceSwitches({ selected }) {
     return isKept
   }
   return (
-    <div className="flex flex-col gap-6">
+    <div className="grid items-start gap-5 lg:grid-cols-3">
       {Object.entries(SERVICE_GROUPS).map(([group, ids]) => (
-        <section key={group} className="flex flex-col gap-3">
-          <h2 className="text-title-3">{copy.services.groups[group].label}</h2>
-          <ul className="flex flex-col gap-4 rounded-card bg-bg-grouped p-4">
+        <Panel key={group} title={copy.services.groups[group].label}>
+          <ul className="flex flex-col gap-4">
             {ids.map((id) => (
               <li key={id}>
                 <Switch
@@ -36,7 +36,7 @@ export default function ServiceSwitches({ selected }) {
               </li>
             ))}
           </ul>
-        </section>
+        </Panel>
       ))}
     </div>
   )

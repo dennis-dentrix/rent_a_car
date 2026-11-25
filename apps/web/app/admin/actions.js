@@ -84,10 +84,14 @@ export async function updateStaffAction(_state, formData) {
   return { status: 'done' }
 }
 
-/** Puts a vehicle on a booking. The database refuses a car that is busy on those dates, and the form says so. */
+/** Puts a car, and a delivery's driver, on a booking. The database refuses a car that is busy on those dates. */
 export async function assignVehicleAction(_state, formData) {
   const id = field(formData, 'id')
-  const input = assignBookingSchema.safeParse({ vehicle_id: field(formData, 'vehicle_id') })
+  const driver = field(formData, 'driver_id')
+  const input = assignBookingSchema.safeParse({
+    vehicle_id: field(formData, 'vehicle_id'),
+    ...(driver && { driver_id: driver }),
+  })
   if (!input.success) return { error: copy.adminFleet.assign.failed }
   const result = await adminSend('POST', `/staff/bookings/${id}/assign`, input.data)
   if (result.error) return { error: copy.adminFleet.assign.failed }

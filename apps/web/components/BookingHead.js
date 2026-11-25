@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import LargeTitle from '@/components/LargeTitle'
+import PageHeader from '@/components/PageHeader'
 import StatusBadge from '@/components/StatusBadge'
 import { personName } from '@/lib/admin-format'
 
@@ -13,8 +13,11 @@ export default function BookingHead({ booking, backHref, backLabel }) {
       >
         {backLabel}
       </Link>
-      <LargeTitle subtitle={booking.reference}>{personName(booking.customer)}</LargeTitle>
-      <StatusBadge status={booking.status} />
+      <PageHeader
+        eyebrow={booking.reference}
+        title={personName(booking.customer)}
+        actions={<StatusBadge status={booking.status} />}
+      />
     </>
   )
 }

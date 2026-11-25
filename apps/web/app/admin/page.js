@@ -1,13 +1,16 @@
 import Link from 'next/link'
-import AdminAttention from '@/components/AdminAttention'
-import AdminBookingList from '@/components/AdminBookingList'
-import AdminToday from '@/components/AdminToday'
-import Alert from '@/components/Alert'
-import LargeTitle from '@/components/LargeTitle'
-import AdminAuditList from '@/components/AdminAuditList'
 import { nairobiDate } from '@carvo/shared'
+import AdminAttention from '@/components/AdminAttention'
+import AdminAuditList from '@/components/AdminAuditList'
+import AdminBookingList from '@/components/AdminBookingList'
+import AdminPage from '@/components/AdminPage'
+import BookingOutcomes from '@/components/BookingOutcomes'
+import Alert from '@/components/Alert'
+import Panel from '@/components/Panel'
+import StatTiles from '@/components/StatTiles'
 import { copy } from '@/copy/en'
 import { adminGet, getClassNames, requireAdmin } from '@/lib/admin'
+import { adminTiles } from '@/lib/admin-tiles'
 
 const text = copy.admin.overview
 
@@ -16,58 +19,53 @@ export const metadata = { title: copy.admin.meta.title }
 const PICKUP_STATUSES = ['confirmed', 'ready']
 
 // The first page of the admin: what is waiting, what moves today, and the latest changes. Nothing else.
-export default async function AdminPage() {
+export default async function AdminOverviewPage() {
   const { token, profile } = await requireAdmin()
-  const today = nairobiDate(new Date())
-  const [overview, pickups, audit, classNames] = await Promise.all([
+  const [overview, pickups, audit, classNames, outcomes] = await Promise.all([
     adminGet('/admin/overview', token),
-    adminGet('/staff/bookings', token, { date: today }),
+    adminGet('/staff/bookings', token, { date: nairobiDate(new Date()) }),
     adminGet('/admin/audit', token, { limit: 5 }),
     getClassNames(),
+    adminGet('/admin/booking-outcomes', token),
   ])
   if (overview.error) return <Alert tone="error" title={copy.admin.loadError} />
   const dueToday = (pickups.data ?? []).filter((b) => PICKUP_STATUSES.includes(b.status))
   return (
-    <div className="flex flex-col gap-8">
-      <LargeTitle subtitle={text.greeting(profile.full_name)}>{text.title}</LargeTitle>
-      <AdminAttention overview={overview.data} />
-      <AdminToday overview={overview.data} />
-      <PickupsSection bookings={dueToday} classNames={classNames} />
-      <RecentSection entries={audit.data ?? []} />
-    </div>
+    <AdminPage title={text.title} subtitle={text.greeting(profile.full_name)}>
+      <StatTiles title={text.todayTitle} items={adminTiles(overview.data)} />
+      <div className="grid items-start gap-5 lg:grid-cols-[2fr_1fr]">
+        <div className="flex flex-col gap-5">
+          <PickupsPanel bookings={dueToday} classNames={classNames} />
+          <BookingOutcomes weeks={outcomes.data ?? []} />
+          <RecentPanel entries={audit.data ?? []} />
+        </div>
+        <AdminAttention overview={overview.data} />
+      </div>
+    </AdminPage>
   )
 }
 
-function PickupsSection({ bookings, classNames }) {
+function PickupsPanel({ bookings, classNames }) {
   return (
-    <section aria-labelledby="pickups" className="flex flex-col gap-3">
-      <h2 id="pickups" className="text-title-3">
-        {text.pickupsTitle}
-      </h2>
+    <Panel title={text.pickupsTitle} isFlush>
       {bookings.length ? (
         <AdminBookingList bookings={bookings} classNames={classNames} />
       ) : (
-        <p className="text-body text-label-2">{text.noPickups}</p>
+        <p className="px-5 pb-8 pt-4 text-center text-cell text-label-2">{text.noPickups}</p>
       )}
-    </section>
+    </Panel>
   )
 }
 
-function RecentSection({ entries }) {
+function RecentPanel({ entries }) {
+  const seeAll = (
+    <Link href="/admin/audit" className="text-meta font-bold text-primary">
+      {text.seeAll}
+    </Link>
+  )
   return (
-    <section aria-labelledby="recent" className="flex flex-col gap-3">
-      <div className="flex items-baseline justify-between">
-        <h2 id="recent" className="text-title-3">
-          {text.recentTitle}
-        </h2>
-        <Link
-          href="/admin/audit"
-          className="text-callout font-medium text-primary underline underline-offset-2"
-        >
-          {text.seeAll}
-        </Link>
-      </div>
+    <Panel title={text.recentTitle} action={seeAll}>
       <AdminAuditList entries={entries} />
-    </section>
+    </Panel>
   )
 }

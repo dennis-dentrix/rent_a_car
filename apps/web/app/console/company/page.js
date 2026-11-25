@@ -1,4 +1,5 @@
 import AdminPage from '@/components/AdminPage'
+import Panel from '@/components/Panel'
 import ResourceForm from '@/components/ResourceForm'
 import { copy } from '@/copy/en'
 import { CONSOLE_RESOURCES } from '@/lib/console-resources'
@@ -14,14 +15,16 @@ export default async function ConsoleCompanyPage() {
   return (
     <AdminPage title={text.title} subtitle={text.subtitle} isNarrow hasError={Boolean(error)}>
       {data && (
-        <ResourceForm
-          resource="company"
-          scope="console"
-          fields={CONSOLE_RESOURCES.company.fields}
-          labels={text.fields}
-          row={data}
-          refs={{}}
-        />
+        <Panel>
+          <ResourceForm
+            resource="company"
+            scope="console"
+            fields={CONSOLE_RESOURCES.company.fields}
+            labels={text.fields}
+            row={data}
+            refs={{}}
+          />
+        </Panel>
       )}
     </AdminPage>
   )

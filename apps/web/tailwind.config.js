@@ -4,6 +4,8 @@ import {
   space,
   radius,
   size,
+  maxWidth,
+  screens,
   z,
   motion,
   shadow,
@@ -27,7 +29,7 @@ export default {
   future: { hoverOnlyWhenSupported: true },
   content: ['./app/**/*.{js,jsx}', './components/**/*.{js,jsx}', './copy/**/*.js'],
   theme: {
-    screens: { md: '768px', lg: '1024px', wide: '1440px' },
+    screens,
     colors: { transparent: 'transparent', current: 'currentColor', ...colorUtilities },
     spacing: { 0: '0px', ...space, ...size },
     borderRadius: { none: '0', ...radius },
@@ -38,26 +40,43 @@ export default {
     transitionDuration: motion.duration,
     transitionTimingFunction: motion.easing,
     extend: {
+      maxWidth,
       backgroundImage: {
         hero: 'linear-gradient(135deg, var(--color-hero) 0%, var(--color-primary) 55%, var(--color-hero-to) 120%)',
         stage: 'linear-gradient(160deg, var(--color-stage-from), var(--color-stage-to))',
       },
       keyframes: {
-        draw: { from: { strokeDashoffset: '1' }, to: { strokeDashoffset: '0' } },
+        // The arc fades in as it starts, so its round end does not appear out of nowhere.
+        draw: {
+          '0%': { strokeDashoffset: '1', opacity: '0' },
+          '15%': { opacity: '0.3' },
+          '100%': { strokeDashoffset: '0', opacity: '0.3' },
+        },
+        // Size eases over the whole cycle; each ring fades in, then out, and never jumps back into view.
+        beacon: {
+          '0%': { transform: 'scale(1)' },
+          '100%': { transform: 'scale(3.4)' },
+        },
+        'beacon-fade': {
+          '0%, 100%': { opacity: '0' },
+          '18%': { opacity: '0.45' },
+        },
+        'drawer-in': {
+          from: { transform: 'translateX(100%)' },
+          to: { transform: 'translateX(0)' },
+        },
         rise: {
           from: { opacity: '0', transform: 'translateY(8px)' },
           to: { opacity: '1', transform: 'translateY(0)' },
         },
-        beacon: {
-          '0%': { transform: 'scale(1)', opacity: '0.7' },
-          '100%': { transform: 'scale(3.2)', opacity: '0' },
-        },
       },
       animation: {
-        draw: 'draw 1600ms cubic-bezier(0.77, 0, 0.175, 1) 200ms both',
+        draw: 'draw 2400ms cubic-bezier(0.65, 0, 0.35, 1) 150ms both',
+        beacon:
+          'beacon 3200ms cubic-bezier(0.22, 0.61, 0.36, 1) infinite, beacon-fade 3200ms ease-in-out infinite',
+        'drawer-in': 'drawer-in 320ms cubic-bezier(0.32, 0.72, 0, 1) both',
         // A screen that appears once: short and decelerating, so it feels ready at once.
         rise: 'rise 240ms cubic-bezier(0.23, 1, 0.32, 1) both',
-        beacon: 'beacon 2400ms ease-out infinite',
       },
       minHeight: { touch: size.touch, control: size.control, compact: size.compact, row: size.row },
       minWidth: { touch: size.touch, compact: size.compact },

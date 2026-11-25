@@ -4,22 +4,36 @@ import { admin } from './admin.js'
 import { adminFleet } from './admin-fleet.js'
 import { adminSetup } from './admin-setup.js'
 import { auth } from './auth.js'
+import { consoleUi } from './console-ui.js'
 import { operatorConsole } from './operator-console.js'
+import { policies } from './policies.js'
+import { carFacts } from './car-facts.js'
 import { classPage } from './class-page.js'
+import { classPrices } from './class-prices.js'
+import { journey } from './journey.js'
+import { liveCars } from './live-cars.js'
 import { editor } from './editor.js'
 import { home } from './home.js'
+import { inspections } from './inspections.js'
 import { blogCopy } from './blog/index.js'
 import { operators } from './operators.js'
 import { privacy } from './privacy.js'
+import { renterHome } from './renter-home.js'
 import { servicePages } from './service-pages.js'
 import { settings } from './settings.js'
 import { services } from './services.js'
 
 export const copy = {
+  inspections,
+  carFacts,
+  journey,
+  liveCars,
+  consoleUi,
   admin,
   adminSetup,
   adminFleet,
   operatorConsole,
+  policies,
   auth,
   settings,
   editor,
@@ -27,7 +41,9 @@ export const copy = {
   blog: blogCopy,
   operators,
   privacy,
+  renterHome,
   classPage,
+  classPrices,
   services,
   servicePages,
   nav: {
@@ -43,6 +59,7 @@ export const copy = {
     help: 'Help',
     home: 'Home',
     signIn: 'Sign in',
+    dashboard: 'Dashboard',
     main: 'Main',
   },
   console: {
@@ -51,6 +68,8 @@ export const copy = {
     fleet: 'Fleet',
   },
   footer: {
+    hire: 'Hire a car',
+    help: 'Help and company',
     descriptor: 'Car hire from approved rental companies across Kenya.',
     nav: 'Footer',
     cars: 'All cars',

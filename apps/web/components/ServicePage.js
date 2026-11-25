@@ -19,7 +19,7 @@ export default function ServicePage({ pageKey, search, children }) {
   const page = copy.servicePages[pageKey]
   const { steps, faq } = page
   return (
-    <div className="flex flex-col gap-14 md:gap-24">
+    <div className="flex flex-col gap-16 md:gap-20">
       <JsonLd
         data={serviceJsonLd({
           name: page.hero.title,
@@ -38,7 +38,7 @@ export default function ServicePage({ pageKey, search, children }) {
       <ServiceList {...page.list} />
       {children}
       <TellAndRules tell={page.tell} />
-      <Journey eyebrow={steps.eyebrow} title={steps.title} steps={steps.items} />
+      <Journey title={steps.title} steps={steps.items} />
       <Faq {...faq} />
       <GuidesSection />
       <CtaBand />

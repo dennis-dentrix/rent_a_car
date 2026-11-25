@@ -16,6 +16,8 @@ export const FILE_PURPOSES = {
   blog_image: BLOG_IMAGE_CONTENT_TYPES,
   // Public too: a person's picture is shown beside their name.
   avatar: BLOG_IMAGE_CONTENT_TYPES,
+  // Public: renters look at the car before they book it.
+  vehicle_photo: BLOG_IMAGE_CONTENT_TYPES,
 }
 
 export const allowsContentType = (purpose, contentType) =>

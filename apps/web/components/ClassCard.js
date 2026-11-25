@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ArrowUpRight, Users } from 'lucide-react'
+import { Users } from 'lucide-react'
 import Badge from '@/components/Badge'
 import Price from '@/components/Price'
 import TagList from '@/components/TagList'
@@ -38,35 +38,13 @@ function Picture({ item }) {
   if (photo) {
     return (
       <div className="relative aspect-[16/10] overflow-hidden bg-fill">
-        <CarPhoto
-          src={photo}
-          alt={item.name}
-          sizes={CARD_SIZES}
-          className="transition-transform duration-slow ease-standard group-hover:scale-[1.03]"
-        />
+        <CarPhoto src={photo} alt={item.name} sizes={CARD_SIZES} />
       </div>
     )
   }
   return (
     <div className="flex aspect-[16/10] items-center bg-stage px-4">
-      <VehicleArt
-        label={item.name}
-        styleHint={`${item.name} ${item.slug}`}
-        className="w-full transition-transform duration-standard ease-standard group-hover:translate-x-2"
-      />
-    </div>
-  )
-}
-
-function Stage({ item, hasLink }) {
-  return (
-    <div className="relative">
-      <Picture item={item} />
-      {hasLink && (
-        <span className="absolute right-3 top-3 flex size-9 items-center justify-center rounded-pill bg-surface text-label opacity-0 shadow-1 transition-opacity duration-fast group-hover:opacity-100">
-          <ArrowUpRight size={18} aria-hidden="true" />
-        </span>
-      )}
+      <VehicleArt label={item.name} styleHint={`${item.name} ${item.slug}`} className="w-full" />
     </div>
   )
 }
@@ -91,23 +69,19 @@ function Details({ item }) {
   )
 }
 
-/**
- * One car type: a staged drawing, name, seats, what it suits, and the daily price. With `href` the
- * whole card is one link and the car edges forward on hover.
- */
+/** One car type: a picture, name, seats, what it suits, and the daily price. With `href` the whole card is one link. */
 export default function ClassCard({ item, href }) {
   const Wrapper = href ? Link : 'div'
   return (
     <Wrapper
       href={href}
       className={cx(
-        'group relative flex h-full flex-col overflow-hidden rounded-panel border border-separator bg-surface shadow-1',
-        'transition-[transform,box-shadow] duration-standard ease-standard',
-        href && 'hover:-translate-y-1 hover:shadow-2 active:scale-[0.99]',
-        item.available_count === 0 && 'opacity-60',
+        'flex h-full flex-col overflow-hidden rounded-panel border border-separator bg-surface',
+        href &&
+          'transition-[border-color,transform] duration-fast hover:border-primary active:scale-[0.99]',
       )}
     >
-      <Stage item={item} hasLink={Boolean(href)} />
+      <Picture item={item} />
       <Details item={item} />
     </Wrapper>
   )

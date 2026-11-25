@@ -12,7 +12,7 @@ export const emailConfigured = () =>
  * Send one email through ZeptoMail. Gives up after ten seconds. Throws an Error whose message says what
  * went wrong (without the token) so the caller can record it and try again later.
  */
-export async function sendEmail({ to, subject, text, html }) {
+export async function sendEmail({ to, subject, text, html, attachments }) {
   if (!emailConfigured()) throw new AppError('INTERNAL_ERROR', { message: 'Email is not set up.' })
   const response = await fetch(ZEPTOMAIL_URL, {
     method: 'POST',
@@ -27,6 +27,8 @@ export async function sendEmail({ to, subject, text, html }) {
       subject,
       textbody: text,
       htmlbody: html,
+      // Files travel with the message as { name, mime_type, content (base64) }.
+      ...(attachments ? { attachments } : {}),
     }),
     signal: AbortSignal.timeout(TIMEOUT_MS),
   })

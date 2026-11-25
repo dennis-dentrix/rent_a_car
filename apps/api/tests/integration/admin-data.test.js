@@ -169,6 +169,16 @@ describe('delivery zones and locations', () => {
   })
 })
 
+describe('drivers', () => {
+  it('adds a driver and switches the driver off', async () => {
+    const driver = { name: 'API Driver', phone: '+254 733 000 002' }
+    const created = await admin('POST', '/admin/drivers', driver)
+    expect([created.status, created.body.data.phone]).toEqual([201, '+254733000002'])
+    const off = await admin('PATCH', `/admin/drivers/${created.body.data.id}`, { is_active: false })
+    expect(off.body.data.is_active).toBe(false)
+  })
+})
+
 describe('settings', () => {
   afterEach(() => db.query("update settings set value = '30' where key = 'deposit_percent'"))
 

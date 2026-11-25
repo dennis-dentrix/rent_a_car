@@ -36,3 +36,44 @@ export const MAX_BLOG_IMAGE_BYTES = 5 * 1024 * 1024
 
 // A profile picture: the same picture types as a guide's, but a smaller file.
 export const MAX_AVATAR_BYTES = 2 * 1024 * 1024
+
+export const MAX_VEHICLE_PHOTOS = 8
+export const MAX_VEHICLE_PHOTO_BYTES = 5 * 1024 * 1024
+
+export const CROSS_BORDER_RULES = ['not_allowed', 'with_permission', 'allowed']
+export const FUEL_POLICIES = ['same_level', 'full_to_full', 'prepaid']
+
+export const TRANSMISSIONS = ['automatic', 'manual']
+export const FUEL_TYPES = ['petrol', 'diesel', 'hybrid', 'electric']
+export const DRIVE_TYPES = ['two_wheel', 'four_wheel', 'all_wheel']
+export const CHAUFFEUR_OPTIONS = ['self_drive', 'chauffeur', 'both']
+
+// What is looked at before a car is handed over and when it comes back. Each is marked fine or not.
+export const INSPECTION_CHECKS = [
+  'bodywork',
+  'windscreen',
+  'lights',
+  'tyres',
+  'spare_wheel',
+  'tools',
+  'interior',
+  'documents',
+]
+export const MIN_INSPECTION_PHOTOS = 4
+/** The words for each check, on the screens and in the sealed report alike. */
+export const INSPECTION_CHECK_LABELS = {
+  bodywork: 'Bodywork',
+  windscreen: 'Windscreen and windows',
+  lights: 'Lights',
+  tyres: 'Tyres',
+  spare_wheel: 'Spare wheel',
+  tools: 'Jack and tools',
+  interior: 'Interior',
+  documents: 'Insurance and documents',
+}
+
+/** A report's checks in the order they are asked. A database returns them in an order of its own. */
+export const orderedChecks = (checklist = {}) => {
+  const rank = (check) => INSPECTION_CHECKS.indexOf(check) + 1 || INSPECTION_CHECKS.length + 1
+  return Object.entries(checklist ?? {}).sort(([a], [b]) => rank(a) - rank(b))
+}

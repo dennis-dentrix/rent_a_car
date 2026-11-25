@@ -6,16 +6,18 @@ import Button from '@/components/Button'
 import ClassFacts from '@/components/ClassFacts'
 import ClassGrid from '@/components/ClassGrid'
 import ClassPriceCard, { DATES_ID } from '@/components/ClassPriceCard'
-import Eyebrow from '@/components/Eyebrow'
 import GoodToKnow from '@/components/GoodToKnow'
 import JsonLd from '@/components/JsonLd'
 import LoadError from '@/components/LoadError'
 import PriceExplainer from '@/components/PriceExplainer'
+import SectionHeading from '@/components/SectionHeading'
 import StickySearchCta from '@/components/StickySearchCta'
 import CarPhoto from '@/components/CarPhoto'
 import VehicleArt from '@/components/VehicleArt'
 import { copy } from '@/copy/en'
-import { getClassBySlug, getClasses } from '@/lib/catalogue'
+import TypeCars from '@/components/TypeCars'
+import { getClassBySlug, getClasses, getVehicles } from '@/lib/catalogue'
+import { carsOfType, withCarPhotos } from '@/lib/live-cars'
 import { classPhoto } from '@/lib/photos'
 import { pageMetadata } from '@/lib/seo'
 import { breadcrumbJsonLd, productJsonLd } from '@/lib/structured-data'
@@ -71,10 +73,7 @@ function Overview({ item, detail }) {
   return (
     <div className="flex flex-col gap-6">
       <Picture item={item} />
-      <div>
-        <Eyebrow>{text.eyebrow}</Eyebrow>
-        <h1 className="text-display md:text-display-lg">{item.name}</h1>
-      </div>
+      <h1 className="text-display md:text-display-lg">{item.name}</h1>
       <ClassFacts item={item} detail={detail} />
       {detail.description && (
         <p className="max-w-prose text-body text-label-2">{detail.description}</p>
@@ -87,8 +86,7 @@ function Similar({ items }) {
   if (items.length === 0) return null
   return (
     <section>
-      <Eyebrow>{text.similarEyebrow}</Eyebrow>
-      <h2 className="mb-6 text-title-2 md:text-title-1">{text.similarTitle}</h2>
+      <SectionHeading title={text.similarTitle} />
       <ClassGrid items={items} getHref={(other) => pathFor(other.slug)} />
     </section>
   )
@@ -96,13 +94,15 @@ function Similar({ items }) {
 
 export default async function ClassPage({ params }) {
   const { slug } = await params
-  const result = await getClassBySlug(slug)
+  const [result, vehicles] = await Promise.all([getClassBySlug(slug), getVehicles()])
   if (result.isMissing) notFound()
   if (result.error) return <LoadError text={text} href={pathFor(slug)} />
-  const { item, detail, others } = result
+  const { detail } = result
+  const cars = vehicles.data ?? []
+  const [item, ...others] = withCarPhotos([result.item, ...result.others], cars)
   const description = text.meta.description(item.name, item.seats, '')
   return (
-    <div className="flex flex-col gap-14 md:gap-20">
+    <div className="flex flex-col gap-16 md:gap-20">
       <TrackEvent
         name="class_viewed"
         properties={{ class_id: item.id, price_per_day_kes: item.price_per_day_kes }}
@@ -123,6 +123,7 @@ export default async function ClassPage({ params }) {
           <ClassPriceCard item={item} />
         </div>
       </section>
+      <TypeCars name={item.name} cars={carsOfType(cars, slug)} />
       <GoodToKnow />
       <PriceExplainer />
       <Similar items={others.slice(0, SIMILAR_COUNT)} />

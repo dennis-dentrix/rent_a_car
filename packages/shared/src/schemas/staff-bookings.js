@@ -38,3 +38,7 @@ export const staffBookingsQuerySchema = z.strictObject({
   handover_type: z.enum(['office', 'delivery']).optional(),
   ...pageFields,
 })
+/** The one-tap steps a rental company records on a booking. */
+export const milestoneSchema = z.strictObject({
+  step: z.enum(['car_prepared', 'en_route', 'arrived']),
+})

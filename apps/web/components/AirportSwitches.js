@@ -1,6 +1,7 @@
 'use client'
 
 import { setAirportServedAction } from '@/app/console/actions'
+import Panel from '@/components/Panel'
 import Switch from '@/components/Switch'
 import { copy } from '@/copy/en'
 
@@ -17,11 +18,10 @@ const GROUPS = [
  */
 export default function AirportSwitches({ airports }) {
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-5">
       {GROUPS.map(({ type, title }) => (
-        <section key={type} className="flex flex-col gap-3">
-          <h3 className="text-headline">{title}</h3>
-          <ul className="flex flex-col gap-4 rounded-card bg-bg-grouped p-4">
+        <Panel key={type} title={title}>
+          <ul className="grid gap-x-10 gap-y-4 md:grid-cols-2">
             {airports
               .filter((place) => place.type === type)
               .map((place) => (
@@ -36,7 +36,7 @@ export default function AirportSwitches({ airports }) {
                 </li>
               ))}
           </ul>
-        </section>
+        </Panel>
       ))}
     </div>
   )

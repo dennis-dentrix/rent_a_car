@@ -39,38 +39,8 @@ export function BookingTimeline({ events }) {
   }))
   return (
     <section className="flex flex-col gap-3">
-      <h2 className="text-title-3">{text.history}</h2>
+      <h2 className="text-section">{text.history}</h2>
       <InsetList items={items} />
-    </section>
-  )
-}
-
-function MoveSection({ booking }) {
-  return (
-    <section className="rounded-card bg-bg-grouped p-4">
-      <h2 className="text-headline">{text.moveTo}</h2>
-      {booking.next_statuses.length ? (
-        <AdminDecision
-          action={bookingStatusAction}
-          id={booking.id}
-          answerName="to_status"
-          noteName="note"
-          noteLabel={text.noteLabel}
-          answers={moves(booking)}
-        />
-      ) : (
-        <p className="mt-2 text-callout text-label-2">{text.noMoves}</p>
-      )}
-    </section>
-  )
-}
-
-function AssignSection({ booking, vehicles }) {
-  if (!canAssign(booking)) return null
-  return (
-    <section className="rounded-card bg-bg-grouped p-4">
-      <h2 className="text-headline">{copy.adminFleet.assign.title}</h2>
-      <AssignVehicleForm bookingId={booking.id} vehicles={vehiclesFor(booking, vehicles)} />
     </section>
   )
 }

@@ -1,5 +1,15 @@
 import { describe, expect, it } from 'vitest'
-import { IDS, accounts, call, errorOf, get, signUpCustomer, withApi } from './api-client.js'
+import {
+  IDS,
+  accounts,
+  call,
+  errorOf,
+  get,
+  putFile,
+  sampleFile,
+  signUpCustomer,
+  withApi,
+} from './api-client.js'
 
 withApi()
 
@@ -190,4 +200,79 @@ describe('the operator console: prices and places', () => {
     expect(company.body.data.phone).toBe('+254700000999')
     expect((await mine(token, 'PATCH', '/company', { status: 'approved' })).status).toBe(400)
   })
+})
+
+describe('the operator console: changing a price', () => {
+  it('prices a new class as it is added, and changes the price in one call', async () => {
+    const token = await newOperator('API Console R3')
+    const priced = { name: 'API Priced Class', seats: 5, price_kes: 4000 }
+    const made = await mine(token, 'POST', '/classes', priced)
+    expect(made.status).toBe(201)
+    const path = `/classes/${made.body.data.id}/rate`
+    expect((await mine(token, 'PUT', path, { price_kes: 4500 })).body.data.price_kes).toBe(4500)
+    expect((await mine(token, 'GET', '/rates')).body.data.map((row) => row.price_kes)).toEqual([
+      4500,
+    ])
+    expect(errorOf(await mine(accounts.admin, 'PUT', path, { price_kes: 1 }))[0]).toBe(403)
+  }, 20_000)
+})
+
+describe('the operator console: photos, car rate, and policies', () => {
+  it('uploads a photo to its own car, keeps others out, and removes it', async () => {
+    const [one, two] = await Promise.all([
+      newOperator('API Console P1'),
+      newOperator('API Console P2'),
+    ])
+    const car = (
+      await mine(one, 'POST', '/vehicles', { ...vehicle('PIC-1'), daily_rate_kes: 9000 })
+    ).body.data
+    expect(car).toMatchObject({ daily_rate_kes: 9000, photo_paths: [] })
+    const file = sampleFile('image/png', 4096)
+    const declared = { content_type: 'image/png', size_bytes: file.length }
+    const refused = await mine(two, 'POST', `/vehicles/${car.id}/photo-uploads`, declared)
+    expect(refused.status).toBe(404)
+    const link = (await mine(one, 'POST', `/vehicles/${car.id}/photo-uploads`, declared)).body.data
+    await putFile(link, file)
+    const saved = await mine(one, 'POST', `/vehicles/${car.id}/photos`, {
+      ...declared,
+      storage_path: link.storage_path,
+    })
+    expect(saved.body.data.photo_paths).toEqual([link.storage_path])
+    const gone = await mine(one, 'DELETE', `/vehicles/${car.id}/photos`, {
+      storage_path: link.storage_path,
+    })
+    expect(gone.body.data.photo_paths).toEqual([])
+  }, 20_000)
+
+  it('keeps one general policy per company and one per class', async () => {
+    const token = await newOperator('API Console Rules')
+    const general = { min_hire_days: 2, cross_border: 'not_allowed', rules: ['No smoking'] }
+    expect((await mine(token, 'POST', '/policies', general)).status).toBe(201)
+    expect(errorOf(await mine(token, 'POST', '/policies', { min_age: 25 }))[0]).toBe(409)
+    const forClass = await mine(token, 'POST', '/policies', { class_id: IDS.SEDAN, min_age: 25 })
+    expect(forClass.status).toBe(201)
+    expect((await mine(token, 'GET', '/policies')).body.data).toHaveLength(2)
+  })
+})
+
+describe('the cars renters see', () => {
+  it('lists an approved company\u2019s car with its details and none of its private ones', async () => {
+    const token = await newOperator('API Console Public')
+    const details = { seats: 7, transmission: 'automatic', features: ['Roof rack'] }
+    const car = await mine(token, 'POST', '/vehicles', { ...vehicle('PUB-1'), ...details })
+    expect(car.body.data).toMatchObject(details)
+    const seen = async () =>
+      (await get('/vehicles?limit=100')).body.data.find((item) => item.id === car.body.data.id)
+    expect(await seen()).toBeUndefined()
+    expect((await get(`/vehicles/${car.body.data.id}`)).status).toBe(404)
+    const company = (await mine(token, 'GET', '/company')).body.data
+    await admin('POST', `/admin/operators/${company.id}/review`, { to: 'approved' })
+    const listed = await seen()
+    expect(listed).toMatchObject({ ...details, operator_name: 'API Console Public' })
+    expect(listed.class).toMatchObject({ slug: expect.any(String) })
+    for (const secret of ['registration', 'chassis_number', 'owner_id', 'daily_rate_kes']) {
+      expect(listed).not.toHaveProperty(secret)
+    }
+    expect((await get(`/vehicles/${car.body.data.id}`)).body.data).toEqual(listed)
+  }, 20_000)
 })

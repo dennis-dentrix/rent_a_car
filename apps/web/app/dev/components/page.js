@@ -24,7 +24,7 @@ const SECTIONS = [
 // Every component in every state. Check it in light and dark, at 360 and 1280 px.
 export default function ComponentsPage() {
   return (
-    <main className="mx-auto max-w-[1280px] px-4 py-6 md:px-6 lg:px-10">
+    <main className="mx-auto max-w-page px-4 py-6 md:px-6 lg:px-10">
       <div className="flex items-start justify-between">
         <LargeTitle subtitle="Internal. Not in the production build.">Components</LargeTitle>
         <ThemeToggle />

@@ -1,21 +1,16 @@
 import { ChevronDown } from 'lucide-react'
-import Eyebrow from '@/components/Eyebrow'
+import SectionHeading from '@/components/SectionHeading'
 import { copy } from '@/copy/en'
 
 /** Questions and answers in native <details> elements: keyboard and screen-reader friendly with no script. */
-export default function Faq({
-  eyebrow = copy.home.eyebrows.faq,
-  title = copy.home.faq.title,
-  items = copy.home.faq.items,
-}) {
+export default function Faq({ title = copy.home.faq.title, items = copy.home.faq.items }) {
   return (
-    <section className="mx-auto w-full max-w-3xl">
-      <Eyebrow>{eyebrow}</Eyebrow>
-      <h2 className="mb-6 text-title-2 md:text-title-1">{title}</h2>
-      <div className="divide-y divide-separator overflow-hidden rounded-panel border border-separator bg-surface shadow-1">
+    <section className="w-full max-w-3xl">
+      <SectionHeading title={title} />
+      <div className="divide-y divide-separator border-y border-separator">
         {items.map((item) => (
           <details key={item.q} className="group">
-            <summary className="state-layer flex min-h-touch cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 text-headline [&::-webkit-details-marker]:hidden">
+            <summary className="flex min-h-touch cursor-pointer list-none items-center justify-between gap-4 py-4 text-headline [&::-webkit-details-marker]:hidden">
               {item.q}
               <ChevronDown
                 size={20}
@@ -23,7 +18,7 @@ export default function Faq({
                 aria-hidden="true"
               />
             </summary>
-            <p className="px-5 pb-5 text-body text-label-2">{item.a}</p>
+            <p className="pb-5 text-reading text-label-2">{item.a}</p>
           </details>
         ))}
       </div>

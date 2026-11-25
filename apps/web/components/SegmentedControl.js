@@ -6,8 +6,11 @@ function Pill({ index, count }) {
   return (
     <span
       aria-hidden="true"
-      className="absolute inset-y-1 left-1 rounded-[6px] bg-surface shadow-1 transition-transform duration-standard ease-standard"
-      style={{ width: `calc((100% - 8px) / ${count})`, transform: `translateX(${index * 100}%)` }}
+      className="absolute inset-y-1 left-1 rounded-[0.375rem] bg-surface shadow-1 transition-transform duration-standard ease-standard"
+      style={{
+        width: `calc((100% - 0.5rem) / ${count})`,
+        transform: `translateX(${index * 100}%)`,
+      }}
     />
   )
 }
@@ -37,7 +40,7 @@ export default function SegmentedControl({ label, options, value, onChange, isCo
           aria-checked={option.value === value}
           onClick={() => onChange(option.value)}
           className={cx(
-            'relative z-10 rounded-[6px] px-3 text-callout font-semibold',
+            'relative z-10 rounded-[0.375rem] px-3 text-callout font-semibold',
             option.value === value ? 'text-label' : 'text-label-2',
           )}
         >

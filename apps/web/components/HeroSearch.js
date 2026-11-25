@@ -68,7 +68,7 @@ export default function HeroSearch({ search, initialGroup = 'car_hire', initialS
   const error = dateError(form.group, form.hasTriedWithoutDate)
   return (
     <Card hasPadding={false} className="overflow-hidden shadow-2">
-      <div className="flex flex-col gap-3 border-b border-separator px-4 py-3 md:flex-row md:items-center md:justify-between md:px-6">
+      <div className="flex flex-col gap-3 border-b border-separator px-gutter py-3 md:flex-row md:flex-wrap md:items-center md:justify-between md:px-6">
         <SearchTabs value={form.group} onChange={form.chooseGroup} />
         <div className="flex flex-wrap items-center gap-2">
           <ServicePicker
@@ -83,7 +83,7 @@ export default function HeroSearch({ search, initialGroup = 'car_hire', initialS
           />
         </div>
       </div>
-      <form onSubmit={form.submit} className="flex flex-col gap-4 p-4 md:p-6">
+      <form onSubmit={form.submit} className="flex flex-col gap-4 px-gutter py-4 md:p-6">
         <div className="overflow-hidden rounded-card border border-separator bg-surface md:flex md:items-stretch">
           <div
             style={{ '--cols': FIELD_COUNTS[form.group] }}

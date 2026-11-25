@@ -25,3 +25,18 @@ export async function sendToLink(link, file) {
     return false
   }
 }
+
+/**
+ * Sends a picture in three steps: ask for a link, send the file, save it. Resolves to { data } with what saving
+ * returned, or { error: 'type' | 'size' | 'upload' | 'save' }.
+ */
+export async function uploadPicture(file, { maxBytes, request, save }) {
+  const problem = checkPicture(file, maxBytes)
+  if (problem) return { error: problem }
+  const declaration = { content_type: file.type, size_bytes: file.size }
+  const link = await request(declaration)
+  if (link.error) return { error: 'upload' }
+  if (!(await sendToLink(link.data, file))) return { error: 'upload' }
+  const saved = await save({ ...declaration, storage_path: link.data.storage_path })
+  return saved.error ? { error: 'save' } : { data: saved.data }
+}

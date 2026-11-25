@@ -40,7 +40,7 @@ export default function Logo({ variant = 'wordmark', tone = 'accent', size = 28,
   return (
     <span className="inline-flex items-center gap-2" aria-label={brand.name} role="img">
       <span className={TONES[tone]}>{mark}</span>
-      <span className="text-headline tracking-tight text-label" style={{ fontSize: size * 0.7 }}>
+      <span className={size >= 28 ? 'text-title-2 text-label' : 'text-headline text-label'}>
         {brand.name}
       </span>
     </span>
