@@ -31,5 +31,4 @@ export const services = {
     corporate_transport: 'Corporate transport',
   },
   anyService: 'Any service',
-  filterLabel: 'Service',
 }

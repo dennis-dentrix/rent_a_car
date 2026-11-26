@@ -16,16 +16,16 @@ export default function Hero({
       <ArcBackdrop className="pointer-events-none absolute -right-20 -top-20 -z-10 w-[16.25rem] text-on-hero md:-right-10 md:-top-24 md:w-[32.5rem]" />
       <div
         className={cx(
-          'px-gutter-wide pt-10 md:px-12 md:pt-14',
+          'px-gutter-wide pt-6 md:px-12 md:pt-14',
           hasSearchBelow ? 'pb-20 md:pb-24' : 'pb-10 md:pb-14',
         )}
       >
-        <p className="mb-5 inline-flex items-center gap-2 rounded-pill bg-hero-glass px-3 py-1.5 text-caption">
+        <p className="mb-3 inline-flex md:mb-5 items-center gap-2 rounded-pill bg-hero-glass px-3 py-1.5 text-caption">
           <ShieldCheck size={14} className="shrink-0" aria-hidden="true" />
           {badge}
         </p>
         <h1 className="max-w-xl text-display md:text-display-lg">{title}</h1>
-        <p className="mt-4 max-w-lg text-body text-on-hero-2 md:text-headline md:font-normal">
+        <p className="mt-2 max-w-lg text-callout text-on-hero-2 md:mt-4 md:text-headline md:font-normal">
           {subtitle}
         </p>
         {children && <div className="mt-6 flex flex-wrap gap-3">{children}</div>}

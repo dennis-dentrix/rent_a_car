@@ -66,35 +66,27 @@ function Editor({ label, start, placeholder, onKeep, onCancel }) {
   )
 }
 
-const source = (value, fallback) => {
-  if (value) return text.thisCar
-  if (!fallback) return text.noClassRate
-  return fallback.isOwn ? text.yourClass : text.carvoClass
-}
-
 /**
- * A car's daily price: what applies now and where it comes from, with a pencil to change it. The tick keeps the new
- * figure (an empty one goes back to the class rate) and the cross leaves it as it was. `onKeep` receives the figure.
- * `note` and `placeholder` replace the car's wording where the price is not a car's.
+ * A car's daily price, with a pencil to change it. The tick keeps the new figure (an empty one removes the price) and
+ * the cross leaves it as it was. `onKeep` receives the figure.
  */
-export default function InlineRate(props) {
-  const { label, value, fallback, onKeep, note, placeholder = text.placeholder } = props
+export default function InlineRate({ label, value, onKeep }) {
   const [isEditing, setIsEditing] = useState(false)
-  const shown = value ?? fallback?.amountKes
   if (isEditing) {
     const keep = (next) => {
       setIsEditing(false)
-      // The class figure typed back unchanged is not a price of the car's own.
-      onKeep(!value && next === fallback?.amountKes ? null : next)
+      onKeep(next)
     }
-    const editor = { label, start: shown, placeholder, onKeep: keep }
+    const editor = { label, start: value, placeholder: text.placeholder, onKeep: keep }
     return <Editor {...editor} onCancel={() => setIsEditing(false)} />
   }
   return (
     <div className="flex items-center justify-between gap-3">
       <p>
-        <span className="num block text-headline">{shown ? formatMoney(shown) : text.notSet}</span>
-        <span className="block text-footnote text-label-2">{note ?? source(value, fallback)}</span>
+        <span className="num block text-headline">{value ? formatMoney(value) : text.notSet}</span>
+        <span className="block text-footnote text-label-2">
+          {value ? text.perDay : text.noPrice}
+        </span>
       </p>
       <Square
         label={text.edit(label)}

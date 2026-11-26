@@ -17,7 +17,10 @@ export default function Breadcrumbs({ trail }) {
                 </span>
               ) : (
                 <>
-                  <Link href={step.path} className="hover:text-label">
+                  <Link
+                    href={step.path}
+                    className="inline-flex min-h-touch items-center hover:text-label"
+                  >
                     {step.name}
                   </Link>
                   <ChevronRight size={14} aria-hidden="true" />

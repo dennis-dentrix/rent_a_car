@@ -31,12 +31,12 @@ function Details({ vehicle }) {
 
 const money = (amount) => (amount ? formatMoney(amount) : null)
 
-function Pricing({ vehicle, car, fallback }) {
+function Pricing({ vehicle, car }) {
   const hired = copy.carFacts.chauffeur[vehicle.chauffeur_option]
   return (
     <Panel title={text.pricingTitle} hint={text.pricingNote}>
       <div className="mb-4 rounded-control bg-bg-grouped p-3">
-        <CarRate car={car} value={vehicle.daily_rate_kes} fallback={fallback} />
+        <CarRate car={car} value={vehicle.daily_rate_kes} />
       </div>
       <dl className="grid grid-cols-2 gap-4">
         <Fact
@@ -67,12 +67,12 @@ function Records({ vehicle }) {
 }
 
 /** Everything known about one car: what renters see, what it costs, and the company's own records. */
-export default function VehicleFacts({ vehicle, car, fallback }) {
+export default function VehicleFacts({ vehicle, car }) {
   return (
     <>
       <Details vehicle={vehicle} />
       <div className="grid items-start gap-5 md:grid-cols-2">
-        <Pricing vehicle={vehicle} car={car} fallback={fallback} />
+        <Pricing vehicle={vehicle} car={car} />
         <Records vehicle={vehicle} />
       </div>
     </>

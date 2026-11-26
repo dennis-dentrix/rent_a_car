@@ -4,12 +4,13 @@ import { copy } from '@/copy/en'
 const STEPS = [
   ['company', (overview) => overview.company.is_complete],
   ['vehicle', (overview) => overview.vehicles_total > 0],
-  ['rate', (overview) => overview.rates > 0],
+  ['price', (overview) => overview.vehicles_total > 0 && overview.vehicles_without_rate === 0],
   ['service', (overview) => overview.services > 0],
 ]
 
 export const setupSteps = (overview) =>
   STEPS.map(([key, isDone]) => ({
     ...copy.operatorConsole.today.steps[key],
+    key,
     isDone: isDone(overview),
   }))

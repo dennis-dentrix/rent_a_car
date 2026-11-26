@@ -29,6 +29,7 @@ import {
   UserCog,
   Users,
   Waypoints,
+  MessageSquare,
 } from 'lucide-react'
 
 // Menu icons, chosen by name: a server component cannot hand a component function to a client one. One icon per
@@ -50,6 +51,8 @@ export const NAV_ICONS = {
   home: House,
   inbox: Inbox,
   inspections: ClipboardCheck,
+  messages: MessageSquare,
+  calendar: CalendarDays,
   locations: MapPin,
   more: LayoutGrid,
   owners: KeyRound,

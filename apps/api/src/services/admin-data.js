@@ -25,7 +25,8 @@ import { resource } from './resources.js'
 export const ADMIN_RESOURCES = {
   classes: resource(
     'vehicle_classes',
-    'name, slug, seats, luggage_capacity, description, best_for, is_public, sort_order, ' +
+    'name, slug, seats, luggage_capacity, description, best_for, example_models, is_public, ' +
+      'sort_order, ' +
       'security_deposit_enabled, security_deposit_kes',
     { create: createClassSchema, update: updateClassSchema },
   ),

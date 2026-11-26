@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { homeFor, isSecondFactorRequired, needsSecondFactor } from './roles.js'
+import { homeFor, isSecondFactorRequired, landingFor, needsSecondFactor } from './roles.js'
 
 describe('needsSecondFactor', () => {
   it.each([
@@ -33,5 +33,18 @@ describe('isSecondFactorRequired', () => {
       false,
       false,
     ])
+  })
+})
+
+describe('where a person lands after signing in', () => {
+  it('is the page they asked for, or their own area', () => {
+    expect(landingFor('customer', '/cars/suv')).toBe('/cars/suv')
+    expect(landingFor('customer', '')).toBe('/account')
+  })
+
+  it('is always the dashboard for a rental company, unless a page inside it was asked for', () => {
+    expect(landingFor('operator', '/cars')).toBe('/console')
+    expect(landingFor('operator', '/console/bookings/1')).toBe('/console/bookings/1')
+    expect(landingFor('operator', '/consolex')).toBe('/console')
   })
 })

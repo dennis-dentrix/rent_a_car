@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import {
   BLOG_IMAGE_CONTENT_TYPES,
+  BOOKING_MODES,
   CHAUFFEUR_OPTIONS,
   DRIVE_TYPES,
   FUEL_TYPES,
@@ -28,6 +29,7 @@ const vehicleDetails = {
   description: blankable(text(1000)),
   features: z.array(text(60)).max(20).optional(),
   chauffeur_option: blankable(z.enum(CHAUFFEUR_OPTIONS)),
+  booking_mode: z.enum(BOOKING_MODES).optional(),
   chauffeur_daily_kes: blankable(z.number().int().min(1).max(100_000_000)),
 }
 

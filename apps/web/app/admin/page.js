@@ -59,7 +59,10 @@ function PickupsPanel({ bookings, classNames }) {
 
 function RecentPanel({ entries }) {
   const seeAll = (
-    <Link href="/admin/audit" className="text-meta font-bold text-primary">
+    <Link
+      href="/admin/audit"
+      className="inline-flex min-h-touch items-center text-meta font-bold text-primary"
+    >
       {text.seeAll}
     </Link>
   )

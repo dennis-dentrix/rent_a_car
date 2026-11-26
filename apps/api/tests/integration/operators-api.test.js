@@ -4,6 +4,8 @@ import {
   accounts,
   call,
   errorOf,
+  DATES,
+  query,
   get,
   putFile,
   sampleFile,
@@ -121,10 +123,11 @@ describe('the operator console', () => {
       company: { status: 'pending', is_complete: false },
       vehicles: 1,
       vehicles_total: 1,
-      rates: 0,
       services: 0,
       vehicles_without_rate: 1,
-      pickups_today: 0,
+      handovers: [],
+      requests: [],
+      to_collect_kes: 0,
     })
   })
 })
@@ -144,36 +147,18 @@ describe('the operator console: fleet and classes', () => {
     ).toBe(404)
   })
 
-  it('adds a class of its own that starts private, beside the platform list', async () => {
+  it("chooses from the platform's classes and cannot add or price one", async () => {
     const token = await newOperator('API Console Classes')
-    const made = await mine(token, 'POST', '/classes', { name: 'API Safari Cruiser', seats: 7 })
-    expect(made.body.data).toMatchObject({
-      is_public: false,
-      slug: 'api-console-classes-api-safari-cruiser',
-    })
-    expect(
-      (await mine(token, 'PATCH', `/classes/${made.body.data.id}`, { is_public: true })).status,
-    ).toBe(400)
-    const names = (await mine(token, 'GET', '/classes')).body.data.map((item) => item.name)
-    expect(names).toContain('API Safari Cruiser')
-    expect(names.length).toBeGreaterThan(1)
+    const listed = (await mine(token, 'GET', '/classes')).body.data.map((item) => item.slug)
+    expect(listed).toEqual(
+      expect.arrayContaining(['compact', 'sedan', 'suv', 'large-suv', 'van', 'luxury']),
+    )
+    expect((await mine(token, 'POST', '/classes', { name: 'API Own', seats: 5 })).status).toBe(404)
+    expect((await mine(token, 'GET', '/rates')).status).toBe(404)
   })
 })
 
-describe('the operator console: prices and places', () => {
-  it('prices its own classes and leaves what renters are charged alone', async () => {
-    const [one, two] = await Promise.all([
-      newOperator('API Console R1'),
-      newOperator('API Console R2'),
-    ])
-    const before = JSON.stringify((await get('/classes')).body)
-    const rate = { class_id: IDS.SEDAN, price_kes: 1000, effective_from: '2026-01-01' }
-    expect((await mine(one, 'POST', '/rates', rate)).status).toBe(201)
-    expect((await mine(two, 'POST', '/rates', rate)).status).toBe(201)
-    expect(errorOf(await mine(one, 'POST', '/rates', { ...rate, price_kes: 2000 }))[0]).toBe(409)
-    expect(JSON.stringify((await get('/classes')).body)).toBe(before)
-  }, 20_000)
-
+describe('the operator console: places', () => {
   it('serves every airport by default, and stops serving one when switched off', async () => {
     const token = await newOperator('API Console Places')
     const all = (await mine(token, 'GET', '/airports')).body.data
@@ -200,21 +185,6 @@ describe('the operator console: prices and places', () => {
     expect(company.body.data.phone).toBe('+254700000999')
     expect((await mine(token, 'PATCH', '/company', { status: 'approved' })).status).toBe(400)
   })
-})
-
-describe('the operator console: changing a price', () => {
-  it('prices a new class as it is added, and changes the price in one call', async () => {
-    const token = await newOperator('API Console R3')
-    const priced = { name: 'API Priced Class', seats: 5, price_kes: 4000 }
-    const made = await mine(token, 'POST', '/classes', priced)
-    expect(made.status).toBe(201)
-    const path = `/classes/${made.body.data.id}/rate`
-    expect((await mine(token, 'PUT', path, { price_kes: 4500 })).body.data.price_kes).toBe(4500)
-    expect((await mine(token, 'GET', '/rates')).body.data.map((row) => row.price_kes)).toEqual([
-      4500,
-    ])
-    expect(errorOf(await mine(accounts.admin, 'PUT', path, { price_kes: 1 }))[0]).toBe(403)
-  }, 20_000)
 })
 
 describe('the operator console: photos, car rate, and policies', () => {
@@ -259,7 +229,11 @@ describe('the cars renters see', () => {
   it('lists an approved company\u2019s car with its details and none of its private ones', async () => {
     const token = await newOperator('API Console Public')
     const details = { seats: 7, transmission: 'automatic', features: ['Roof rack'] }
-    const car = await mine(token, 'POST', '/vehicles', { ...vehicle('PUB-1'), ...details })
+    const car = await mine(token, 'POST', '/vehicles', {
+      ...vehicle('PUB-1'),
+      ...details,
+      daily_rate_kes: 7000,
+    })
     expect(car.body.data).toMatchObject(details)
     const seen = async () =>
       (await get('/vehicles?limit=100')).body.data.find((item) => item.id === car.body.data.id)
@@ -270,9 +244,13 @@ describe('the cars renters see', () => {
     const listed = await seen()
     expect(listed).toMatchObject({ ...details, operator_name: 'API Console Public' })
     expect(listed.class).toMatchObject({ slug: expect.any(String) })
-    for (const secret of ['registration', 'chassis_number', 'owner_id', 'daily_rate_kes']) {
+    expect(listed.daily_rate_kes).toBe(7000)
+    for (const secret of ['registration', 'chassis_number', 'owner_id']) {
       expect(listed).not.toHaveProperty(secret)
     }
     expect((await get(`/vehicles/${car.body.data.id}`)).body.data).toEqual(listed)
+    const stay = query({ from: DATES.START, to: DATES.END_3_DAYS, limit: 100 })
+    const free = (await get(`/vehicles${stay}`)).body.data
+    expect(free.find((item) => item.id === listed.id)).toMatchObject({ days: 3, total_kes: 21000 })
   }, 20_000)
 })

@@ -3,7 +3,6 @@ const FIRST_HOUR = 6
 const LAST_HOUR = 22
 
 export const DEFAULT_PICKUP_TIME = '09:00'
-export const DEFAULT_RETURN_TIME = '18:00'
 // A one-day service (a transfer, a wedding) is searched from its start time to the end of that day.
 export const END_OF_DAY = '23:59'
 

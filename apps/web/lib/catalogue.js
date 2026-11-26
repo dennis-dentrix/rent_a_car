@@ -1,6 +1,5 @@
 import { isAirportType } from '@carvo/shared'
 import { apiGet } from '@/lib/api'
-import { withCarPhotos } from '@/lib/live-cars'
 import { classPhoto } from '@/lib/photos'
 
 // Classes and locations change rarely and are cached; a list with dates carries live availability and is not.
@@ -8,20 +7,13 @@ export const getClasses = (query = {}) =>
   apiGet('/classes', { query, revalidate: query.from ? 0 : 60 })
 
 // Real cars carry a price, so they are read fresh.
-export const getVehicles = () => apiGet('/vehicles', { query: { limit: 100 }, revalidate: 0 })
+/** The cars renters may see; with `from` and `to`, only the free ones, each with its total. */
+export const getVehicles = (stay = {}) =>
+  apiGet('/vehicles', { query: { limit: 100, ...stay }, revalidate: 0 })
 
-export const getVehicle = (id) => apiGet(`/vehicles/${id}`, { revalidate: 0 })
-
-/** Car types for display, and the real cars: a type without a photo shows one of its cars. */
-export async function getShowroom(query) {
-  const [classes, cars] = await Promise.all([getClasses(query), getVehicles()])
-  const list = cars.data ?? []
-  return {
-    classes: classes.data && withCarPhotos(classes.data, list),
-    cars: list,
-    error: classes.error,
-  }
-}
+/** One car; with `from` and `to`, also what the stay costs and whether the car is free for it. */
+export const getVehicle = (id, stay = {}) =>
+  apiGet(`/vehicles/${encodeURIComponent(id)}`, { query: stay, revalidate: 0 })
 
 export const getLocations = () => apiGet('/locations', { revalidate: 3600 })
 

@@ -42,23 +42,6 @@ export const CONSOLE_RESOURCES = {
     createPath: (ownerId) => `/operator/vehicle-owners/${ownerId}/agreements`,
     pagePath: () => '/console/fleet',
   },
-  classes: {
-    pagePath: () => '/console/classes',
-    fields: [
-      { name: 'name', type: 'text', isRequired: true },
-      // Only a new class takes its price here; afterwards it is changed on the class's card, from a date.
-      { name: 'price_kes', type: 'number', isCreateOnly: true },
-      { name: 'seats', type: 'number', isRequired: true },
-      { name: 'luggage_capacity', type: 'number' },
-      { name: 'description', type: 'textarea' },
-      { name: 'best_for', type: 'list' },
-    ],
-  },
-  rates: {
-    ...PRICE_RESOURCES.rates,
-    needs: ['classes'],
-    pagePath: () => '/console/classes',
-  },
   policies: {
     needs: ['classes'],
     pagePath: () => '/console/policies',

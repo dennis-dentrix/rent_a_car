@@ -1,19 +1,35 @@
 import { copy } from '@/copy/en'
 
 /**
- * The last tab on a phone: "Sign in" for a visitor, and a way into their own dashboard for someone signed in.
+ * The last tab on a phone: "Sign in" for a visitor, "Trips" for a renter, and the dashboard for a company or admin.
  * `who` is null until the server has answered; `hasHint` says someone seems to be signed in meanwhile.
  */
 export function accountTab(who, hasHint) {
+  if (who?.home === '/account') {
+    return {
+      href: '/account/bookings',
+      label: copy.nav.bookings,
+      icon: 'bookings',
+      badge: 'booking_updates',
+    }
+  }
   if (who) return { href: who.home, label: copy.nav.dashboard, icon: 'today' }
   if (hasHint) return { href: '/account', label: copy.nav.account, icon: 'user' }
   return { href: '/auth', label: copy.nav.signIn, icon: 'signIn' }
+}
+
+const MESSAGES_TAB = {
+  href: '/account/messages',
+  label: copy.messages.title,
+  icon: 'messages',
+  badge: 'unread_messages',
 }
 
 // Customer navigation on phones. Only pages that exist.
 export const customerTabs = (who, hasHint) => [
   { href: '/', label: copy.nav.home, icon: 'home', isExact: true },
   { href: '/cars', label: copy.nav.cars, icon: 'car' },
+  ...(who?.home === '/account' ? [MESSAGES_TAB] : []),
   accountTab(who, hasHint),
 ]
 

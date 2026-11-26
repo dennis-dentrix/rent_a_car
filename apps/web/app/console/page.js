@@ -1,56 +1,50 @@
-import { nairobiDate } from '@carvo/shared'
-import AdminBookingList from '@/components/AdminBookingList'
 import AdminPage from '@/components/AdminPage'
 import Alert from '@/components/Alert'
+import Button from '@/components/Button'
 import ConsoleStatus from '@/components/ConsoleStatus'
-import Panel from '@/components/Panel'
+import DeviceAlertsButton from '@/components/DeviceAlertsButton'
+import LivePoll from '@/components/LivePoll'
 import SetupChecklist from '@/components/SetupChecklist'
-import StatTiles from '@/components/StatTiles'
+import TodayFigures from '@/components/TodayFigures'
+import TodayHandovers from '@/components/TodayHandovers'
+import TodayMessages from '@/components/TodayMessages'
+import TodayRequests from '@/components/TodayRequests'
 import { copy } from '@/copy/en'
-import { consoleGet, getOperatorClassNames, requireOperator } from '@/lib/console'
-import { consoleTiles } from '@/lib/console-tiles'
+import { consoleGet, requireOperator } from '@/lib/console'
 
-const text = copy.operatorConsole.today
+const text = copy.today
 
 export const metadata = { title: copy.operatorConsole.meta.title }
 
-const PICKUP_STATUSES = ['confirmed', 'ready']
-
-function Pickups({ bookings, classNames }) {
-  return (
-    <Panel title={text.pickups} isFlush>
-      {bookings.length ? (
-        <AdminBookingList
-          bookings={bookings}
-          classNames={classNames}
-          basePath="/console/bookings"
-        />
-      ) : (
-        <p className="px-5 pb-8 pt-4 text-center text-cell text-label-2">{text.noPickups}</p>
-      )}
-    </Panel>
-  )
-}
-
-// The first page of the console: where the company stands, what is left to set up, what moves today.
+// The company's first page: who is waiting for an answer, then the cars changing hands today.
 export default async function ConsolePage() {
   const { token } = await requireOperator()
-  const [overview, pickups, classNames] = await Promise.all([
+  const [{ data, error }, conversations] = await Promise.all([
     consoleGet('/operator/overview', token),
-    consoleGet('/operator/bookings', token, { date: nairobiDate(new Date()) }),
-    getOperatorClassNames(token),
+    consoleGet('/messages', token),
   ])
-  if (overview.error) return <Alert tone="error" title={copy.admin.loadError} />
-  const data = overview.data
-  const dueToday = (pickups.data ?? []).filter((b) => PICKUP_STATUSES.includes(b.status))
+  if (error) return <Alert tone="error" title={copy.admin.loadError} />
+  const waiting = data.requests.length
   return (
-    <AdminPage eyebrow={text.eyebrow} title={data.company.business_name} subtitle={text.subtitle}>
+    <AdminPage
+      eyebrow={data.company.business_name}
+      title={text.title}
+      subtitle={waiting ? text.waiting(waiting) : text.quiet}
+      actions={
+        <Button href="/console/fleet" variant="tonal">
+          {text.addCar}
+        </Button>
+      }
+    >
       <ConsoleStatus company={data.company} />
-      <StatTiles title={copy.admin.overview.todayTitle} items={consoleTiles(data)} />
-      <div className="grid items-start gap-5 lg:grid-cols-[2fr_1fr]">
-        <Pickups bookings={dueToday} classNames={classNames} />
-        <SetupChecklist overview={data} />
-      </div>
+      {/* Someone waiting comes first: requests, then messages, then the day's cars. */}
+      <TodayRequests requests={data.requests} />
+      <TodayMessages conversations={conversations.data ?? []} />
+      <TodayHandovers handovers={data.handovers} />
+      <TodayFigures overview={data} />
+      <SetupChecklist overview={data} />
+      <DeviceAlertsButton />
+      <LivePoll />
     </AdminPage>
   )
 }

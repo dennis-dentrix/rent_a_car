@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { TEMPLATES, renderEmail } from './notification-templates.js'
 import { MAX_ATTEMPTS, retryDelayMinutes } from './notification-retry.js'
 
@@ -16,7 +16,8 @@ describe('email wording', () => {
     for (const kind of Object.keys(TEMPLATES)) {
       const email = renderEmail(kind, { payload: { document_type: 'national_id' }, booking })
       expect(email.subject.length).toBeGreaterThan(0)
-      expect(email.text).toContain('Call or WhatsApp')
+      expect(email.text).toContain('Questions?')
+      expect(email.text).not.toContain('WhatsApp')
     }
   })
 
@@ -41,6 +42,27 @@ describe('email wording', () => {
     })
     expect(html).not.toContain('<script>')
     expect(html).toContain('&lt;script&gt;')
+  })
+})
+
+describe('what an email offers the reader', () => {
+  it('links to the page for the side being told, when the site address is set', () => {
+    vi.stubEnv('APP_URL', 'https://example.test')
+    const context = { payload: {}, booking, bookingId: 'b1' }
+    expect(renderEmail('company_request', context).text).toContain(
+      'https://example.test/console/bookings/b1',
+    )
+    expect(renderEmail('booking_confirmed', context).text).toContain(
+      'https://example.test/account/bookings/b1',
+    )
+    const message = { payload: { conversation_id: 'c1', to_company: false } }
+    expect(renderEmail('message_received', message).text).toContain('/account/messages/c1')
+    vi.unstubAllEnvs()
+  })
+
+  it('leaves out a deposit when none is taken', () => {
+    const free = { payload: {}, booking: { ...booking, deposit_kes: 0 } }
+    expect(renderEmail('booking_received', free).text).not.toContain('deposit')
   })
 
   it('has no email for a kind it does not know', () => {

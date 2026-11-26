@@ -2,6 +2,7 @@ import { formatMoney } from '@carvo/shared'
 import InsetList from '@/components/InsetList'
 import { copy } from '@/copy/en'
 import { momentText, personName } from '@/lib/admin-format'
+import { tripFacts } from '@/lib/trip-facts'
 
 const text = copy.admin.bookings
 
@@ -21,6 +22,11 @@ const facts = (booking, className) => [
   },
   { id: 'total', title: text.total, detail: formatMoney(booking.total_kes) },
   { id: 'balance', title: text.balance, detail: formatMoney(booking.balance_kes) },
+  // What the company checks and plans with, when the renter gave it.
+  ...tripFacts(booking),
+  ...[['born', booking.customer?.date_of_birth]]
+    .filter(([, value]) => value)
+    .map(([id, detail]) => ({ id, title: text[id], detail })),
 ]
 
 /** Who, what car, when, and how much, as one list. Shared by the admin's and the operator's booking pages. */

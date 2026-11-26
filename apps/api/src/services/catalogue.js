@@ -69,11 +69,16 @@ async function availableCounts(db, startAt, endAt) {
   return new Map(rows.map((row) => [row.class_id, row.available_count]))
 }
 
+/** The daily price of the cheapest listed car of each class that has one, as a Map of class id to price. */
+async function carPrices(db) {
+  const rows = unwrap(await db.from('listed_class_prices').select('class_id, price_kes'))
+  return new Map(rows.map((row) => [row.class_id, row.price_kes]))
+}
+
 const displayPrice = (kes, fx) => (fx ? convertFromKes(kes, fx.rateToKes) : kes)
 
-// A pure shaping function: the rate and count are looked up once for the whole list by the caller.
-function toClassItem(cls, { rate, fx, availableCount }) {
-  const priceKes = rate?.price_kes ?? null
+// A pure shaping function: the price and count are looked up once for the whole list by the caller.
+function toClassItem(cls, { priceKes = null, fx, availableCount }) {
   const item = {
     id: cls.id,
     name: cls.name,
@@ -99,16 +104,12 @@ export async function listClasses(db, { from, to, currency, service }) {
   // With a service chosen, keep only the classes some listed vehicle of an operator offering it belongs to.
   const offered = offering ? new Set(unwrap(offering).map((row) => row.class_id)) : null
   const list = unwrap(classes).filter((cls) => !offered || offered.has(cls.id))
-  const [rates, counts] = await Promise.all([
-    ratesOn(
-      db,
-      list.map((cls) => cls.id),
-      from ?? new Date(),
-    ),
+  const [prices, counts] = await Promise.all([
+    carPrices(db),
     from && to ? availableCounts(db, from, to) : null,
   ])
   return list.map((cls) =>
-    toClassItem(cls, { rate: rates.get(cls.id), fx, availableCount: counts?.get(cls.id) }),
+    toClassItem(cls, { priceKes: prices.get(cls.id), fx, availableCount: counts?.get(cls.id) }),
   )
 }
 
@@ -121,7 +122,7 @@ export async function findPublicClass(db, id) {
 
 export async function getClass(db, id) {
   const cls = await findPublicClass(db, id)
-  const item = toClassItem(cls, { rate: await rateOn(db, cls.id, new Date()), fx: null })
+  const item = toClassItem(cls, { priceKes: (await carPrices(db)).get(cls.id), fx: null })
   return {
     ...item,
     description: cls.description,

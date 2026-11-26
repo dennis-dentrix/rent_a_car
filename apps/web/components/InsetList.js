@@ -1,13 +1,24 @@
 import Link from 'next/link'
 import { ChevronRight } from 'lucide-react'
+import { cx } from '@/lib/cx'
 
-function Row({ item }) {
-  const content = (
+function Content({ item }) {
+  return (
     <>
       {item.leading}
       <span className="min-w-0 flex-1">
         <span className="block text-cell font-semibold">{item.title}</span>
         {item.detail && <span className="block text-meta text-label-2">{item.detail}</span>}
+        {item.preview && (
+          <span
+            className={cx(
+              'block truncate text-cell',
+              item.isUnread ? 'font-bold text-label' : 'text-label-2',
+            )}
+          >
+            {item.preview}
+          </span>
+        )}
       </span>
       {item.trailing}
       {(item.href || item.onSelect) && (
@@ -15,10 +26,17 @@ function Row({ item }) {
       )}
     </>
   )
-  const classes = 'state-layer flex min-h-touch w-full items-center gap-3 px-4 py-3 text-left'
+}
+
+function Row({ item }) {
+  const content = <Content item={item} />
+  const classes = cx(
+    'state-layer flex min-h-touch w-full items-center gap-3 px-4 py-3 text-left',
+    item.isActive && 'bg-accent-subtle',
+  )
   if (item.href) {
     return (
-      <Link href={item.href} className={classes}>
+      <Link href={item.href} aria-current={item.isActive ? 'page' : undefined} className={classes}>
         {content}
       </Link>
     )

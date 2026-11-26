@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import NavBadge from '@/components/NavBadge'
 import { cx } from '@/lib/cx'
 import { NAV_ICONS } from '@/lib/nav-icons'
 
@@ -15,16 +16,17 @@ const PILL = {
   rail: 'min-h-touch w-full justify-start gap-3 px-4 text-callout font-medium',
 }
 
-function TabItem({ Icon, isActive, children }) {
+function TabItem({ Icon, isActive, badge, children }) {
   return (
     <>
       <span
         className={cx(
-          'flex h-8 w-full max-w-16 items-center justify-center rounded-pill transition-colors duration-fast',
+          'relative flex h-8 w-full max-w-16 items-center justify-center rounded-pill transition-colors duration-fast',
           isActive && 'bg-accent-subtle',
         )}
       >
         <Icon size={24} strokeWidth={isActive ? 2.25 : 1.75} aria-hidden="true" />
+        {badge && <NavBadge name={badge} className="absolute right-1 top-0" />}
       </span>
       <span className="max-w-full truncate text-caption">{children}</span>
     </>
@@ -32,7 +34,7 @@ function TabItem({ Icon, isActive, children }) {
 }
 
 /** A link that knows when it is the current page: a tint and a bolder label, never colour alone. */
-export default function NavLink({ href, icon, variant = 'top', isExact = false, children }) {
+export default function NavLink({ href, icon, variant = 'top', isExact = false, badge, children }) {
   const isActive = isActivePath(usePathname(), href, isExact)
   const Icon = NAV_ICONS[icon]
   const current = isActive ? 'text-accent' : 'text-label-2 hover:text-label'
@@ -46,7 +48,7 @@ export default function NavLink({ href, icon, variant = 'top', isExact = false, 
           current,
         )}
       >
-        <TabItem Icon={Icon} isActive={isActive}>
+        <TabItem Icon={Icon} isActive={isActive} badge={badge}>
           {children}
         </TabItem>
       </Link>

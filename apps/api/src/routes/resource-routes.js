@@ -3,9 +3,33 @@ import { idParam } from '../middleware/auth.js'
 import { handle } from '../middleware/respond.js'
 import { createResource, getResource, listResource, updateResource } from '../services/resources.js'
 
+function mountCreate(router, route, definition) {
+  router.post(
+    route,
+    handle(async (req) => ({
+      data: await createResource(req.auth, definition, definition.create.parse(req.body)),
+      status: 201,
+    })),
+  )
+}
+
+function mountUpdate(router, route, definition) {
+  router.patch(
+    `${route}/:id`,
+    handle(async (req) => ({
+      data: await updateResource(
+        req.auth,
+        definition,
+        req.params.id,
+        definition.update.parse(req.body),
+      ),
+    })),
+  )
+}
+
 /**
  * Mounts list, read, create, and change for each kind of record at `/<path>`, on a router whose parent has already
- * checked who is calling. A kind with no `update` has no change route.
+ * checked who is calling. A kind with no `create` or `update` has no such route.
  */
 export function mountResources(router, resources) {
   router.param('id', idParam)
@@ -19,24 +43,7 @@ export function mountResources(router, resources) {
       `${route}/:id`,
       handle(async (req) => ({ data: await getResource(req.auth, definition, req.params.id) })),
     )
-    router.post(
-      route,
-      handle(async (req) => ({
-        data: await createResource(req.auth, definition, definition.create.parse(req.body)),
-        status: 201,
-      })),
-    )
-    if (!definition.update) return
-    router.patch(
-      `${route}/:id`,
-      handle(async (req) => ({
-        data: await updateResource(
-          req.auth,
-          definition,
-          req.params.id,
-          definition.update.parse(req.body),
-        ),
-      })),
-    )
+    if (definition.create) mountCreate(router, route, definition)
+    if (definition.update) mountUpdate(router, route, definition)
   })
 }

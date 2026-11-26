@@ -18,7 +18,7 @@ const system = entry(text.groupSystem)
 
 // The admin's navigation, ordered by how often it is needed: what is waiting today, who supplies the cars, what
 // they cost, where they go, then content and the system itself. From tablet up a labelled sidebar; on phones four
-// tabs, the last of which opens the full list.
+// tabs, and the rest in the menu.
 export const adminRail = [
   { ...work('/admin', text.overview, 'today'), isExact: true },
   work('/admin/enquiries', text.enquiries, 'inbox'),
@@ -42,7 +42,7 @@ export const adminTabs = [
   { href: '/admin', label: text.overview, icon: 'today', isExact: true },
   { href: '/admin/bookings', label: text.bookings, icon: 'requests' },
   { href: '/admin/documents', label: text.documents, icon: 'documents' },
-  { href: '/admin/menu', label: text.more, icon: 'more' },
+  { href: '/admin/operators', label: text.companies, icon: 'companies' },
 ]
 
 /** One admin API call as the signed-in admin. */

@@ -16,7 +16,7 @@ function Pill({ isSelected, onClick, children }) {
       aria-pressed={isSelected}
       onClick={onClick}
       className={cx(
-        'inline-flex min-h-row items-center whitespace-nowrap rounded-pill px-3.5 text-meta font-semibold transition-transform duration-fast active:scale-[0.97]',
+        'inline-flex min-h-touch items-center whitespace-nowrap md:min-h-row rounded-pill px-3.5 text-meta font-semibold transition-transform duration-fast active:scale-[0.97]',
         isSelected ? 'bg-primary text-on-primary' : 'bg-bg-grouped text-label-2 hover:bg-fill',
       )}
     >

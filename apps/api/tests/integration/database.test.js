@@ -99,42 +99,40 @@ describe('rates', () => {
   })
 })
 
-describe('changing the price of a class', () => {
-  const set = (price, day) =>
-    attempt(client, 'select set_operator_class_rate($1, $2, $3)', [ids.cls, price, day])
-  const own = async () =>
-    (
-      await client.query(
-        `select price_kes, effective_from::text as starts, effective_to::text as ends from rates
-         where operator_id = $1 order by effective_from`,
-        [opIds.opA],
-      )
-    ).rows
+describe('deposits', () => {
+  it('are not taken as shipped', async () => {
+    const { rows } = await client.query("select value from settings where key = 'deposit_percent'")
+    expect(rows[0].value).toBe(0)
+  })
+})
 
+describe('classes belong to the admin', () => {
+  const COMPANY_CLASS = '00000000-0000-4000-8000-000000000901'
   beforeEach(async () => {
     await seedOperators(client)
+    // A class a company made before classes became the admin's.
+    await client.query(
+      "insert into vehicle_classes (id, name, slug, seats, operator_id) values ($1, 'Old', 'old', 5, $2)",
+      [COMPANY_CLASS, opIds.opA],
+    )
     await actAs(client, opIds.userA)
   })
 
-  it('ends the old price the day before, and corrects a price set the same day', async () => {
-    await set(5000, '2026-03-01')
-    await set(6000, '2026-03-10')
-    await set(6500, '2026-03-10')
-    expect(await own()).toEqual([
-      { price_kes: 5000, starts: '2026-03-01', ends: '2026-03-09' },
-      { price_kes: 6500, starts: '2026-03-10', ends: null },
+  it('lets no company add or change a class, or price one', async () => {
+    const writes = [
+      "insert into vehicle_classes (name, slug, seats, operator_id) values ('New', 'new', 5, auth_operator_id())",
+      "update vehicle_classes set name = 'Renamed' where operator_id = auth_operator_id()",
+      "insert into rates (class_id, operator_id, duration_type, price_kes, effective_from) select id, operator_id, 'day', 100, '2027-01-01' from vehicle_classes where operator_id = auth_operator_id()",
+    ]
+    for (const sql of writes) expect(isBlocked(await attempt(client, sql))).toBe(true)
+  })
+
+  it("refuses to put a car into a company's class", async () => {
+    const move = await attempt(client, 'update vehicles set class_id = $2 where id = $1', [
+      opIds.vehA,
+      COMPANY_CLASS,
     ])
-  })
-
-  it('stops a first price where a later one already starts', async () => {
-    await set(7000, '2026-05-01')
-    await set(5000, '2026-04-01')
-    expect((await own())[0]).toEqual({ price_kes: 5000, starts: '2026-04-01', ends: '2026-04-30' })
-  })
-
-  it('is refused to someone with no company, so Carvo\u2019s price cannot be touched', async () => {
-    await actAs(client, ids.admin)
-    expect((await set(1, '2026-03-01')).error?.message).toBe('FORBIDDEN')
+    expect(move.error?.message).toBe('VALIDATION_FAILED')
   })
 })
 

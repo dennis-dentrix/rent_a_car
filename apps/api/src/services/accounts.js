@@ -68,3 +68,6 @@ export async function removeAvatar({ db, user }) {
   if (before?.avatar_path) await removeStoredFiles([before.avatar_path])
   return profile
 }
+
+/** How many chats hold something unseen and, for a rental company, how many requests wait for an answer. */
+export const getAlerts = async ({ db }) => unwrap(await db.rpc('my_alerts').single())

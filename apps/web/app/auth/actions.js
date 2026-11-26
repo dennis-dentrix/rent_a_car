@@ -23,7 +23,7 @@ import {
 } from '@/lib/auth/cookies'
 import { fieldErrors } from '@/lib/auth/fields'
 import { findVerifiedFactor, startEnrol, verifyCode } from '@/lib/auth/mfa'
-import { homeFor } from '@/lib/auth/roles'
+import { homeFor, landingFor } from '@/lib/auth/roles'
 import { nextStep } from '@/lib/auth/session'
 import { anonAuthClient, currentSession, signedInClient } from '@/lib/auth/supabase'
 import { safeNext } from '@/lib/auth/token'
@@ -69,7 +69,7 @@ export async function signInAction(_state, formData) {
   // project from the website). Saying so beats landing on a page that treats the person as signed out.
   if (!profile) return { error: accountError(), values }
   writeSession(await cookies(), data.session)
-  const next = safeNext(formData.get('next'), homeFor(profile.role))
+  const next = landingFor(profile.role, safeNext(formData.get('next'), ''))
   redirect(nextStep(profile, next))
 }
 

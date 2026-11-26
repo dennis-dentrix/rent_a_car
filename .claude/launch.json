@@ -6,6 +6,24 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev", "-w", "@carvo/web", "--", "-p", "3100"],
       "port": 3100
+    },
+    {
+      "name": "api-local",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": [
+        "-c",
+        "cd apps/api && PAUSE_SECOND_FACTOR=true PORT=4000 APP_URL=http://localhost:3000 exec node --env-file=.env.test src/server.js"
+      ],
+      "port": 4000
+    },
+    {
+      "name": "web-local",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": [
+        "-c",
+        "set -a && . apps/api/.env.test && set +a && PAUSE_SECOND_FACTOR=true API_URL=http://localhost:4000 NEXT_PUBLIC_SUPABASE_URL=$SUPABASE_URL NEXT_PUBLIC_SUPABASE_ANON_KEY=$SUPABASE_ANON_KEY NEXT_PUBLIC_MEDIA_BASE_URL=$SUPABASE_URL/storage/v1/object/public/$R2_PUBLIC_BUCKET NEXT_PUBLIC_SITE_URL=http://localhost:3000 NEXT_PUBLIC_POSTHOG_KEY= NEXT_PUBLIC_SENTRY_DSN= exec npm run dev -w @carvo/web -- -p 3000"
+      ],
+      "port": 3000
     }
   ]
 }

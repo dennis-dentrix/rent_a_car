@@ -12,7 +12,7 @@ import {
   changeBookingDates,
   previewCancellation,
 } from '../services/booking-changes.js'
-import { createBooking, getBooking, listBookings } from '../services/bookings.js'
+import { createBooking, getTrip, listBookings, markBookingSeen } from '../services/bookings.js'
 import { agreementSignRouter, createAgreementReadRouter } from './agreements.js'
 
 // Customer routes: sign-in required. Row Level Security limits every read to the caller's rows.
@@ -35,7 +35,12 @@ bookingsRouter.get(
 
 bookingsRouter.get(
   '/:id',
-  handle(async (req) => ({ data: await getBooking(req.auth, req.params.id) })),
+  handle(async (req) => ({ data: await getTrip(req.auth, req.params.id) })),
+)
+
+bookingsRouter.post(
+  '/:id/seen',
+  handle(async (req) => ({ data: await markBookingSeen(req.auth, req.params.id) })),
 )
 
 bookingsRouter.get(

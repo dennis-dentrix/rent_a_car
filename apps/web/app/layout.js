@@ -1,6 +1,7 @@
 import './globals.css'
 import { Nunito_Sans } from 'next/font/google'
 import { brand } from '@carvo/shared/brand'
+import AlertsProvider from '@/components/AlertsProvider'
 import { AnalyticsProvider } from '@/components/AnalyticsProvider'
 import ConsentBanner from '@/components/ConsentBanner'
 import JsonLd from '@/components/JsonLd'
@@ -39,7 +40,9 @@ export default function RootLayout({ children }) {
       <body>
         <JsonLd data={organizationJsonLd()} />
         <AnalyticsProvider>
-          <ToastProvider>{children}</ToastProvider>
+          <ToastProvider>
+            <AlertsProvider>{children}</AlertsProvider>
+          </ToastProvider>
           <ConsentBanner />
         </AnalyticsProvider>
       </body>

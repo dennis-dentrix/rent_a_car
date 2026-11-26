@@ -4,7 +4,8 @@ import { AppError } from '../lib/errors.js'
 // domain/booking-status.test.js fails if the two differ.
 export const TRANSITIONS = {
   quoted: ['pending_payment', 'expired'],
-  pending_payment: ['confirmed', 'cancelled', 'expired'],
+  pending_payment: ['requested', 'confirmed', 'cancelled', 'expired'],
+  requested: ['confirmed', 'declined', 'cancelled', 'expired'],
   confirmed: ['ready', 'cancelled'],
   ready: ['active', 'cancelled'],
   active: ['returned'],
@@ -12,6 +13,7 @@ export const TRANSITIONS = {
   closed: [],
   cancelled: [],
   expired: [],
+  declined: [],
 }
 
 export const BOOKING_STATUSES = Object.keys(TRANSITIONS)

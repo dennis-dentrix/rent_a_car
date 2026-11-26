@@ -11,13 +11,14 @@ const fleet = entry(text.groupFleet)
 const business = entry(text.groupSetup)
 
 // The company's navigation, in the order of the work: today's hires, then the cars and what they cost, then how
-// the company trades. From tablet up it is a labelled sidebar; on phones four tabs, the last opening the full list.
+// the company trades. From tablet up it is a labelled sidebar; on phones four tabs, and the rest in the menu.
 export const consoleRail = [
   { ...run('/console', text.today, 'today'), isExact: true },
-  run('/console/bookings', text.bookings, 'requests'),
+  { ...run('/console/bookings', text.bookings, 'requests'), badge: 'waiting_requests' },
+  { ...run('/console/messages', copy.messages.title, 'messages'), badge: 'unread_messages' },
+  run('/console/calendar', copy.calendar.title, 'calendar'),
   run('/console/inspections', copy.inspections.title, 'inspections'),
   fleet('/console/fleet', text.fleet, 'fleet'),
-  fleet('/console/classes', copy.classPrices.title, 'rates'),
   fleet('/console/owners', text.owners, 'owners'),
   business('/console/company', text.company, 'company'),
   business('/console/services', text.services, 'services'),
@@ -27,9 +28,14 @@ export const consoleRail = [
 
 export const consoleTabs = [
   { href: '/console', label: text.today, icon: 'today', isExact: true },
-  { href: '/console/bookings', label: text.bookings, icon: 'requests' },
+  { href: '/console/bookings', label: text.bookings, icon: 'requests', badge: 'waiting_requests' },
+  {
+    href: '/console/messages',
+    label: copy.messages.title,
+    icon: 'messages',
+    badge: 'unread_messages',
+  },
   { href: '/console/fleet', label: text.fleet, icon: 'fleet' },
-  { href: '/console/menu', label: text.more, icon: 'more' },
 ]
 
 /** The signed-in person of a rental company. A page asks too, because it is drawn alongside its layout. */

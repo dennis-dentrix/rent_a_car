@@ -13,8 +13,8 @@ const text = copy.admin.documents
  * Opens a stored identity file, which needs a reason that is written to the access log. The link is shown to click
  * rather than opened by the page, because a browser may block a window that opens after a wait.
  */
-export default function DocumentViewer({ id }) {
-  const [state, run] = useActionState(documentLinkAction, null)
+export default function DocumentViewer({ id, action = documentLinkAction }) {
+  const [state, run] = useActionState(action, null)
   return (
     <form action={run} className="mt-3 flex flex-col gap-3">
       <input type="hidden" name="id" value={id} />

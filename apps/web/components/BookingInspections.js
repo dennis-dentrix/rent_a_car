@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import Button from '@/components/Button'
 import Panel from '@/components/Panel'
+import PanelList from '@/components/PanelList'
 import { copy } from '@/copy/en'
 import { momentText } from '@/lib/admin-format'
 import { consoleGet } from '@/lib/console'
@@ -13,9 +14,7 @@ export default async function BookingInspections({ bookingId, token }) {
   const reports = data ?? []
   return (
     <Panel title={text.title} hint={text.hint}>
-      {error && <p className="text-error">{copy.admin.loadError}</p>}
-      {!error && reports.length === 0 && <p className="text-label-2">{text.none}</p>}
-      <ul className="divide-y divide-separator empty:hidden">
+      <PanelList error={error} isEmpty={reports.length === 0} empty={text.none}>
         {reports.map((report) => (
           <li key={report.id} className="flex items-center justify-between gap-3 py-2">
             <span>
@@ -29,7 +28,7 @@ export default async function BookingInspections({ bookingId, token }) {
             </Link>
           </li>
         ))}
-      </ul>
+      </PanelList>
       <div className="mt-4 flex flex-wrap gap-3">
         {['pickup', 'return'].map((type) => (
           <Button

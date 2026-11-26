@@ -33,10 +33,14 @@ describe('dates', () => {
     ).toEqual({ from: '2026-11-10T09:30:00+03:00', to: '2026-11-12T14:00:00+03:00' })
   })
 
-  it('turns picked days into a working-day stay in Nairobi time', () => {
+  // A later return would start another 24-hour period and charge a day more than the dates suggest.
+  it('returns at the pickup time unless another return time is picked', () => {
     expect(nairobiDayBounds('2026-11-10', '2026-11-12')).toEqual({
       from: '2026-11-10T08:00:00+03:00',
-      to: '2026-11-12T18:00:00+03:00',
+      to: '2026-11-12T08:00:00+03:00',
     })
+    expect(nairobiDayBounds('2026-11-10', '2026-11-12', { startTime: '15:00' }).to).toBe(
+      '2026-11-12T15:00:00+03:00',
+    )
   })
 })

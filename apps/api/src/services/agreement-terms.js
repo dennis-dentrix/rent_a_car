@@ -1,19 +1,24 @@
 import { createHash } from 'node:crypto'
-import { brand, formatFullDate, formatMoney, formatTime } from '@carvo/shared'
+import { formatFullDate, formatMoney, formatTime } from '@carvo/shared'
 
 // The wording of the rental agreement. Numbers that are business rules (grace period, cancellation window,
 // minimum age) come from the settings table through `facts.rules`, so the agreement never disagrees with the
 // system. Change the wording here and raise AGREEMENT_VERSION, so every signature records which wording was signed.
 // The wording is a draft until the company's lawyer has reviewed it.
-export const AGREEMENT_VERSION = '2026-11-draft'
+export const AGREEMENT_VERSION = '2026-11-draft-2'
 
 const kes = (amount) => formatMoney(amount, 'KES')
 export const when = (at) => `${formatFullDate(at)} at ${formatTime(at)}`
 
+const takesDeposit = ({ booking }) => booking.deposit_kes > 0
+
+const chargeText = ({ booking }) =>
+  takesDeposit({ booking })
+    ? `A refundable deposit of ${kes(booking.deposit_kes)} is paid to confirm the booking and is part of the total, and the balance of ${kes(booking.balance_kes)} is paid as agreed with the Company.`
+    : 'It is paid as agreed with the Company.'
+
 const paymentText = ({ booking }) => {
-  const parts = [
-    `The total hire charge is ${kes(booking.total_kes)}. A refundable deposit of ${kes(booking.deposit_kes)} is paid to confirm the booking and is part of the total, and the balance of ${kes(booking.balance_kes)} is paid as agreed with the Company.`,
-  ]
+  const parts = [`The total hire charge is ${kes(booking.total_kes)}. ${chargeText({ booking })}`]
   if (booking.security_deposit_kes > 0) {
     parts.push(
       `A separate security deposit of ${kes(booking.security_deposit_kes)} is held for the hire and is returned after the vehicle is checked on return, less any amount the Renter owes under this agreement.`,
@@ -25,8 +30,8 @@ const paymentText = ({ booking }) => {
 const CLAUSES = [
   [
     'The agreement',
-    () =>
-      `This agreement is between ${brand.legalName} (the Company) and the Renter named above, for the hire of the vehicle described above. By signing, the Renter confirms that the details above are correct and accepts these terms.`,
+    ({ lessor }) =>
+      `This agreement is between ${lessor} (the Company) and the Renter named above, for the hire of the vehicle described above. By signing, the Renter confirms that the details above are correct and accepts these terms.`,
   ],
   [
     'Hire period and return',
@@ -43,6 +48,8 @@ const CLAUSES = [
     'Cancelling and changing the booking',
     ({ rules }) =>
       `If the Renter cancels more than ${rules.cancellation_window_hours} hours before the start of the hire, the refundable deposit is returned in full. Within ${rules.cancellation_window_hours} hours of the start, it is not returned. The Renter may change the dates once, up to ${rules.cancellation_window_hours} hours before the start, and the price is worked out again for the new dates. A change of dates cancels this signature, and the Renter signs again.`,
+    // These terms are about the deposit. Without one they wait for the owner's wording.
+    takesDeposit,
   ],
   [
     'Use of the vehicle',
@@ -86,7 +93,8 @@ const CLAUSES = [
  * and a snapshot of the facts, which is saved with the signature as the record of what was agreed.
  */
 export function buildTerms(facts) {
-  const clauses = CLAUSES.map(([title, text], index) => ({
+  const applying = CLAUSES.filter(([, , applies]) => !applies || applies(facts))
+  const clauses = applying.map(([title, text], index) => ({
     number: index + 1,
     title,
     text: text(facts),

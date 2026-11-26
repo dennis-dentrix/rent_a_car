@@ -1,33 +1,24 @@
-import { beforeAll, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import {
   DATES,
   IDS,
   deliveryHandover,
   get,
-  loadApp,
   officeQuote,
   postQuote,
   query,
+  withApi,
 } from './api-client.js'
 
 const { START, END_3_DAYS, END_7_DAYS } = DATES
 
-beforeAll(loadApp)
+withApi()
 
 describe('GET /classes', () => {
-  it('lists public classes with the current daily rate', async () => {
+  // A class costs what its cheapest listed car does; the seed lists no priced car.
+  it('shows no price for a class with no listed car', async () => {
     const { status, body } = await get('/classes')
-    expect(status).toBe(200)
-    expect(body.data.map((item) => item.price_per_day_kes)).toEqual([12500, 18000, 25000])
-  })
-
-  it('converts prices for display when USD is chosen', async () => {
-    const { body } = await get(`/classes${query({ currency: 'USD' })}`)
-    expect(body.data[0]).toMatchObject({
-      price_per_day_kes: 12500,
-      price_per_day_display: 97,
-      display_currency: 'USD',
-    })
+    expect([status, body.data[0].price_per_day_kes]).toEqual([200, null])
   })
 
   it('counts available vehicles for the dates', async () => {

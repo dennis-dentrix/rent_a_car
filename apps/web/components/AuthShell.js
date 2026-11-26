@@ -41,7 +41,11 @@ export default function AuthShell({ children }) {
       <BrandPanel />
       <div className="flex flex-col bg-bg">
         <header className="pt-safe flex items-center justify-between px-4 py-3 md:px-8">
-          <Link href="/" aria-label={copy.nav.home} className="lg:invisible">
+          <Link
+            href="/"
+            aria-label={copy.nav.home}
+            className="inline-flex min-h-touch items-center lg:invisible"
+          >
             <Logo />
           </Link>
           <Link

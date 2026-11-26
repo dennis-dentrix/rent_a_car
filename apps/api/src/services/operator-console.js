@@ -1,11 +1,13 @@
-import { nairobiDate, nairobiDayRange } from '@carvo/shared'
+import { nairobiDate } from '@carvo/shared'
 import { countRows } from '../lib/counts.js'
 import { AppError } from '../lib/errors.js'
 import { unwrap } from '../lib/supabase.js'
+import { getToday } from './operator-today.js'
 import { findOne, updateOne } from './records.js'
 
 const COMPANY_COLUMNS =
-  'id, business_name, slug, registration_number, kra_pin, address, phone, email, status, status_reason'
+  'id, business_name, slug, registration_number, kra_pin, address, phone, email, status, status_reason, ' +
+  'offers_dropoff, offers_pickup'
 
 /** The company's own record, for its Company page. */
 export const getCompany = ({ db }, operatorId) =>
@@ -15,35 +17,19 @@ export const getCompany = ({ db }, operatorId) =>
 export const updateCompany = ({ db }, operatorId, input) =>
   updateOne(db, 'operators', COMPANY_COLUMNS, operatorId, input)
 
-// Bookings of the company in one of the statuses whose start or end falls inside the day.
-const bookingsMoving = (db, operatorId, { statuses, column, range: [from, to] }) =>
-  countRows(db, 'bookings', (q) =>
-    q.eq('operator_id', operatorId).in('status', statuses).gte(column, from).lt(column, to),
+// Active cars with no daily price: renters cannot book them.
+const vehiclesWithoutRate = (db, operatorId) =>
+  countRows(db, 'vehicles', (q) =>
+    q.eq('operator_id', operatorId).eq('status', 'active').is('daily_rate_kes', null),
   )
 
-// Active vehicles whose class has no rate of this company in force today: they cannot be priced for a request.
-async function vehiclesWithoutRate(db, operatorId, today) {
-  const [vehicles, rates] = await Promise.all([
-    db.from('vehicles').select('class_id').eq('operator_id', operatorId).eq('status', 'active'),
-    db
-      .from('rates')
-      .select('class_id')
-      .eq('operator_id', operatorId)
-      .lte('effective_from', today)
-      .or(`effective_to.is.null,effective_to.gte.${today}`),
-  ])
-  const priced = new Set(unwrap(rates).map((row) => row.class_id))
-  return unwrap(vehicles).filter((row) => !priced.has(row.class_id)).length
-}
-
-// How far the company has got with setting up: vehicles of any status, its own rates, and the services it offers.
+// How far the company has got with setting up: vehicles of any status, and the services it offers.
 async function setupCounts(db, operatorId) {
-  const [vehiclesTotal, rates, services] = await Promise.all([
+  const [vehiclesTotal, services] = await Promise.all([
     countRows(db, 'vehicles', (q) => q.eq('operator_id', operatorId)),
-    countRows(db, 'rates', (q) => q.eq('operator_id', operatorId)),
     countRows(db, 'operator_services', (q) => q.eq('operator_id', operatorId)),
   ])
-  return { vehicles_total: vehiclesTotal, rates, services }
+  return { vehicles_total: vehiclesTotal, services }
 }
 
 // The company's review state, and whether the details renters and admins look for are filled in.
@@ -65,8 +51,7 @@ const toCompany = ({
 /** What the company needs to see first: its review status, today's movement, and what is not ready to rent. */
 export async function getOperatorOverview({ db }, operatorId, now = new Date()) {
   const today = nairobiDate(now)
-  const range = nairobiDayRange(today)
-  const [company, vehicles, onHire, pickups, returns, unpriced, setup] = await Promise.all([
+  const [company, vehicles, onHire, day, unpriced, setup] = await Promise.all([
     findOne(
       db,
       'operators',
@@ -75,9 +60,8 @@ export async function getOperatorOverview({ db }, operatorId, now = new Date()) 
     ),
     countRows(db, 'vehicles', (q) => q.eq('operator_id', operatorId).eq('status', 'active')),
     countRows(db, 'bookings', (q) => q.eq('operator_id', operatorId).eq('status', 'active')),
-    bookingsMoving(db, operatorId, { statuses: ['confirmed', 'ready'], column: 'start_at', range }),
-    bookingsMoving(db, operatorId, { statuses: ['active'], column: 'end_at', range }),
-    vehiclesWithoutRate(db, operatorId, today),
+    getToday({ db }, operatorId, today),
+    vehiclesWithoutRate(db, operatorId),
     setupCounts(db, operatorId),
   ])
   return {
@@ -86,8 +70,7 @@ export async function getOperatorOverview({ db }, operatorId, now = new Date()) 
     ...setup,
     vehicles,
     on_hire: onHire,
-    pickups_today: pickups,
-    returns_today: returns,
+    ...day,
     vehicles_without_rate: unpriced,
   }
 }

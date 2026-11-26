@@ -1,60 +1,51 @@
-import { TRANSMISSIONS } from '@carvo/shared'
-import Chip from '@/components/Chip'
-import LiveCarCard from '@/components/LiveCarCard'
+import { Car } from 'lucide-react'
+import Button from '@/components/Button'
+import EmptyState from '@/components/EmptyState'
+import FilterRail from '@/components/FilterRail'
+import ResultCard from '@/components/ResultCard'
+import ResultsGrid from '@/components/ResultsGrid'
+import SortSelect from '@/components/SortSelect'
 import { copy } from '@/copy/en'
-import { filterCars } from '@/lib/live-cars'
-import { withParams } from '@/lib/query'
+import { filterCars, sortCars } from '@/lib/live-cars'
+import { carriedChoices } from '@/lib/stay-query'
 
 const text = copy.liveCars
 
-function ChoiceRow({ name, params, options }) {
+function NoCars() {
   return (
-    <ul className="flex gap-2 overflow-x-auto">
-      {options.map((option) => (
-        <li key={option.value || 'any'}>
-          <Chip
-            label={option.label}
-            isSelected={(params[name] ?? '') === option.value}
-            href={withParams('/cars', { ...params, [name]: option.value })}
-          />
-        </li>
-      ))}
-    </ul>
+    <EmptyState
+      icon={Car}
+      title={copy.cars.emptyTitle}
+      message={copy.cars.emptyText}
+      action={
+        <Button href="/cars" variant="tonal">
+          {copy.cars.clear}
+        </Button>
+      }
+    />
   )
 }
 
-const typeOptions = (cars) => [
-  { value: '', label: text.allTypes },
-  ...[
-    ...new Map(cars.filter((car) => car.class).map((car) => [car.class.slug, car.class.name])),
-  ].map(([value, label]) => ({ value, label })),
-]
-
-const GEARBOXES = [
-  { value: '', label: text.anyGearbox },
-  ...TRANSMISSIONS.map((value) => ({ value, label: copy.carFacts.transmission[value] })),
-]
-
-/** The real cars on Carvo, filtered by type and gearbox from the page's address. Nothing is shown until there is one. */
+/** The results: the filter rail at the side, then the matching cars as large cards in the chosen order. */
 export default function LiveCars({ cars, params }) {
-  if (!cars.length) return null
-  const shown = filterCars(cars, params)
+  const shown = sortCars(filterCars(cars, params), params.sort)
   return (
-    <section aria-labelledby="live-cars" className="mb-10 flex flex-col gap-4">
-      <div className="flex items-baseline gap-3">
-        <h2 id="live-cars" className="text-title-2">
-          {text.title}
-        </h2>
-        <p className="text-footnote text-label-2">{text.count(shown.length)}</p>
-      </div>
-      <ChoiceRow name="type" params={params} options={typeOptions(cars)} />
-      <ChoiceRow name="gear" params={params} options={GEARBOXES} />
-      {shown.length === 0 && <p className="text-body text-label-2">{text.none}</p>}
-      <ul className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-        {shown.map((car) => (
-          <LiveCarCard key={car.id} car={car} />
-        ))}
-      </ul>
-    </section>
+    <div className="grid gap-6 lg:grid-cols-[18rem_1fr] lg:items-start">
+      <FilterRail cars={cars} params={params} />
+      <section className="flex min-w-0 flex-col gap-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="text-title-2">
+            {params.start ? text.availableFor(shown.length) : text.count(shown.length)}
+          </h2>
+          <SortSelect params={params} />
+        </div>
+        {shown.length === 0 && <NoCars />}
+        <ResultsGrid>
+          {shown.map((car) => (
+            <ResultCard key={car.id} car={car} choices={carriedChoices(params)} />
+          ))}
+        </ResultsGrid>
+      </section>
+    </div>
   )
 }

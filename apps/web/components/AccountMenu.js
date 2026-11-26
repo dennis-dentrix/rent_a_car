@@ -2,10 +2,11 @@
 
 import Link from 'next/link'
 import { useCallback, useRef, useState } from 'react'
-import { LayoutDashboard, LogIn, LogOut, Settings } from 'lucide-react'
+import { CalendarDays, LayoutDashboard, LogIn, LogOut, MessageSquare, Settings } from 'lucide-react'
 import { signOutAction } from '@/app/auth/actions'
 import Avatar from '@/components/Avatar'
 import Button from '@/components/Button'
+import NavBadge from '@/components/NavBadge'
 import { copy } from '@/copy/en'
 import { areaFor } from '@/lib/areas'
 import { useDismiss } from '@/lib/use-dismiss'
@@ -25,6 +26,29 @@ function MenuLink({ href, icon: Icon, onClose, children }) {
   )
 }
 
+// A company or the admin goes to their dashboard; a renter to their trips and messages.
+function OwnLinks({ role, onClose }) {
+  const area = areaFor(role)
+  if (area) {
+    return (
+      <MenuLink href={area.href} icon={LayoutDashboard} onClose={onClose}>
+        {area.label}
+      </MenuLink>
+    )
+  }
+  return (
+    <>
+      <MenuLink href="/account/bookings" icon={CalendarDays} onClose={onClose}>
+        {text.bookings}
+      </MenuLink>
+      <MenuLink href="/account/messages" icon={MessageSquare} onClose={onClose}>
+        {copy.messages.title}
+        <NavBadge name="unread_messages" className="ml-auto" />
+      </MenuLink>
+    </>
+  )
+}
+
 function MenuPanel({ who, onClose }) {
   return (
     <div
@@ -33,9 +57,7 @@ function MenuPanel({ who, onClose }) {
       className="animate-pop-in absolute right-0 top-full z-sheet mt-2 w-64 origin-top-right rounded-panel border border-separator bg-surface p-1 shadow-2"
     >
       <p className="truncate px-3 py-2 text-callout font-semibold">{who.name}</p>
-      <MenuLink href={who.home} icon={LayoutDashboard} onClose={onClose}>
-        {areaFor(who.role)?.label ?? copy.nav.dashboard}
-      </MenuLink>
+      <OwnLinks role={who.role} onClose={onClose} />
       <MenuLink href="/settings" icon={Settings} onClose={onClose}>
         {text.settings}
       </MenuLink>
@@ -82,9 +104,10 @@ export default function AccountMenu() {
         aria-haspopup="menu"
         aria-expanded={isOpen}
         onClick={() => setIsOpen(!isOpen)}
-        className="state-layer inline-flex h-compact min-w-compact items-center justify-center rounded-pill transition-transform duration-fast active:scale-[0.95]"
+        className="state-layer relative inline-flex h-compact min-w-compact items-center justify-center rounded-pill transition-transform duration-fast active:scale-[0.95]"
       >
         <Avatar name={who.name} src={who.avatar} size={36} />
+        <NavBadge name="unread_messages" className="absolute -right-1 -top-1" />
       </button>
       {isOpen && <MenuPanel who={who} onClose={close} />}
     </div>

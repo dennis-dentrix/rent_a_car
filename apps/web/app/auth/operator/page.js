@@ -29,8 +29,7 @@ export default async function OperatorSignUpPage() {
           submitLabel={text.submit}
         />
         <p className="text-callout text-label-2">
-          {text.haveAccount}{' '}
-          <AuthLink href="/auth?next=/console">{copy.auth.signUp.signIn}</AuthLink>
+          {text.haveAccount} <AuthLink href="/auth/company">{copy.auth.signUp.signIn}</AuthLink>
         </p>
         <p className="text-callout text-label-2">
           {text.forRenters} <AuthLink href="/auth/sign-up">{text.renterSignUp}</AuthLink>

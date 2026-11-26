@@ -1,10 +1,13 @@
 import { httpServerHandler } from 'cloudflare:node'
+import { waitUntil } from 'cloudflare:workers'
 import { createApp } from './app.js'
+import { onBackgroundWork } from './lib/background.js'
 import { logger } from './lib/logger.js'
 
 // The Express app served by Cloudflare Workers. `server.js` serves the same app on a port for local use
 // and Docker. The Workers runtime has no real network port, so this one is internal and never exposed.
 const PORT = 8080
+onBackgroundWork(waitUntil)
 createApp().listen(PORT)
 const api = httpServerHandler({ port: PORT })
 

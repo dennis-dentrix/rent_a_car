@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useEffectEvent, useRef } from 'react'
 import Alert from '@/components/Alert'
+import HiddenFields from '@/components/HiddenFields'
 import TextField from '@/components/Field'
 import PasswordField from '@/components/PasswordField'
 import SubmitButton from '@/components/SubmitButton'
@@ -64,6 +65,7 @@ export default function AuthForm({
   initial = {},
   saved,
   onSaved,
+  children,
 }) {
   const [state, run] = useActionState(action, null)
   const formRef = useRef(null)
@@ -77,11 +79,10 @@ export default function AuthForm({
   }
   return (
     <form ref={formRef} action={run} className="flex flex-col gap-4">
-      {Object.entries(hidden).map(([name, value]) => (
-        <input key={name} type="hidden" name={name} value={value ?? ''} />
-      ))}
+      <HiddenFields values={hidden} />
       {state?.error && <Alert tone="error" title={state.error} />}
       <FieldList fields={fields} state={state} initial={initial} />
+      {children}
       <SubmitButton>{submitLabel}</SubmitButton>
       {saved && state?.status === 'saved' && (
         <p role="status" className="text-callout text-success">

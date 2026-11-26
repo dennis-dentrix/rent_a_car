@@ -49,13 +49,14 @@ export const adminSetup = {
   resources: {
     classes: {
       title: 'Vehicle classes',
-      subtitle: 'The kinds of car renters choose from. Prices are set under Daily rates.',
+      subtitle: 'The kinds of car companies list under and renters filter by.',
       fields: {
         name: 'Name',
         slug: 'Web address word (lowercase, hyphens)',
         seats: 'Seats',
         luggage_capacity: 'Luggage (bags)',
-        description: 'Description',
+        description: 'What belongs in this class',
+        example_models: 'Example models (separate with commas)',
         best_for: 'Best for (separate with commas)',
         is_public: 'Show on the website',
         sort_order: 'Order in lists (smaller first)',
@@ -201,6 +202,12 @@ export const adminSetup = {
         hint: 'Youngest age that may rent.',
         unit: 'years',
         group: 'renters',
+      },
+      request_response_minutes: {
+        label: 'Time to answer a request',
+        hint: 'A booking request the company has not answered by then expires.',
+        unit: 'minutes',
+        group: 'bookings',
       },
       review_threshold: {
         label: 'Review stars to show',

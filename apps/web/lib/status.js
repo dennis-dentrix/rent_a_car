@@ -15,6 +15,8 @@ import {
 export const STATUS_BADGES = {
   quoted: { tone: 'neutral', icon: FileText },
   pending_payment: { tone: 'warning', icon: Hourglass },
+  requested: { tone: 'warning', icon: Hourglass },
+  declined: { tone: 'error', icon: CircleX },
   confirmed: { tone: 'success', icon: CircleCheck },
   ready: { tone: 'accent', icon: PackageCheck },
   active: { tone: 'accent', icon: CarFront },

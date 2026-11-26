@@ -1,14 +1,19 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { sendQueuedNotifications } from '../../src/services/notifications.js'
 import {
+  IDS,
   accounts,
   asCustomer,
   bookNewQuote,
   call,
   changeStatus,
+  officeQuote,
+  postQuote,
+  signIn,
   reviewDocument,
   uploadDocument,
   withApi,
+  createCarBooking,
 } from './api-client.js'
 
 const db = withApi()
@@ -171,5 +176,71 @@ describe('the scheduled job', () => {
     })
     expect([status, body.data]).toEqual([200, { sent: 0, failed: 0, skipped: true }])
     expect((await queued())[0].status).toBe('pending')
+  })
+})
+
+// A priced car of the seeded rental company, booked the way a renter books it. Test cleanup removes `API-` cars.
+async function bookCar(mode = 'instant') {
+  const car = await db.query(
+    `insert into vehicles (registration, chassis_number, class_id, operator_id, daily_rate_kes, booking_mode)
+     values ('API-NOTE1', 'API-CHASSIS-NOTE1', $1, 'bbbbbbbb-bbbb-4bbb-8bbb-000000000001', 4000, $2)
+     returning id`,
+    [IDS.SEDAN, mode],
+  )
+  const quote = await postQuote({
+    ...officeQuote(),
+    class_id: undefined,
+    vehicle_id: car.rows[0].id,
+  })
+  const booked = await createCarBooking(quote.body.data.id)
+  return { bookingId: booked.body.data.id, vehicleId: car.rows[0].id }
+}
+const sentTo = async () =>
+  (await queued()).map((row) => `${row.kind} > ${row.to_email.split('@')[0]}`).sort()
+const answer = async (id, body) =>
+  call('POST', `/operator/bookings/${id}/answer`, {
+    body,
+    token: await signIn('operator@example.test'),
+  })
+
+describe('telling both sides about a car booking', () => {
+  it('confirms an instant booking to the renter and the company, once each', async () => {
+    await bookCar()
+    expect(await sentTo()).toEqual(['booking_confirmed > customer', 'company_booked > operator'])
+  })
+
+  it('asks the company about a request, then tells the renter the answer', async () => {
+    const { bookingId: id } = await bookCar('request')
+    expect(await sentTo()).toEqual(['booking_requested > customer', 'company_request > operator'])
+    await answer(id, { accept: false, reason: 'Car in service' })
+    expect(await sentTo()).toContain('booking_declined > customer')
+    expect(await sentTo()).toHaveLength(3)
+  })
+
+  it('tells both sides when a request goes unanswered', async () => {
+    const { bookingId: id } = await bookCar('request')
+    await db.query(
+      "update bookings set hold_expires_at = now() - interval '1 minute' where id = $1",
+      [id],
+    )
+    await db.query('select expire_unanswered_requests()')
+    expect(await sentTo()).toEqual(
+      expect.arrayContaining(['request_expired > customer', 'company_request_expired > operator']),
+    )
+  })
+})
+
+describe('telling someone about a message', () => {
+  it('alerts the other side once in a while, without the words that were said', async () => {
+    const { vehicleId } = await bookCar()
+    await db.query('truncate notifications, conversations cascade')
+    const started = await asCustomer('POST', '/messages', {
+      vehicle_id: vehicleId,
+      body: 'A private question',
+    })
+    await asCustomer('POST', `/messages/${started.body.data.id}`, { body: 'And another' })
+    const rows = await queued()
+    expect(await sentTo()).toEqual(['message_received > operator'])
+    expect(JSON.stringify(rows[0].payload)).not.toContain('private')
   })
 })

@@ -17,7 +17,7 @@ const bind = ({ values, set }, key) => ({
   onChange: (value) => set(key, value),
 })
 
-function SelectCell({ icon, label, options, value, onChange }) {
+export function SelectCell({ icon, label, options, value, onChange }) {
   return (
     <SearchCell icon={icon} label={label}>
       {(id) => (
@@ -47,7 +47,7 @@ function TypedPlace({ form, field, icon, label, placeholder, known }) {
   )
 }
 
-function PickupCell({ form, search }) {
+export function PickupCell({ form, search }) {
   return (
     <TypedPlace
       form={form}
@@ -55,6 +55,19 @@ function PickupCell({ form, search }) {
       icon={MapPin}
       label={copy.search.pickup}
       placeholder={copy.search.pickupPlaceholder}
+      known={search.places}
+    />
+  )
+}
+
+export function DestinationCell({ form, search }) {
+  return (
+    <TypedPlace
+      form={form}
+      field="dropoff"
+      icon={Flag}
+      label={copy.search.destination}
+      placeholder={copy.search.destinationPlaceholder}
       known={search.places}
     />
   )
@@ -78,7 +91,7 @@ function WhenCell({ form, error }) {
 }
 
 /** How many cells each line shows, so the strip can sit on one row with equal columns. */
-export const FIELD_COUNTS = { car_hire: 2, transfers: 4, events: 3 }
+export const FIELD_COUNTS = { car_hire: 3, transfers: 4, events: 3 }
 
 /** The trip details for each service line. `form` is { values, set }; `set(key, value)` updates one part. */
 export function CarHireFields({ form, search, error }) {
@@ -86,6 +99,7 @@ export function CarHireFields({ form, search, error }) {
   return (
     <>
       <PickupCell form={form} search={search} />
+      <DestinationCell form={form} search={search} />
       <DatesField
         stay={values.stay}
         onChange={(stay) => set('stay', { ...values.stay, ...stay })}
@@ -105,14 +119,7 @@ export function TransferFields({ form, search, error }) {
       ) : (
         <PickupCell form={form} search={search} />
       )}
-      <TypedPlace
-        form={form}
-        field="dropoff"
-        icon={Flag}
-        label={copy.search.destination}
-        placeholder={copy.search.destinationPlaceholder}
-        known={search.places}
-      />
+      <DestinationCell form={form} search={search} />
       <WhenCell form={form} error={error} />
       <SelectCell
         icon={Users}

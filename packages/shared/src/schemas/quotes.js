@@ -24,11 +24,23 @@ const handoverSchema = z
 export const quoteBodySchema = z
   .strictObject({
     ...stayFields,
+    // A quote is for one car, at its own price, or for any car of a class.
+    class_id: stayFields.class_id.optional(),
+    vehicle_id: z.uuid().optional(),
+    with_chauffeur: z.boolean().optional(),
     service: z.enum(['rental', 'airport_transfer']).default('rental'),
     handover: handoverSchema,
     pickup_location_id: z.uuid().nullable().optional(),
     extras: z.array(z.uuid()).max(10).default([]),
     currency: z.enum(CURRENCIES).default('KES'),
+  })
+  .refine((quote) => Boolean(quote.class_id) !== Boolean(quote.vehicle_id), {
+    message: 'Send either class_id or vehicle_id, not both.',
+    path: ['vehicle_id'],
+  })
+  .refine((quote) => !quote.with_chauffeur || quote.vehicle_id, {
+    message: 'A chauffeur is chosen for a particular car.',
+    path: ['with_chauffeur'],
   })
   .refine((quote) => new Date(quote.end_at) > new Date(quote.start_at), {
     message: 'end_at must be after start_at.',

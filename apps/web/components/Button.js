@@ -15,7 +15,7 @@ const VARIANTS = {
 const SIZES = {
   md: 'min-h-control px-6 text-body',
   compact: 'min-h-compact px-5 text-callout',
-  sm: 'min-h-row px-3 text-staff-label',
+  sm: 'min-h-touch px-3 text-staff-label md:min-h-row',
 }
 
 const buttonClasses = ({ variant, size, isFullWidth, className }) =>

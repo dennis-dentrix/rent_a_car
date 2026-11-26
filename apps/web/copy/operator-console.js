@@ -1,6 +1,18 @@
 // The rental company's console: what its pages say.
 export const operatorConsole = {
   meta: { title: 'Console' },
+  handover: {
+    title: 'Drop-off and pick-up',
+    offers_dropoff: {
+      label: 'We drop cars off',
+      hint: 'Renters can ask you to bring the car to their pick up location.',
+    },
+    offers_pickup: {
+      label: 'We pick cars up',
+      hint: 'Renters can ask you to collect the car when the hire ends.',
+    },
+    failed: 'That did not save. Try again.',
+  },
   nav: {
     today: 'Today',
     bookings: 'Bookings',
@@ -24,7 +36,7 @@ export const operatorConsole = {
     dueToday: 'Due today',
     ofFleet: (n) => `of ${n} in your fleet`,
     ofActive: (n) => `of ${n} active`,
-    unpricedShort: (n) => `${n} without a daily rate`,
+    unpricedShort: (n) => `${n} without a daily price`,
     pickups: 'Pickups today',
     returns: 'Returns today',
     onHire: 'On hire now',
@@ -32,7 +44,7 @@ export const operatorConsole = {
     needsTitle: 'Needs you',
     allClear: 'Nothing is waiting for you.',
     unpriced: (n) =>
-      `${n} ${n === 1 ? 'car has' : 'cars have'} no daily rate. Set a rate for ${n === 1 ? 'its' : 'their'} class.`,
+      `${n} ${n === 1 ? 'car has' : 'cars have'} no daily price. Renters can book a car only once it has one.`,
     setUpTitle: 'Get ready to rent',
     setUpHint: 'A few steps, and renters can find your cars.',
     steps: {
@@ -46,10 +58,10 @@ export const operatorConsole = {
         hint: 'Registration, class and home place.',
         href: '/console/fleet',
       },
-      rate: {
-        title: 'Set a daily rate',
-        hint: 'The price per day for a class.',
-        href: '/console/classes',
+      price: {
+        title: 'Price your cars',
+        hint: 'A daily price on each car.',
+        href: '/console/fleet',
       },
       service: {
         title: 'Choose what you offer',
@@ -63,7 +75,7 @@ export const operatorConsole = {
   },
   bookings: {
     title: 'Bookings',
-    subtitle: 'Bookings on your cars, newest first. Carvo handles confirmation for now.',
+    subtitle: 'Bookings on your cars, newest first.',
     empty: 'No bookings yet. They appear here when a renter books one of your cars.',
     back: 'Bookings',
     detail: 'Booking',

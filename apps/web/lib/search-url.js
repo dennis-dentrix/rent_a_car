@@ -1,4 +1,4 @@
-import { DEFAULT_PICKUP_TIME, DEFAULT_RETURN_TIME, END_OF_DAY } from '@/lib/stay-times'
+import { DEFAULT_PICKUP_TIME, END_OF_DAY } from '@/lib/stay-times'
 import { withParams } from '@/lib/query'
 
 /** What the search form holds before anything is chosen. */
@@ -10,7 +10,7 @@ export const emptySearch = () => ({
   place: '',
   passengers: '2',
   cars: '1',
-  stay: { start: null, end: null, startTime: DEFAULT_PICKUP_TIME, endTime: DEFAULT_RETURN_TIME },
+  stay: { start: null, end: null, startTime: DEFAULT_PICKUP_TIME, endTime: DEFAULT_PICKUP_TIME },
   when: { date: '', time: DEFAULT_PICKUP_TIME },
 })
 
@@ -43,6 +43,7 @@ export function buildSearchUrl(group, values, extra = {}) {
       service,
       types,
       pickup: values.pickup,
+      dropoff: values.dropoff,
       ...stayParams(values.stay),
     })
   }

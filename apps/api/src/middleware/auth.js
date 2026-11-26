@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { STAFF_ROLES } from '@carvo/shared'
+import { STAFF_ROLES, isSecondFactorPaused } from '@carvo/shared'
 import { AppError } from '../lib/errors.js'
 import { createAnonClient, createUserClient } from '../lib/supabase.js'
 import { hasVerifiedFactor } from '../lib/factors.js'
@@ -16,7 +16,8 @@ const assuranceLevel = (token) => {
 
 // Staff and admin must have signed in with a second factor (aal2). Set REQUIRE_STAFF_MFA=false to
 // switch this off for local development only.
-const mfaRequired = () => process.env.REQUIRE_STAFF_MFA !== 'false'
+const mfaRequired = () =>
+  process.env.REQUIRE_STAFF_MFA !== 'false' && !isSecondFactorPaused(process.env)
 
 const bearerToken = (req) => {
   const header = req.get('authorization') ?? ''
@@ -44,7 +45,8 @@ async function readSession(req) {
  */
 export async function authenticate(req, _res, next) {
   await readSession(req)
-  if (req.auth.hasSecondFactor && req.auth.aal !== 'aal2') {
+  const isCodeDue = req.auth.hasSecondFactor && !isSecondFactorPaused(process.env)
+  if (isCodeDue && req.auth.aal !== 'aal2') {
     throw new AppError('FORBIDDEN', {
       message: 'Enter the code from your authenticator app to continue.',
       details: { reason: 'mfa_required' },

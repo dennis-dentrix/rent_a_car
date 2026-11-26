@@ -61,6 +61,16 @@ describe('reading the agreement', () => {
     expect(text).toContain('21 years')
   })
 
+  it('is with the rental company that has the booking, not the platform', async () => {
+    const id = await confirmedBooking()
+    await db.query(
+      `with company as (insert into operators (business_name, slug) values ('API Savannah Rentals', 'api-savannah')
+         returning id) update bookings set operator_id = company.id from company where bookings.id = $1`,
+      [id],
+    )
+    expect((await read(id)).clauses[0].text).toContain('between API Savannah Rentals (the Company)')
+  })
+
   it('cannot be signed until staff confirm the booking', async () => {
     const { id } = (await bookNewQuote()).body.data
     expect((await read(id)).can_sign).toBe(false)
@@ -119,7 +129,7 @@ describe('the evidence of a signature', () => {
     const customerView = (await read(id)).signature
     const staffView = (await staff('GET', `/staff/bookings/${id}/agreement`)).body.data.signature
     expect(customerView).not.toHaveProperty('ip_address')
-    expect(staffView).toMatchObject({ terms_sha256, terms_version: '2026-11-draft' })
+    expect(staffView).toMatchObject({ terms_sha256, terms_version: '2026-11-draft-2' })
     expect(staffView.ip_address).toBeTruthy()
     const { rows } = await db.query('select snapshot from agreement_signatures')
     expect(rows[0].snapshot.booking.reference).toMatch(/^BK-/)

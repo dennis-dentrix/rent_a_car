@@ -8,7 +8,7 @@ const text = copy.liveCars
 
 // A swipeable row on phones that snaps photo by photo; from tablet, a large cover with the rest beneath it.
 const ROW =
-  '-mx-gutter flex snap-x snap-mandatory gap-2 overflow-x-auto px-gutter md:mx-0 md:grid md:grid-cols-3 md:overflow-visible md:px-0'
+  'relative -mx-gutter flex snap-x snap-mandatory gap-2 overflow-x-auto px-gutter md:mx-0 md:grid md:grid-cols-3 md:overflow-visible md:px-0'
 const SLIDE =
   'relative aspect-[4/3] w-[88%] shrink-0 snap-center overflow-hidden rounded-panel bg-fill md:w-auto'
 

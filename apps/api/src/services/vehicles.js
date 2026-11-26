@@ -4,7 +4,7 @@ import { findOne, insertOne, updateOne } from './records.js'
 
 export const VEHICLE_DETAIL_COLUMNS =
   'seats, luggage_capacity, transmission, fuel_type, drive_type, engine_cc, colour, description, features, ' +
-  'chauffeur_option, chauffeur_daily_kes'
+  'chauffeur_option, chauffeur_daily_kes, booking_mode'
 
 const VEHICLE_COLUMNS =
   'id, registration, chassis_number, make, model, year, class_id, status, mileage_km, ' +

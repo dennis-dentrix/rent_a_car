@@ -1,4 +1,5 @@
 import AdminPage from '@/components/AdminPage'
+import HandoverSwitches from '@/components/HandoverSwitches'
 import Panel from '@/components/Panel'
 import ResourceForm from '@/components/ResourceForm'
 import { copy } from '@/copy/en'
@@ -14,6 +15,7 @@ export default async function ConsoleCompanyPage() {
   const { data, error } = await consoleGet('/operator/company', token)
   return (
     <AdminPage title={text.title} subtitle={text.subtitle} isNarrow hasError={Boolean(error)}>
+      {data && <HandoverSwitches company={data} />}
       {data && (
         <Panel>
           <ResourceForm

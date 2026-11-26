@@ -1,5 +1,7 @@
 // All visible text lives here as message keys (English first). Components receive text as props or
 // read it from this file; no sentence is written inside a component.
+import { alerts } from './alerts.js'
+import { menu } from './menu.js'
 import { admin } from './admin.js'
 import { adminFleet } from './admin-fleet.js'
 import { adminSetup } from './admin-setup.js'
@@ -9,21 +11,26 @@ import { operatorConsole } from './operator-console.js'
 import { policies } from './policies.js'
 import { carFacts } from './car-facts.js'
 import { classPage } from './class-page.js'
-import { classPrices } from './class-prices.js'
 import { journey } from './journey.js'
 import { liveCars } from './live-cars.js'
 import { editor } from './editor.js'
+import { booking } from './booking.js'
+import { hire } from './hire.js'
 import { home } from './home.js'
+import { calendar, today } from './today.js'
+import { messages } from './messages.js'
+import { trip } from './trip.js'
 import { inspections } from './inspections.js'
 import { blogCopy } from './blog/index.js'
 import { operators } from './operators.js'
 import { privacy } from './privacy.js'
-import { renterHome } from './renter-home.js'
 import { servicePages } from './service-pages.js'
 import { settings } from './settings.js'
 import { services } from './services.js'
 
 export const copy = {
+  alerts,
+  menu,
   inspections,
   carFacts,
   journey,
@@ -37,13 +44,17 @@ export const copy = {
   auth,
   settings,
   editor,
+  booking,
+  hire,
+  calendar,
+  today,
   home,
+  messages,
+  trip,
   blog: blogCopy,
   operators,
   privacy,
-  renterHome,
   classPage,
-  classPrices,
   services,
   servicePages,
   nav: {
@@ -59,6 +70,7 @@ export const copy = {
     help: 'Help',
     home: 'Home',
     signIn: 'Sign in',
+    bookings: 'Bookings',
     dashboard: 'Dashboard',
     main: 'Main',
   },
@@ -82,6 +94,8 @@ export const copy = {
   status: {
     quoted: 'Quoted',
     pending_payment: 'Awaiting payment',
+    requested: 'Requested',
+    declined: 'Declined',
     confirmed: 'Confirmed',
     ready: 'Ready for pickup',
     active: 'On hire',
@@ -154,10 +168,10 @@ export const copy = {
   search: {
     tabsLabel: 'What do you need?',
     service: 'Service',
-    pickup: 'Pick-up place',
-    pickupPlaceholder: 'Type where to collect you',
-    destination: 'Where are you going?',
-    destinationPlaceholder: 'Type where you are going',
+    pickup: 'Pick up location',
+    pickupPlaceholder: 'Add location',
+    destination: 'Destination',
+    destinationPlaceholder: 'Add destination',
     airport: 'Airport or airstrip',
     chooseAirport: 'Choose an airport or airstrip',
     carType: 'Car type',
@@ -195,21 +209,18 @@ export const copy = {
     meta: {
       title: 'Car hire prices in Kenya by car type',
       description:
-        'Daily rates for every car type from approved rental companies in Kenya. Add your dates to see which cars are free.',
+        'Cars from approved rental companies in Kenya, with their daily price. Add your dates to see which are free.',
     },
     crumbs: { home: 'Home' },
     title: 'Cars',
-    subtitle: 'Daily rates for every car type.',
-    forDates: (range) => `Available for ${range}`,
+    subtitle: 'Add dates to see which are free, with the total.',
     forQuery: (text) => `Results for "${text}"`,
     seats: (count) => `${count} seats`,
     from: 'From',
     perDay: 'per day',
-    noRate: 'Ask for a price',
+    noRate: 'No cars listed yet',
     available: (count) => `${count} available`,
     notAvailable: 'Not available for these dates',
-    filtersLabel: 'Best for',
-    all: 'All',
     emptyTitle: 'No cars match',
     emptyText: 'Try different dates or remove a filter.',
     clear: 'Clear filters',

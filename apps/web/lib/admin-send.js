@@ -3,7 +3,15 @@ import { copy } from '@/copy/en'
 import { apiSend } from '@/lib/api'
 import { readTokens } from '@/lib/auth/cookies'
 
-const REFUSALS = ['VALIDATION_FAILED', 'CONFLICT', 'FORBIDDEN']
+const REFUSALS = [
+  'VALIDATION_FAILED',
+  'CONFLICT',
+  'FORBIDDEN',
+  'DOCUMENTS_NOT_VERIFIED',
+  'INSPECTION_REQUIRED',
+  'BOOKING_OVERLAP',
+  'INVALID_STATUS_TRANSITION',
+]
 
 /**
  * One change made by the signed-in admin. Resolves to { ok: true } or { error }, where the error is the API's own

@@ -1,25 +1,13 @@
 import { z } from 'zod'
 import { e164Phone, hasAtLeastOneField } from './common.js'
-import { CROSS_BORDER_RULES, FUEL_POLICIES } from '../constants.js'
-import { classBasics, createLocationSchema, updateSchemaFrom } from './admin-data.js'
+import { CROSS_BORDER_RULES, FUEL_POLICIES, HANDOVER_PAYMENT_METHODS } from '../constants.js'
+import { createLocationSchema, updateSchemaFrom } from './admin-data.js'
 import { createOwnerSchema } from './fleet.js'
 
 // What a rental company enters in its own console. The server adds who it belongs to, the web address word, and that
 // a class or place starts private, so none of those are fields here.
 
 const text = (max = 200) => z.string().trim().min(1).max(max)
-
-const dailyPrice = z.number().int().min(1).max(100_000_000)
-/** A new class may arrive with its price per day. */
-export const createOperatorClassSchema = z.strictObject({
-  ...classBasics,
-  price_kes: dailyPrice.optional(),
-})
-/** What the company charges per day for a class, from today. */
-export const setClassRateSchema = z.strictObject({ price_kes: dailyPrice })
-export const updateOperatorClassSchema = z
-  .strictObject(z.object(classBasics).partial().shape)
-  .refine(...hasAtLeastOneField)
 
 export const OPERATOR_PLACE_TYPES = ['airport', 'airstrip', 'custom']
 const placeFields = {
@@ -50,6 +38,8 @@ export const updateCompanySchema = z
     address: text(300),
     phone: e164Phone,
     email: z.email(),
+    offers_dropoff: z.boolean(),
+    offers_pickup: z.boolean(),
   })
   .partial()
   .refine(...hasAtLeastOneField)
@@ -69,3 +59,33 @@ export const updatePolicySchema = updateSchemaFrom(policyFields, {
   clearable: ['min_hire_days', 'min_age', 'cross_border', 'daily_km_limit', 'fuel_policy'],
   locked: ['class_id'],
 })
+
+/** What a company says it was paid at handover. The reference is an M-PESA code or bank note, if there is one. */
+export const recordPaymentSchema = z.strictObject({
+  method: z.enum(HANDOVER_PAYMENT_METHODS),
+  amount_kes: z.number().int().min(1),
+  reference: text(60).optional(),
+})
+
+/** A company's answer to a booking request. A refusal says why. */
+export const answerRequestSchema = z
+  .strictObject({ accept: z.boolean(), reason: text(500).optional() })
+  .refine((answer) => answer.accept || answer.reason, {
+    message: 'Say why you are declining.',
+    path: ['reason'],
+  })
+
+export const calendarQuerySchema = z.strictObject({ from: z.iso.date() })
+
+/** Days a car is not offered, such as a hire made outside the platform. Both days are included. */
+export const blockDatesSchema = z
+  .strictObject({
+    vehicle_id: z.uuid(),
+    start_date: z.iso.date(),
+    end_date: z.iso.date(),
+    note: text(200).optional(),
+  })
+  .refine((block) => block.end_date >= block.start_date, {
+    message: 'The last day cannot be before the first.',
+    path: ['end_date'],
+  })

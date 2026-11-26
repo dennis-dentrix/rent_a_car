@@ -15,6 +15,7 @@ export const PRICE_RESOURCES = {
       { name: 'seats', type: 'number', isRequired: true },
       { name: 'luggage_capacity', type: 'number' },
       { name: 'description', type: 'textarea', isClearable: true },
+      { name: 'example_models', type: 'list' },
       { name: 'best_for', type: 'list' },
       { name: 'is_public', type: 'boolean', isOnByDefault: true },
       { name: 'sort_order', type: 'number' },

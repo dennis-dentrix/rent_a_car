@@ -15,13 +15,13 @@ export const journey = {
     car_prepared: 'Car prepared',
     ready: 'Ready for pickup',
     on_the_way: 'Car on the way',
-    active: 'Trip under way',
+    active: 'Hire under way',
     completed: 'Completed',
   },
   // What happens next, said to the renter.
   nextForRenter: {
     confirmed: 'The rental company checks your request and confirms it.',
-    agreement_signed: 'Sign your rental agreement at the office.',
+    agreement_signed: 'Read and sign your rental agreement.',
     car_prepared: 'The company cleans and checks your car.',
     ready: 'The company tells you when the car is ready to collect.',
     on_the_way: 'The company brings the car to you.',
@@ -30,6 +30,7 @@ export const journey = {
   },
   ended: {
     cancelled: 'This booking was cancelled.',
+    declined: 'The rental company could not take this booking.',
     expired: 'This booking was not completed in time, so the car was released.',
   },
   delivery: {
@@ -49,15 +50,14 @@ export const journey = {
   noShowDone: 'Recorded: the renter did not come.',
   failed: 'That did not save. The booking may have moved on. Reload the page.',
   renter: {
-    listTitle: 'Your bookings',
+    listTitle: 'My bookings',
     listSubtitle: 'Follow each one from request to return.',
     empty: 'You have no bookings yet.',
     find: 'Find a car',
-    back: 'Your bookings',
+    back: 'My bookings',
     dates: 'Dates',
     total: 'Total',
     handover: 'Handover',
-    reports: 'Inspection reports are on your account page.',
   },
   outcomes: {
     title: 'Cancellations and no-shows',

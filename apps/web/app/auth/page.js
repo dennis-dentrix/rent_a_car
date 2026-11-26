@@ -6,7 +6,7 @@ import AuthNotice from '@/components/AuthNotice'
 import LargeTitle from '@/components/LargeTitle'
 import { copy } from '@/copy/en'
 import { signInFields } from '@/lib/auth/fields'
-import { homeFor } from '@/lib/auth/roles'
+import { landingFor } from '@/lib/auth/roles'
 import { getCurrentUser } from '@/lib/auth/session'
 import { safeNext } from '@/lib/auth/token'
 
@@ -15,7 +15,7 @@ const text = copy.auth.signIn
 export default async function SignInPage({ searchParams }) {
   const { next, notice } = await searchParams
   const user = await getCurrentUser()
-  if (user) redirect(safeNext(next, homeFor(user.profile.role)))
+  if (user) redirect(landingFor(user.profile.role, safeNext(next, '')))
   const around = next ? `?next=${encodeURIComponent(safeNext(next, ''))}` : ''
   return (
     <>

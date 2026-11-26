@@ -111,6 +111,14 @@ export const auth = {
     forCompanies: 'Own a rental company?',
     createCompany: 'List your fleet',
   },
+  companySignIn: {
+    title: 'Company sign in',
+    subtitle: 'Manage your cars, requests, and handovers.',
+    new: 'New to Carvo?',
+    create: 'List your fleet',
+    renter: 'Hiring a car?',
+    renterSignIn: 'Renter sign in',
+  },
   signUp: {
     meta: { title: 'Create an account' },
     title: 'Create an account',
@@ -178,6 +186,7 @@ export const auth = {
     },
   },
   menu: {
+    bookings: 'My bookings',
     label: 'Your account',
     account: 'Your account',
     settings: 'Settings',

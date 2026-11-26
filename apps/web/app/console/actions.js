@@ -19,6 +19,14 @@ export async function setServicesAction(serviceIds) {
   return true
 }
 
+/** Switches drop-off or pick-up on or off. Resolves true when the server kept it. */
+export async function setHandoverAction(name, isOn) {
+  const result = await adminSend('PATCH', '/operator/company', { [name]: isOn })
+  if (result.error) return false
+  revalidatePath('/console/company')
+  return true
+}
+
 // One tap on a booking. Resolves true when the server kept it, so the button can say when it did not.
 async function tap(bookingId, path, body) {
   const result = await adminSend(
@@ -36,13 +44,4 @@ export async function recordMilestoneAction(bookingId, step) {
 
 export async function markNoShowAction(bookingId) {
   return tap(bookingId, 'no-show')
-}
-
-/** Changes the company's price per day for a class, from today. */
-export async function setClassRateAction(classId, price) {
-  const result = await adminSend('PUT', `/operator/classes/${encodeURIComponent(classId)}/rate`, {
-    price_kes: price,
-  })
-  if (!result.error) revalidatePath('/console/classes')
-  return result
 }

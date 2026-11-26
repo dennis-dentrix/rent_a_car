@@ -29,12 +29,18 @@ export async function cancelBooking({ db }, id, { reason, acknowledged_no_refund
 const moveIso = (iso, milliseconds) =>
   new Date(new Date(iso).getTime() + milliseconds).toISOString()
 
-/** The quote request for the new dates: same class, extras, currency, and service as the original quote. */
+// A booked car stays the same car; otherwise any car of the booking's class will do.
+const offeredBy = (booking, quote) =>
+  quote.vehicle_id
+    ? { vehicle_id: quote.vehicle_id, with_chauffeur: quote.with_chauffeur }
+    : { class_id: booking.class_id }
+
+/** The quote request for the new dates: same car or class, extras, currency, and service as the original quote. */
 function quoteInputFor(booking, quote, { start_at, end_at }) {
   const shift = new Date(start_at).getTime() - new Date(booking.start_at).getTime()
   const delivery = quote.handover_type === 'delivery'
   return {
-    class_id: booking.class_id,
+    ...offeredBy(booking, quote),
     start_at,
     end_at,
     handover: delivery

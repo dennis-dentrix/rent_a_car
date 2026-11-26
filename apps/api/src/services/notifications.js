@@ -7,7 +7,7 @@ import { retryDelayMinutes } from './notification-retry.js'
 
 const BATCH_SIZE = 25
 const BOOKING_COLUMNS =
-  'reference, start_at, end_at, total_kes, deposit_kes, refund_due_kes, status'
+  'reference, start_at, end_at, total_kes, deposit_kes, refund_due_kes, status, hold_expires_at'
 
 /** The bookings that a batch of notifications is about, as a Map of booking id to booking. One query for the batch. */
 async function loadBookings(admin, notifications) {
@@ -55,7 +55,11 @@ async function deliver(notification, bookings, context) {
   const { admin, send } = context
   try {
     const booking = bookings.get(notification.booking_id) ?? null
-    const email = renderEmail(notification.kind, { payload: notification.payload, booking })
+    const email = renderEmail(notification.kind, {
+      payload: notification.payload,
+      booking,
+      bookingId: notification.booking_id,
+    })
     if (!email) throw new Error(`No template for ${notification.kind}`)
     await send({ to: notification.to_email, ...email, ...(await attachmentsFor(notification)) })
     await finish(admin, notification.id, { sent: true })

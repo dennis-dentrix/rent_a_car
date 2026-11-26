@@ -4,7 +4,7 @@ import SectionHeading from '@/components/SectionHeading'
 import { copy } from '@/copy/en'
 
 const text = copy.liveCars.home
-const SHOWN = 3
+const SHOWN = 4
 
 /** The newest real cars, on the home page. Nothing is shown until a company has listed one. */
 export default function HomeCars({ cars }) {
@@ -19,7 +19,7 @@ export default function HomeCars({ cars }) {
       <SectionHeading title={text.title} action={seeAll}>
         {text.text}
       </SectionHeading>
-      <ul className="stagger grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+      <ul className="stagger grid gap-5 md:grid-cols-2 lg:grid-cols-4">
         {cars.slice(0, SHOWN).map((car) => (
           <LiveCarCard key={car.id} car={car} />
         ))}

@@ -1,6 +1,9 @@
 import Link from 'next/link'
 import { ExternalLink } from 'lucide-react'
+import BookingsBell from '@/components/BookingsBell'
 import Logo from '@/components/Logo'
+import MenuChoices from '@/components/MenuChoices'
+import MobileMenu from '@/components/MobileMenu'
 import SideNav from '@/components/SideNav'
 import SignOutForm from '@/components/SignOutForm'
 import TabBar from '@/components/TabBar'
@@ -53,13 +56,19 @@ function Sidebar({ items, area, identity }) {
   )
 }
 
-// A phone's bar says where you are and who you are; the pages are in the tab bar below.
-function PhoneBar({ href, area, identity }) {
+// A phone's bar says where you are and who you are. The main pages are in the tab bar below; every page is in the menu.
+function PhoneBar({ items, area, identity }) {
   return (
     <header className="glass pt-safe sticky top-0 z-header border-b border-separator md:hidden">
       <div className="flex min-h-header items-center justify-between gap-3 px-4">
-        <Brand href={href} area={area} />
-        <ThemeToggle />
+        <Brand href={items[0].href} area={area} />
+        <div className="flex items-center gap-2">
+          <BookingsBell />
+          <MobileMenu items={items}>
+            <SiteLink />
+            <MenuChoices />
+          </MobileMenu>
+        </div>
       </div>
       {identity && <div className="px-4 pb-2">{identity}</div>}
     </header>
@@ -76,7 +85,7 @@ export default function ConsoleShell({ items, tabs = items, area, identity, chil
     <div className="min-h-dvh pb-[calc(theme(spacing.tabbar)+env(safe-area-inset-bottom))] text-cell md:flex md:pb-0">
       <Sidebar items={items} area={area} identity={identity} />
       <div className="min-w-0 flex-1">
-        <PhoneBar href={items[0].href} area={area} identity={identity} />
+        <PhoneBar items={items} area={area} identity={identity} />
         <main className="mx-auto w-full max-w-page px-4 py-6 md:px-8 md:py-8">{children}</main>
       </div>
       <TabBar items={tabs} label={copy.nav.main} hasTopNavFromTablet />

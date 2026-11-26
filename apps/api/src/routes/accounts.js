@@ -9,6 +9,7 @@ import { authenticate, authenticateFirstStep } from '../middleware/auth.js'
 import { handle } from '../middleware/respond.js'
 import {
   createAvatarUpload,
+  getAlerts,
   getMe,
   removeAvatar,
   setAvatar,
@@ -27,6 +28,12 @@ accountsRouter.get(
 )
 
 accountsRouter.use(authenticate)
+
+// What is waiting for this person, asked often while the website is open.
+accountsRouter.get(
+  '/alerts',
+  handle(async (req) => ({ data: await getAlerts(req.auth) })),
+)
 
 accountsRouter.patch(
   '/',

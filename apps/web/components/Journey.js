@@ -3,8 +3,8 @@ import SectionHeading from '@/components/SectionHeading'
 import { copy } from '@/copy/en'
 import { cx } from '@/lib/cx'
 
-/** Steps in order. With no props it is the home page's "How it works". */
-export default function Journey({ title = copy.home.howTitle, steps = copy.home.steps }) {
+/** Steps in order, under a title. */
+export default function Journey({ title, steps }) {
   return (
     <section id="how" className="scroll-mt-24">
       <SectionHeading title={title} />

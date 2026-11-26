@@ -9,6 +9,8 @@ export const BOOKING_STATUSES = [
   'closed',
   'cancelled',
   'expired',
+  'requested',
+  'declined',
 ]
 
 // Cursor pagination (docs/api-spec.md section 1).
@@ -77,3 +79,9 @@ export const orderedChecks = (checklist = {}) => {
   const rank = (check) => INSPECTION_CHECKS.indexOf(check) + 1 || INSPECTION_CHECKS.length + 1
   return Object.entries(checklist ?? {}).sort(([a], [b]) => rank(a) - rank(b))
 }
+
+// How a renter pays the company at handover.
+export const HANDOVER_PAYMENT_METHODS = ['cash', 'mpesa', 'bank']
+
+// Whether a booking of a car is confirmed at once, or waits for its company to accept it.
+export const BOOKING_MODES = ['instant', 'request']

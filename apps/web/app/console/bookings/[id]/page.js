@@ -3,9 +3,14 @@ import BookingHead from '@/components/BookingHead'
 import BookingFacts, { BookingTimeline } from '@/components/BookingFacts'
 import BookingInspections from '@/components/BookingInspections'
 import ConsoleJourney from '@/components/ConsoleJourney'
+import HireNextStep from '@/components/HireNextStep'
+import PaymentPanel from '@/components/PaymentPanel'
+import RenterDocuments from '@/components/RenterDocuments'
+import RequestAnswer from '@/components/RequestAnswer'
 import { copy } from '@/copy/en'
 import { loadBooking } from '@/lib/booking-load'
 import { getOperatorClassNames, requireOperator } from '@/lib/console'
+import { showsDocuments } from '@/lib/hire'
 
 const text = copy.operatorConsole.bookings
 
@@ -22,8 +27,15 @@ export default async function ConsoleBookingPage({ params }) {
     <div className="flex max-w-3xl flex-col gap-6">
       <BookingHead booking={booking} backHref="/console/bookings" backLabel={text.back} />
       <BookingFacts booking={booking} className={classNames.get(booking.class_id)} />
+      {booking.status === 'requested' ? (
+        <RequestAnswer booking={booking} />
+      ) : (
+        <HireNextStep booking={booking} />
+      )}
+      {showsDocuments(booking.status) && <RenterDocuments bookingId={id} token={token} />}
       <ConsoleJourney bookingId={id} startAt={booking.start_at} token={token} />
       <BookingInspections bookingId={id} token={token} />
+      <PaymentPanel booking={booking} />
       <BookingTimeline events={booking.events} />
     </div>
   )

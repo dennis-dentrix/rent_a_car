@@ -31,7 +31,7 @@ export function updateSchemaFrom(shape, { clearable = [], locked = [] } = {}) {
 }
 
 // What describes a class to a renter. A rental company enters these for a class of its own.
-export const classBasics = {
+const classBasics = {
   name: text(80),
   seats: z.number().int().min(1).max(60),
   luggage_capacity: z.number().int().min(0).max(100).optional(),
@@ -42,6 +42,7 @@ export const classBasics = {
 const classFields = {
   ...classBasics,
   slug,
+  example_models: z.array(text(60)).max(10).optional(),
   is_public: z.boolean().optional(),
   sort_order: z.number().int().optional(),
   security_deposit_enabled: z.boolean().optional(),
@@ -162,6 +163,11 @@ export const SETTING_SCHEMAS = {
   date_change_cutoff_hours: hours,
   max_date_changes: z.number().int().min(0).max(10),
   minimum_age: z.number().int().min(18).max(99),
+  request_response_minutes: z
+    .number()
+    .int()
+    .min(15)
+    .max(48 * 60),
   minimum_hire_days: z.number().int().min(1).max(30),
   review_threshold: z.number().int().min(1).max(5),
   security_deposit_enabled: z.boolean(),

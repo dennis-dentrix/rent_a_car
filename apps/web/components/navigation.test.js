@@ -41,6 +41,7 @@ describe('the way into an account on a phone', () => {
     expect(accountTab(null, false)).toMatchObject({ href: '/auth', label: 'Sign in' })
     expect(accountTab({ home: '/console' }, true)).toMatchObject({ href: '/console' })
     expect(accountTab(null, true)).toMatchObject({ href: '/account' })
+    expect(accountTab({ home: '/account' }, true)).toMatchObject({ href: '/account/bookings' })
   })
 })
 

@@ -12,7 +12,7 @@ import { filterPills, visibleRows } from '@/lib/table-rows'
 
 const text = copy.consoleUi
 const ACTION =
-  'whitespace-nowrap rounded-control px-3 py-1.5 text-meta font-bold text-primary hover:bg-fill'
+  'inline-flex min-h-touch items-center whitespace-nowrap rounded-control px-3 py-1.5 text-meta font-bold text-primary hover:bg-fill md:min-h-row'
 
 const PLAIN_COLUMNS = [
   { key: 'title', label: text.name },

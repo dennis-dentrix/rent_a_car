@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import BackLink from '@/components/BackLink'
 import AdminPage from '@/components/AdminPage'
 import ReportBody from '@/components/ReportBody'
 import ReportSignatures from '@/components/ReportSignatures'
@@ -10,9 +10,7 @@ const text = copy.inspections
 export default function InspectionReport({ report, side, backHref, backLabel }) {
   return (
     <AdminPage eyebrow={report.reference} title={text.reportTitle[report.type]}>
-      <Link href={backHref} className="w-max text-cell font-semibold text-primary">
-        ← {backLabel}
-      </Link>
+      <BackLink href={backHref}>← {backLabel}</BackLink>
       <ReportBody report={report} />
       <ReportSignatures report={report} side={side} />
     </AdminPage>

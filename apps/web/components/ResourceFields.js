@@ -1,4 +1,3 @@
-import RateField from '@/components/RateField'
 import TextArea from '@/components/TextArea'
 import TextField from '@/components/Field'
 import Select from '@/components/Select'
@@ -55,9 +54,6 @@ function FieldInput({ field, labels, row, refs, errors, isEdit }) {
   const value = startingValue(field, row)
   const error = errors?.[field.name]
   const common = { name: field.name, label, error, defaultValue: value }
-  if (field.type === 'rate') {
-    return <RateField {...common} classId={row?.class_id} rates={refs.classRates ?? {}} />
-  }
   if (field.type === 'boolean')
     return <Checkbox name={field.name} label={label} defaultChecked={value} />
   if (field.type === 'textarea' || field.type === 'lines') {

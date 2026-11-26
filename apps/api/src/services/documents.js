@@ -19,7 +19,7 @@ const QUEUE_COLUMNS = `${DOCUMENT_COLUMNS}, owner:profiles!documents_owner_id_fk
 const LINK_COLUMNS = 'storage_path, file_confirmed_at, content_type, file_etag'
 
 /** A link to the stored file, but only while it is still the file that was checked. */
-async function openFile({ storage_path: key, file_etag: etag, content_type: contentType }) {
+export async function openFile({ storage_path: key, file_etag: etag, content_type: contentType }) {
   await assertUnchanged(key, etag)
   return createDownloadUrl(key, contentType)
 }

@@ -3,10 +3,11 @@ import {
   availabilityQuerySchema,
   classesQuerySchema,
   createEnquirySchema,
-  listQuerySchema,
   placeQuerySchema,
   quoteBodySchema,
   reportFingerprintSchema,
+  vehicleQuerySchema,
+  vehiclesQuerySchema,
 } from '@carvo/shared'
 import { idParam } from '../middleware/auth.js'
 import { publicCache } from '../middleware/cache.js'
@@ -36,12 +37,18 @@ const hasDates = (req) => Boolean(req.query.from || req.query.to)
 // Real cars of approved companies. It carries a price, so it is never cached.
 catalogueRouter.get(
   '/vehicles',
-  handle((req) => listPublicVehicles(createAnonClient(), listQuerySchema.parse(req.query))),
+  handle((req) => listPublicVehicles(createAnonClient(), vehiclesQuerySchema.parse(req.query))),
 )
 
 catalogueRouter.get(
   '/vehicles/:id',
-  handle(async (req) => ({ data: await getPublicVehicle(createAnonClient(), req.params.id) })),
+  handle(async (req) => ({
+    data: await getPublicVehicle(
+      createAnonClient(),
+      req.params.id,
+      vehicleQuerySchema.parse(req.query),
+    ),
+  })),
 )
 
 // Whether a copy of an inspection report is one that was sealed here.

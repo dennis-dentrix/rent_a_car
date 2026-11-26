@@ -16,7 +16,7 @@ export default function AdminFilters({ base, name, current, options }) {
             href={option.value ? `${base}?${name}=${option.value}` : base}
             aria-current={isSelected ? 'true' : undefined}
             className={cx(
-              'inline-flex min-h-row items-center whitespace-nowrap rounded-pill px-3.5 text-meta font-semibold transition-transform duration-fast active:scale-[0.97]',
+              'inline-flex min-h-touch items-center whitespace-nowrap md:min-h-row rounded-pill px-3.5 text-meta font-semibold transition-transform duration-fast active:scale-[0.97]',
               isSelected
                 ? 'bg-primary text-on-primary'
                 : 'bg-surface text-label-2 shadow-1 hover:bg-fill',

@@ -58,6 +58,7 @@ export const admin = {
     noVehicle: 'No vehicle assigned',
     dates: 'Dates',
     total: 'Total',
+    born: 'Date of birth, to check against ID',
     balance: 'Balance',
     history: 'History',
     documents: 'Documents',

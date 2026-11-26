@@ -23,7 +23,7 @@ export function SignInButton({ label, variant }) {
   const { who, hasHint } = useWho()
   if (who || hasHint) return null
   return (
-    <Button href="/auth?next=/console" variant={variant}>
+    <Button href="/auth/company" variant={variant}>
       {label}
     </Button>
   )

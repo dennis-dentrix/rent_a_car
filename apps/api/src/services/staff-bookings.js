@@ -29,6 +29,9 @@ export async function listStaffBookings({ db }, { status, date, handover_type, l
   return { ...page, data: page.data.map(toStaffSummary) }
 }
 
+// One booking also carries the renter's date of birth, which the company checks against their ID.
+const WITH_ID_DETAILS = WITH_PEOPLE.replace('phone, email)', 'phone, email, date_of_birth)')
+
 const deliveryDriver = (db, bookingId) =>
   db.from('deliveries').select('driver:drivers(id, name, phone)').eq('booking_id', bookingId)
 
@@ -36,7 +39,7 @@ const deliveryDriver = (db, bookingId) =>
 export async function getStaffBooking({ db }, id) {
   const [booking, people, events, delivery] = await Promise.all([
     getBooking({ db }, id),
-    findOne(db, 'bookings', WITH_PEOPLE, id),
+    findOne(db, 'bookings', WITH_ID_DETAILS, id),
     db
       .from('booking_status_events')
       .select('from_status, to_status, note, created_at, actor:profiles(full_name)')

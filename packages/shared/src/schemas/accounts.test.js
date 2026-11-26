@@ -1,3 +1,4 @@
+import { isSecondFactorPaused } from '../second-factor.js'
 import { describe, expect, it } from 'vitest'
 import {
   authCodeSchema,
@@ -51,5 +52,15 @@ describe('the sign-in forms', () => {
     expect(authCodeSchema.parse({ code: '123 456' }).code).toBe('123456')
     expect(authCodeSchema.safeParse({ code: '12345' }).success).toBe(false)
     expect(authCodeSchema.safeParse({ code: '12345a' }).success).toBe(false)
+  })
+})
+
+describe('pausing the authenticator code', () => {
+  it('needs the switch, and never works in production', () => {
+    expect(isSecondFactorPaused({ PAUSE_SECOND_FACTOR: 'true' })).toBe(true)
+    expect(isSecondFactorPaused({})).toBe(false)
+    expect(isSecondFactorPaused({ PAUSE_SECOND_FACTOR: 'true', NODE_ENV: 'production' })).toBe(
+      false,
+    )
   })
 })

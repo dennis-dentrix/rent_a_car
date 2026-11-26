@@ -13,7 +13,7 @@ const ACTORS = {
   completed: 'renter',
 }
 
-const ENDED = ['cancelled', 'expired']
+const ENDED = ['cancelled', 'expired', 'declined']
 const handoverStep = (handoverType) => (handoverType === 'delivery' ? 'on_the_way' : 'ready')
 
 export const timelineSteps = (handoverType) => [

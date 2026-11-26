@@ -12,7 +12,8 @@ function Track({ label, isOn, onPress }) {
       aria-label={label}
       onClick={onPress}
       className={cx(
-        'relative mt-1 h-8 w-14 shrink-0 rounded-pill transition-colors duration-fast',
+        // The invisible edge above and below makes the target tall enough for a thumb.
+        'relative mt-1 h-8 w-14 shrink-0 rounded-pill transition-colors duration-fast after:absolute after:inset-x-0 after:-inset-y-1.5',
         isOn ? 'bg-primary' : 'bg-fill',
       )}
     >

@@ -2,12 +2,54 @@ import { describe, expect, it } from 'vitest'
 import {
   calculateDepositKes,
   calculateQuote,
+  calculateStay,
+  chauffeurDailyKes,
+  discountsForCar,
   minimumHireDays,
   rentalDays,
   vatIncludedKes,
 } from './pricing.js'
 
 const START = '2026-11-20T08:00:00+03:00'
+
+describe('discountsForCar', () => {
+  it('lets no platform discount lower a price a company set', () => {
+    const weekly = { id: 'w', class_id: null, min_days: 7, kind: 'percent', value: 10 }
+    expect(discountsForCar([weekly])).toEqual([])
+  })
+})
+
+describe('chauffeurDailyKes', () => {
+  const car = (option, kes = 3000) => ({ chauffeur_option: option, chauffeur_daily_kes: kes })
+
+  it('adds nothing to a self-drive hire', () => {
+    expect(chauffeurDailyKes(car('both'), false)).toBe(0)
+    expect(chauffeurDailyKes(car(null, null), false)).toBe(0)
+  })
+
+  it('adds the daily price when asked for, or when the car only comes with a driver', () => {
+    expect(chauffeurDailyKes(car('both'), true)).toBe(3000)
+    expect(chauffeurDailyKes(car('chauffeur'), false)).toBe(3000)
+  })
+
+  it('cannot be priced when the car offers no chauffeur or no price for one', () => {
+    expect(chauffeurDailyKes(car('self_drive'), true)).toBeNull()
+    expect(chauffeurDailyKes(car('both', null), true)).toBeNull()
+  })
+})
+
+describe('calculateStay', () => {
+  const stay = { startAt: START, endAt: '2026-11-23T08:00:00+03:00', minimumDays: 2 }
+  const car = { daily_rate_kes: 4000, chauffeur_option: 'both', chauffeur_daily_kes: 3000 }
+
+  it('totals the car and any chauffeur for each day', () => {
+    expect(calculateStay(car, stay)).toEqual({ days: 3, total_kes: 12000 })
+    expect(calculateStay(car, { ...stay, withChauffeur: true })).toEqual({
+      days: 3,
+      total_kes: 21000,
+    })
+  })
+})
 
 describe('rentalDays', () => {
   it('counts whole 24-hour periods', () => {

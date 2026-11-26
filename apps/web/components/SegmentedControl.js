@@ -41,6 +41,7 @@ export default function SegmentedControl({ label, options, value, onChange, isCo
           onClick={() => onChange(option.value)}
           className={cx(
             'relative z-10 rounded-[0.375rem] px-3 text-callout font-semibold',
+            !isCompact && 'min-h-touch',
             option.value === value ? 'text-label' : 'text-label-2',
           )}
         >

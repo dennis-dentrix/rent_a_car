@@ -15,6 +15,8 @@ const PLACEMENTS = {
     'fixed inset-x-0 bottom-0 top-auto m-0 max-h-[92dvh] w-full max-w-none rounded-t-sheet animate-sheet-in',
     'md:inset-y-0 md:left-auto md:right-0 md:h-dvh md:max-h-none md:max-w-md md:rounded-none md:animate-drawer-in',
   ),
+  // The phone's navigation: the full height, from the right.
+  menu: 'fixed inset-y-0 left-auto right-0 m-0 h-dvh max-h-none w-[min(88vw,22rem)] max-w-none rounded-l-sheet animate-drawer-in',
   center: 'm-auto w-[calc(100%-2rem)] max-w-sm rounded-panel animate-pop-in',
 }
 

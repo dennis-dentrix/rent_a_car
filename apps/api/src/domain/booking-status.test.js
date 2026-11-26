@@ -1,15 +1,16 @@
-import { readFileSync } from 'node:fs'
+import { readFileSync, readdirSync } from 'node:fs'
 import { BOOKING_STATUSES as SHARED_STATUSES } from '@carvo/shared'
 import { describe, expect, it } from 'vitest'
 import { TRANSITIONS, assertTransition, canTransition } from './booking-status.js'
 
+// Every migration that adds allowed moves, together.
+const MIGRATIONS = new URL('../../../../supabase/migrations/', import.meta.url)
 const sqlPairs = () => {
-  const sql = readFileSync(
-    new URL('../../../../supabase/migrations/20261115000003_bookings.sql', import.meta.url),
-    'utf8',
-  )
-  const block = sql.match(/insert into booking_status_transitions[\s\S]*?;/)[0]
-  return [...block.matchAll(/\('(\w+)', '(\w+)'\)/g)].map(([, from, to]) => `${from}>${to}`)
+  const sql = readdirSync(MIGRATIONS)
+    .map((name) => readFileSync(new URL(name, MIGRATIONS), 'utf8'))
+    .join('\n')
+  const blocks = sql.match(/insert into booking_status_transitions[\s\S]*?;/g)
+  return [...blocks.join('').matchAll(/\('(\w+)', '(\w+)'\)/g)].map(([, f, to]) => `${f}>${to}`)
 }
 
 describe('booking status transitions', () => {
@@ -33,7 +34,7 @@ describe('booking status transitions', () => {
     expect([TRANSITIONS.closed, TRANSITIONS.cancelled, TRANSITIONS.expired]).toEqual([[], [], []])
   })
 
-  it('matches the table in the database migration', () => {
+  it('matches the table in the database migrations', () => {
     const fromCode = Object.entries(TRANSITIONS).flatMap(([from, tos]) =>
       tos.map((to) => `${from}>${to}`),
     )

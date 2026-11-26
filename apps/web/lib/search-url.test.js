@@ -10,11 +10,13 @@ describe('buildSearchUrl for car hire', () => {
     const values = search({
       service: 'chauffeur_driven',
       pickup: 'jkia',
+      dropoff: 'Naivasha',
       stay: stay('2026-12-01', '2026-12-04'),
     })
     expect(queryOf(buildSearchUrl('car_hire', values))).toEqual({
       service: 'chauffeur_driven',
       pickup: 'jkia',
+      dropoff: 'Naivasha',
       start: '2026-12-01',
       end: '2026-12-04',
       startTime: '09:00',

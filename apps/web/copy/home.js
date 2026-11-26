@@ -17,17 +17,28 @@ export const home = {
   title: 'Arrive in the right car.',
   subtitle:
     'Choose by the day, the week, or the month, with or without a driver. You see the full price before you ask, and no deposit is taken.',
-  servicesIntro: {
-    title: 'Self-drive, transfers, and events',
-    text: 'Each rental company chooses the services it offers.',
+  trust: {
+    label: 'Why book here',
+    points: [
+      { title: 'Approved companies', text: 'A company is checked before its cars are listed.' },
+      {
+        title: 'Pay at handover',
+        text: 'Nothing to pay online. You pay when you collect the car.',
+      },
+      {
+        title: 'Signed handover report',
+        text: 'You and the company sign for the condition of the car at pickup and return.',
+      },
+    ],
   },
-  classesTitle: 'Popular car types',
-  seeAll: 'See all cars',
   price: {
     title: 'How your price is built',
     intro: 'You see the full price, line by line, before you ask for a booking.',
     lines: [
-      { title: 'Car hire', text: 'The daily rate for your car type, for each day of your stay.' },
+      {
+        title: 'Car hire',
+        text: 'The daily price of the car you choose, for each day of your stay.',
+      },
       {
         title: 'Longer-hire discount',
         text: 'Hire for a week, a month, or longer and the best discount for your stay appears as its own named line.',
@@ -42,22 +53,7 @@ export const home = {
       },
     ],
   },
-  howTitle: 'How it works',
   stepLabel: (number) => `Step ${number}`,
-  steps: [
-    {
-      title: 'Choose your dates and a car',
-      text: 'See the daily price before you ask.',
-    },
-    {
-      title: 'Request your booking',
-      text: 'The rental company confirms. You sign the agreement online.',
-    },
-    {
-      title: 'Pick up and drive',
-      text: 'Collect the car, or have it delivered. Return it on the date.',
-    },
-  ],
   know: {
     title: 'Good to know',
     bring: {

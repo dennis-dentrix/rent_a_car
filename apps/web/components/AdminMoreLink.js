@@ -4,7 +4,10 @@ import Link from 'next/link'
 export default function AdminMoreLink({ href, children }) {
   if (!href) return null
   return (
-    <Link href={href} className="text-cell font-medium text-primary underline underline-offset-2">
+    <Link
+      href={href}
+      className="inline-flex min-h-touch items-center text-cell font-medium text-primary underline underline-offset-2"
+    >
       {children}
     </Link>
   )

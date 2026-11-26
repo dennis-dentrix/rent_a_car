@@ -16,6 +16,25 @@ export const rentalDays = (startAt, endAt, minimumDays = 1) => {
 export const minimumHireDays = (service, configuredDays) =>
   service === 'airport_transfer' ? 1 : configuredDays
 
+/**
+ * What the chauffeur adds to each day of a hire of this car: 0 when driving yourself, or null when the car cannot be
+ * hired that way. A car offered only with a chauffeur always includes one.
+ */
+export function chauffeurDailyKes(car, wantsChauffeur) {
+  const { chauffeur_option: option, chauffeur_daily_kes: dailyKes } = car
+  if (!wantsChauffeur && option !== 'chauffeur') return 0
+  const isOffered = option === 'chauffeur' || option === 'both'
+  return isOffered && dailyKes ? dailyKes : null
+}
+
+/** The chargeable days of a hire of one car and what they cost, or null when it cannot be hired that way. */
+export function calculateStay(car, { startAt, endAt, minimumDays, withChauffeur = false }) {
+  const chauffeurKes = chauffeurDailyKes(car, withChauffeur)
+  if (chauffeurKes === null) return null
+  const days = rentalDays(startAt, endAt, minimumDays)
+  return { days, total_kes: (assertKes(car.daily_rate_kes) + chauffeurKes) * days }
+}
+
 /** Deposit is a percentage of the total, rounded down to a whole shilling. */
 export const calculateDepositKes = (totalKes, depositPercent) =>
   Math.floor((assertKes(totalKes) * depositPercent) / 100)
@@ -55,6 +74,15 @@ export function bestDiscount(discounts, { days, vehicleChargeKes }) {
   const [winner] = candidates
   return winner ? { id: winner.id, label: winner.label, amountKes: winner.amountKes } : null
 }
+
+/**
+ * The platform discounts that may reduce the price of a particular car, which its company set: none, until the owner
+ * rules otherwise, so no company's price is cut without its agreement.
+ *
+ * @param {Array<object>} _platformDiscounts active discounts, filtered by class and date
+ * @returns {Array<object>}
+ */
+export const discountsForCar = (_platformDiscounts) => []
 
 /**
  * @typedef {{ kind: 'charge'|'discount'|'tax'|'refundable_deposit'|'security_deposit', label: string, amountKes: number }} QuoteLine

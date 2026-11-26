@@ -2,6 +2,7 @@ import { crc32, deflateSync } from 'node:zlib'
 import { createHmac } from 'node:crypto'
 import { createClient } from '@supabase/supabase-js'
 import request from 'supertest'
+import { afterAll, beforeEach } from 'vitest'
 import { createApp } from '../../src/app.js'
 import { assertSafeTarget, withApiTestData } from './helpers.js'
 
@@ -103,18 +104,37 @@ export const OTHER_CUSTOMER = {
 export const createBooking = (body, token = accounts.customer) =>
   call('POST', '/bookings', { body, token })
 
+/** Book a quote for a particular car, with the trip details a car booking needs. */
+export const createCarBooking = (quoteId, customer = {}) =>
+  createBooking({
+    quote_id: quoteId,
+    customer: { ...CUSTOMER, date_of_birth: '1990-05-01', ...customer },
+    destination: 'Naivasha',
+    pickup_place: 'Nairobi',
+  })
+
 /** Quote the sedan for the standard dates, then book that quote. */
 export async function bookNewQuote(customer = CUSTOMER, token = accounts.customer, quoteOverrides) {
   const quote = await postQuote(officeQuote(quoteOverrides))
   return createBooking({ quote_id: quote.body.data.id, customer }, token)
 }
 
-/** Create the app and sign in the seeded accounts, then manage test data. Returns the database client. */
-export const withApi = () =>
-  withApiTestData(async () => {
+const setDepositPercent = (db, percent) =>
+  db.query("update settings set value = to_jsonb($1::int) where key = 'deposit_percent'", [percent])
+
+/**
+ * Create the app and sign in the seeded accounts, then manage test data. Returns the database client. The platform
+ * ships with no deposit; the API tests run with 30 percent, so the deposit sums stay covered.
+ */
+export const withApi = () => {
+  const db = withApiTestData(async () => {
     loadApp()
     await loadAccounts()
   })
+  beforeEach(() => setDepositPercent(db, 30))
+  afterAll(() => setDepositPercent(db, 0))
+  return db
+}
 
 let signUpCount = 0
 

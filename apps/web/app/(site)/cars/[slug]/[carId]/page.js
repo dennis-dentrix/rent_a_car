@@ -10,6 +10,7 @@ import { carName } from '@/lib/car-facts'
 import { getVehicle } from '@/lib/catalogue'
 import { carPath } from '@/lib/live-cars'
 import { pageMetadata } from '@/lib/seo'
+import { stayRequest } from '@/lib/stay-query'
 
 const text = copy.liveCars.page
 
@@ -34,9 +35,10 @@ const trailFor = (car) => [
   { name: fullName(car), path: carPath(car) },
 ]
 
-export default async function CarPage({ params }) {
+export default async function CarPage({ params, searchParams }) {
   const { slug, carId } = await params
-  const { data: car, error } = await getVehicle(carId)
+  const query = await searchParams
+  const { data: car, error } = await getVehicle(carId, stayRequest(query))
   if (error === 'NOT_FOUND' || error === 'VALIDATION_FAILED') notFound()
   if (error) return <LoadError text={text} href={`/cars/${slug}/${carId}`} />
   // A car has one address, under its own type.
@@ -52,13 +54,13 @@ export default async function CarPage({ params }) {
           <h1 className="text-display md:text-display-lg">{name}</h1>
         </div>
         <div className="lg:col-start-2 lg:row-span-2 lg:row-start-1">
-          <CarBookingCard car={car} name={name} />
+          <CarBookingCard car={car} query={query} />
         </div>
         <div className="flex min-w-0 flex-col gap-8">
           <CarSpecs car={car} />
         </div>
       </div>
-      <StickySearchCta targetId={BOOK_ID} label={text.sticky} icon="ask" />
+      <StickySearchCta targetId={BOOK_ID} label={copy.booking.stay.book} />
     </div>
   )
 }

@@ -1,13 +1,14 @@
-import { brand, formatMoney, formatShortDate, formatTime } from '@carvo/shared'
+import { brand } from '@carvo/shared'
+import { MARKETPLACE_TEMPLATES } from './notification-marketplace.js'
+import { money, stay, when } from './notification-parts.js'
 
 // The wording of every email. One entry per kind: a subject and the paragraphs of the body. The context holds
 // the notification's saved details and the booking as it is now, so a cancellation shows the refund as recorded.
 
-const when = (at) => `${formatShortDate(at)} at ${formatTime(at)}`
-const stay = ({ booking }) =>
-  `Booking ${booking.reference}: pickup ${when(booking.start_at)}, return ${when(booking.end_at)}.`
-const money = (kes) => formatMoney(kes, 'KES')
-const contact = `Questions? Call or WhatsApp us on ${brand.supportPhone}.`
+const contact = `Questions? Call us on ${brand.supportPhone}.`
+
+const depositLine = ({ booking }) =>
+  booking.deposit_kes > 0 ? [`Refundable deposit: ${money(booking.deposit_kes)}.`] : []
 
 const refundLine = ({ booking }) =>
   booking.refund_due_kes > 0
@@ -25,12 +26,14 @@ const enquiryDetails = ({ payload }) => [
 ]
 
 export const TEMPLATES = {
+  ...MARKETPLACE_TEMPLATES,
   booking_received: {
     subject: ({ booking }) => `We have your booking ${booking.reference}`,
     body: (ctx) => [
       'Thank you for booking with us. Your vehicle is held while we complete your booking.',
       stay(ctx),
-      `Total: ${money(ctx.booking.total_kes)}. Refundable deposit: ${money(ctx.booking.deposit_kes)}.`,
+      `Total: ${money(ctx.booking.total_kes)}.`,
+      ...depositLine(ctx),
     ],
   },
   booking_confirmed: {
@@ -114,11 +117,22 @@ const escapeHtml = (text) =>
     (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c],
   )
 
+// Where the reader can act: their booking or conversation. Left out when the site's address is not set.
+function pageLink(template, { bookingId, payload }) {
+  const site = process.env.APP_URL
+  const isForCompany = template.isForCompany || payload.to_company
+  const area = isForCompany ? '/console' : '/account'
+  const page = payload.conversation_id
+    ? `/messages/${payload.conversation_id}`
+    : bookingId && `/bookings/${bookingId}`
+  return site && page ? [`Open it: ${site}${area}${page}`] : []
+}
+
 /** The email for a notification: subject, plain text, and a simple HTML version. Null for an unknown kind. */
 export function renderEmail(kind, context) {
   const template = TEMPLATES[kind]
   if (!template) return null
-  const paragraphs = [...template.body(context), contact]
+  const paragraphs = [...template.body(context), ...pageLink(template, context), contact]
   return {
     subject: template.subject(context),
     text: `${paragraphs.join('\n\n')}\n\n${brand.name}`,

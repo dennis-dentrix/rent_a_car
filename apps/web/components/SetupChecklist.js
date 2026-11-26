@@ -37,7 +37,7 @@ export default function SetupChecklist({ overview }) {
     <Panel title={text.setUpTitle} hint={text.setUpHint} isFlush>
       <ol className="divide-y divide-separator">
         {steps.map((step, index) => (
-          <Step key={step.href} step={step} number={index + 1} />
+          <Step key={step.key} step={step} number={index + 1} />
         ))}
       </ol>
     </Panel>

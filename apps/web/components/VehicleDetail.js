@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import BackLink from '@/components/BackLink'
 import { formatShortDate } from '@carvo/shared'
 import AdminPage from '@/components/AdminPage'
 import EditRecord from '@/components/EditRecord'
@@ -114,11 +114,9 @@ export default function VehicleDetail({ vehicle, scope, backHref, refs }) {
       subtitle={text.statuses[vehicle.status]}
       actions={edit}
     >
-      <Link href={backHref} className="w-max text-cell font-semibold text-primary">
-        ← {text.vehicle.back}
-      </Link>
+      <BackLink href={backHref}>← {text.vehicle.back}</BackLink>
       <VehiclePhotos car={car} photos={toPhotos(vehicle.photo_paths)} />
-      <VehicleFacts vehicle={vehicle} car={car} fallback={refs.classRates?.[vehicle.class_id]} />
+      <VehicleFacts vehicle={vehicle} car={car} />
       <Trackers vehicle={vehicle} scope={scope} />
       <Agreements vehicle={vehicle} scope={scope} />
       <p className="text-footnote text-label-3">{text.vehicle.sensitive}</p>

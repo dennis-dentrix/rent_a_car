@@ -41,7 +41,7 @@ export const servicePages = {
       items: [
         {
           title: 'A day or a weekend',
-          text: 'The daily rate for your car type, for each day. A very short hire is charged at the minimum hire period, which your quote shows.',
+          text: 'The daily price of the car you choose, for each day. A very short hire is charged at the minimum hire period, which your quote shows.',
         },
         {
           title: 'A week',

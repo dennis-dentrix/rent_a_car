@@ -180,8 +180,6 @@ describe('drivers', () => {
 })
 
 describe('settings', () => {
-  afterEach(() => db.query("update settings set value = '30' where key = 'deposit_percent'"))
-
   it('lists the settings an admin can change', async () => {
     const { body } = await admin('GET', '/admin/settings')
     expect(body.data.find((row) => row.key === 'deposit_percent').value).toBe(30)
@@ -211,8 +209,6 @@ describe('settings that are refused', () => {
 })
 
 describe('changes to settings are audited', () => {
-  afterEach(() => db.query("update settings set value = '30' where key = 'deposit_percent'"))
-
   it('records who changed it in the audit log', async () => {
     await admin('PUT', '/admin/settings/deposit_percent', { value: 40 })
     const { rows } = await db.query(

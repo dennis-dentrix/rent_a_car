@@ -4,7 +4,17 @@ import { customerFields, isoDateTime, pageFields } from './common.js'
 
 export const createBookingSchema = z.strictObject({
   quote_id: z.uuid(),
-  customer: z.strictObject({ ...customerFields, company_id: z.uuid().optional() }),
+  customer: z.strictObject({
+    ...customerFields,
+    company_id: z.uuid().optional(),
+    date_of_birth: z.iso.date().optional(),
+  }),
+  // A booking of a particular car also says where the trip is going.
+  destination: z.string().trim().min(2).max(200).optional(),
+  pickup_place: z.string().trim().max(200).optional(),
+  // Asked only of a company that offers it: the car brought to the renter, or collected after the hire.
+  wants_dropoff: z.boolean().optional(),
+  wants_pickup: z.boolean().optional(),
 })
 
 export const listBookingsQuerySchema = z.strictObject({

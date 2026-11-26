@@ -8,16 +8,14 @@ import SearchCell from '@/components/SearchCell'
 import Sheet from '@/components/Sheet'
 import StayPicker from '@/components/StayPicker'
 import { copy } from '@/copy/en'
-import { countDays } from '@/lib/calendar'
-import { formatStayRange } from '@/lib/stay-range'
+import { formatStayRange, hireDays } from '@/lib/stay-range'
 import { formatTimeLabel } from '@/lib/stay-times'
 
 /** A one-line summary such as "3 days · 9:00 am to 6:00 pm", or null before dates are chosen. */
 export function staySummary(stay) {
   if (!stay.start) return null
-  const days = countDays(stay.start, stay.end ?? stay.start)
   return copy.search.summary(
-    copy.search.days(days),
+    copy.search.days(hireDays(stay)),
     formatTimeLabel(stay.startTime),
     formatTimeLabel(stay.endTime),
   )
@@ -36,9 +34,10 @@ function DatesSheet({ isOpen, onClose, stay, onChange }) {
 
 /**
  * The dates cell of the search strip: a button showing the chosen stay and its length, which opens the
- * picker sheet. `error` shows under the value when the customer searches without dates.
+ * picker sheet. `error` shows under the value when the customer searches without dates. `onDone` is told when the
+ * sheet closes.
  */
-export default function DatesField({ stay, onChange, error }) {
+export default function DatesField({ stay, onChange, onDone, error }) {
   const [isOpen, setIsOpen] = useState(false)
   const summary = staySummary(stay)
   // Searching without dates opens the picker, so the next step is obvious.
@@ -64,7 +63,10 @@ export default function DatesField({ stay, onChange, error }) {
       </SearchCell>
       <DatesSheet
         isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
+        onClose={() => {
+          setIsOpen(false)
+          onDone?.()
+        }}
         stay={stay}
         onChange={onChange}
       />

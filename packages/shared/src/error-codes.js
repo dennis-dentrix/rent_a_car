@@ -6,6 +6,10 @@ export const ERROR_CODES = {
   NOT_FOUND: { status: 404, message: 'We could not find that.' },
   CONFLICT: { status: 409, message: 'This request conflicts with an earlier one.' },
   BOOKING_OVERLAP: { status: 409, message: 'This vehicle is booked for those dates.' },
+  UNDER_MINIMUM_AGE: {
+    status: 422,
+    message: 'You are younger than the minimum age for this car.',
+  },
   QUOTE_EXPIRED: { status: 422, message: 'This quote has expired. Please request a new one.' },
   INVALID_STATUS_TRANSITION: {
     status: 422,

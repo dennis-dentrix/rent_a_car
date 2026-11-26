@@ -1,5 +1,5 @@
-import Link from 'next/link'
 import AdminPage from '@/components/AdminPage'
+import BackLink from '@/components/BackLink'
 import Alert from '@/components/Alert'
 import InspectionForm from '@/components/InspectionForm'
 import { copy } from '@/copy/en'
@@ -21,9 +21,7 @@ export default async function NewInspectionPage({ params, searchParams }) {
       subtitle={text.form.subtitle}
       isNarrow
     >
-      <Link href={`/console/bookings/${id}`} className="w-max font-semibold text-primary">
-        ← {copy.operatorConsole.bookings.detail}
-      </Link>
+      <BackLink href={`/console/bookings/${id}`}>← {copy.operatorConsole.bookings.detail}</BackLink>
       <InspectionForm bookingId={id} type={type} />
     </AdminPage>
   )

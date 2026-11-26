@@ -28,7 +28,7 @@ function Check({ check }) {
               className="peer sr-only"
             />
             <span
-              className={`flex min-h-touch min-w-[5.5rem] items-center justify-center rounded-control bg-fill px-3 text-callout font-semibold transition-transform duration-fast active:scale-[0.97] peer-focus-visible:ring-2 peer-focus-visible:ring-accent ${choice.on}`}
+              className={`flex min-h-touch min-w-[4.5rem] items-center justify-center rounded-control bg-fill px-3 md:min-w-[5.5rem] text-callout font-semibold transition-transform duration-fast active:scale-[0.97] peer-focus-visible:ring-2 peer-focus-visible:ring-accent ${choice.on}`}
             >
               {choice.label}
             </span>

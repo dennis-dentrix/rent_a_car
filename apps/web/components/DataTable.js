@@ -57,7 +57,7 @@ export default function DataTable({ columns, rows, getRowId, getRowHref }) {
           <PhoneCard key={getRowId(row)} columns={columns} row={row} href={getRowHref?.(row)} />
         ))}
       </ul>
-      <div className="hidden overflow-x-auto md:block">
+      <div className="relative hidden overflow-x-auto md:block">
         <table className="w-full text-cell">
           <thead>
             <tr className="bg-bg-grouped text-left text-micro uppercase text-label-2">

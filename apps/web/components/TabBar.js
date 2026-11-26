@@ -21,6 +21,7 @@ export default function TabBar({ items, label, hasTopNavFromTablet = false }) {
             href={item.href}
             icon={item.icon}
             isExact={item.isExact}
+            badge={item.badge}
             variant="tab"
           >
             {item.label}

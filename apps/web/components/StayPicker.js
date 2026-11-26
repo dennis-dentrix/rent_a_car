@@ -6,6 +6,7 @@ import DateRangePicker from '@/components/DateRangePicker'
 import Select from '@/components/Select'
 import { copy } from '@/copy/en'
 import { fromTomorrow, weekend } from '@/lib/stay-presets'
+import { pickupTimeChange } from '@/lib/stay-range'
 import { TIME_OPTIONS } from '@/lib/stay-times'
 
 const sameRange = (a, b) => a.start === b.start && a.end === b.end
@@ -40,7 +41,7 @@ function Times({ value, onChange }) {
         label={copy.search.pickupTime}
         value={value.startTime}
         options={TIME_OPTIONS}
-        onChange={(event) => onChange({ startTime: event.target.value })}
+        onChange={(event) => onChange(pickupTimeChange(value, event.target.value))}
       />
       <Select
         label={copy.search.returnTime}

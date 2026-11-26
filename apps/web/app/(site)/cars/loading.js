@@ -1,5 +1,5 @@
-import { CLASS_GRID } from '@/components/ClassGrid'
 import LargeTitle from '@/components/LargeTitle'
+import ResultsGrid from '@/components/ResultsGrid'
 import Skeleton from '@/components/Skeleton'
 import { copy } from '@/copy/en'
 
@@ -8,15 +8,15 @@ export default function Loading() {
   return (
     <>
       <LargeTitle subtitle={copy.cars.subtitle}>{copy.cars.title}</LargeTitle>
-      <ul className={CLASS_GRID} aria-hidden="true">
-        {Array.from({ length: 4 }, (_, index) => (
-          <li key={index} className="flex flex-col gap-3">
-            <Skeleton className="aspect-[16/10] w-full" />
-            <Skeleton className="h-5 w-2/3" />
-            <Skeleton className="h-5 w-1/3" />
-          </li>
-        ))}
-      </ul>
+      <div className="lg:pl-[19.5rem]" aria-hidden="true">
+        <ResultsGrid>
+          {Array.from({ length: 6 }, (_, index) => (
+            <li key={index}>
+              <Skeleton className="aspect-[3/4] w-full" />
+            </li>
+          ))}
+        </ResultsGrid>
+      </div>
     </>
   )
 }

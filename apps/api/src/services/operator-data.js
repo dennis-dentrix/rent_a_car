@@ -1,17 +1,12 @@
 import {
-  createOperatorClassSchema,
   createOperatorOwnerSchema,
   createOperatorPlaceSchema,
   createPolicySchema,
-  createRateSchema,
   createVehicleSchema,
-  updateOperatorClassSchema,
   updateOperatorPlaceSchema,
   updatePolicySchema,
-  updateRateSchema,
   updateVehicleSchema,
 } from '@carvo/shared'
-import { createClass } from './operator-classes.js'
 import { resource } from './resources.js'
 import { VEHICLE_DETAIL_COLUMNS, getVehicle } from './vehicles.js'
 
@@ -49,27 +44,11 @@ export const OPERATOR_RESOURCES = {
     'owner_type, full_name, phone, email, kra_pin, status, notes',
     { create: createOperatorOwnerSchema, scope: ownRows, prepare: stamp },
   ),
-  // Carvo's classes and the company's own are both listed (Row Level Security shows the right ones).
+  // The admin's classes, to choose from; a company reads them and never writes them.
   classes: resource(
     'vehicle_classes',
-    'name, slug, seats, luggage_capacity, description, best_for, is_public, operator_id',
-    {
-      create: createOperatorClassSchema,
-      update: updateOperatorClassSchema,
-      prepare: (input, auth) => ({
-        ...stamp(input, auth),
-        slug: ownSlug(input, auth),
-        is_public: false,
-      }),
-      insert: createClass,
-    },
+    'name, slug, seats, luggage_capacity, description, best_for, example_models, is_public, operator_id',
   ),
-  rates: resource('rates', 'class_id, price_kes, usd_override, effective_from, effective_to', {
-    create: createRateSchema,
-    update: updateRateSchema,
-    scope: ownRows,
-    prepare: stamp,
-  }),
   policies: resource(
     'operator_policies',
     'class_id, min_hire_days, min_age, cross_border, daily_km_limit, fuel_policy, rules',

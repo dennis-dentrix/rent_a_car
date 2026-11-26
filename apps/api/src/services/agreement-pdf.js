@@ -34,6 +34,7 @@ function writeBooking(writer, { facts }) {
   })
   paragraph(writer, 'Vehicle Rental Agreement', { size: 20, bold: true, after: 10 })
   row(writer, 'Booking', booking.reference)
+  row(writer, 'Rental company', facts.lessor)
   row(
     writer,
     'Renter',
@@ -44,7 +45,9 @@ function writeBooking(writer, { facts }) {
   row(writer, 'Hire ends', when(booking.end_at))
   row(writer, 'Handover', booking.pickup_place)
   row(writer, 'Total', formatMoney(booking.total_kes, 'KES'))
-  row(writer, 'Refundable deposit', formatMoney(booking.deposit_kes, 'KES'))
+  if (booking.deposit_kes > 0) {
+    row(writer, 'Refundable deposit', formatMoney(booking.deposit_kes, 'KES'))
+  }
   space(writer, 12)
 }
 

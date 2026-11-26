@@ -1,4 +1,5 @@
 import {
+  BOOKING_MODES,
   CHAUFFEUR_OPTIONS,
   DRIVE_TYPES,
   FUEL_TYPES,
@@ -34,8 +35,8 @@ const vehicleCells = (row, refs) => ({
   },
   class: refs.classes.get(row.class_id),
   rate: row.daily_rate_kes
-    ? { main: formatMoney(row.daily_rate_kes), sub: copy.consoleUi.fleet.ownRate }
-    : { main: copy.consoleUi.fleet.classRate },
+    ? { main: formatMoney(row.daily_rate_kes), sub: copy.consoleUi.fleet.perDay }
+    : { main: copy.consoleUi.fleet.noPrice },
   status: { pill: text.statuses[row.status], tone: STATUS_TONES[row.status] },
 })
 
@@ -63,7 +64,13 @@ const VEHICLE_FIELDS = [
     optionLabels: text.statuses,
     isEditOnly: true,
   },
-  { ...detail('daily_rate_kes', 'rate'), heading: text.parts.pricing },
+  { ...detail('daily_rate_kes'), heading: text.parts.pricing },
+  {
+    name: 'booking_mode',
+    type: 'select',
+    options: BOOKING_MODES,
+    optionLabels: text.bookingModes,
+  },
   choice('chauffeur_option', CHAUFFEUR_OPTIONS, copy.carFacts.chauffeur),
   detail('chauffeur_daily_kes'),
   { ...detail('seats'), heading: text.parts.details },
@@ -90,7 +97,7 @@ const VEHICLE_FIELDS = [
 // belongs to (a tracker's vehicle); `pagePath` is the page to refresh once one is saved.
 export const FLEET_RESOURCES = {
   vehicles: {
-    needs: ['classes', 'locations', 'vehicle-owners', 'classRates'],
+    needs: ['classes', 'locations', 'vehicle-owners'],
     columns: [
       { key: 'vehicle', label: copy.consoleUi.fleet.vehicle },
       { key: 'chassis', label: copy.consoleUi.fleet.chassis },
