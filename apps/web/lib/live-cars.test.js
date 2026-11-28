@@ -6,6 +6,7 @@ import {
   toggledTypes,
   withCarPhotos,
   listedTypes,
+  shownTypes,
 } from './live-cars.js'
 
 const cars = [
@@ -107,5 +108,12 @@ describe('car types shown to renters', () => {
     ]
     expect(listedTypes(types)).toEqual([types[1]])
     expect(listedTypes(undefined)).toEqual([])
+  })
+
+  it('are pictured by a real car of the type', () => {
+    const types = [{ slug: 'suv', price_per_day_kes: 9000 }]
+    const cars = [{ class: { slug: 'suv' }, photo_paths: ['vehicles/a/front.jpg'] }]
+    expect(shownTypes(types, cars)[0].image_url).toBe('vehicles/a/front.jpg')
+    expect(shownTypes(types, undefined)[0].image_url).toBeNull()
   })
 })

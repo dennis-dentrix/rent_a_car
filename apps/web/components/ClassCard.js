@@ -4,7 +4,7 @@ import Badge from '@/components/Badge'
 import Price from '@/components/Price'
 import TagList from '@/components/TagList'
 import CarPhoto from '@/components/CarPhoto'
-import VehicleArt from '@/components/VehicleArt'
+import NoPhoto from '@/components/NoPhoto'
 import { copy } from '@/copy/en'
 import { cx } from '@/lib/cx'
 import { classPhoto } from '@/lib/photos'
@@ -42,8 +42,8 @@ function Picture({ item }) {
     )
   }
   return (
-    <div className="flex aspect-[16/10] items-center bg-stage px-4">
-      <VehicleArt label={item.name} styleHint={`${item.name} ${item.slug}`} className="w-full" />
+    <div className="flex aspect-[16/10] items-center justify-center bg-fill">
+      <NoPhoto />
     </div>
   )
 }

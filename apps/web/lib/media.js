@@ -1,7 +1,7 @@
 /**
  * The address of a stored image. A full address is used as it is. A storage path ("classes/sedan.jpg") is joined to
  * the media base address when one is set (the public address of wherever photos are kept), and is otherwise
- * unusable, so it gives null and the page shows its drawing instead.
+ * unusable, so it gives null and the page says there is no photo.
  */
 export function mediaUrl(path, baseUrl) {
   if (!path) return null

@@ -56,12 +56,6 @@ const light = {
   'on-hero': '#FFFFFF',
   'on-hero-2': 'rgba(255,255,255,0.76)',
   'hero-glass': 'rgba(255,255,255,0.12)',
-  'art-body': brand.navy,
-  'art-glass': '#AFC6FF',
-  'art-tire': '#141B2B',
-  'art-hub': '#E1E8FD',
-  'stage-from': '#F1F3FF',
-  'stage-to': '#D8E2FF',
   ...statusColors(status.light, 0.12),
 }
 
@@ -92,12 +86,6 @@ const dark = {
   'on-hero': '#FFFFFF',
   'on-hero-2': 'rgba(255,255,255,0.76)',
   'hero-glass': 'rgba(255,255,255,0.1)',
-  'art-body': '#5B8DEF',
-  'art-glass': '#1A2133',
-  'art-tire': '#0B0F1A',
-  'art-hub': '#B4BACB',
-  'stage-from': '#232B40',
-  'stage-to': '#1A2133',
   ...statusColors(status.dark, 0.2),
 }
 

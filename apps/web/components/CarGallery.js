@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import { CarFront } from 'lucide-react'
+import NoPhoto from '@/components/NoPhoto'
 import { copy } from '@/copy/en'
 import { cx } from '@/lib/cx'
 import { mediaUrl } from '@/lib/media'
@@ -12,21 +12,18 @@ const ROW =
 const SLIDE =
   'relative aspect-[4/3] w-[88%] shrink-0 snap-center overflow-hidden rounded-panel bg-fill md:w-auto'
 
-function NoPhoto() {
-  return (
-    <div className="flex aspect-[16/10] flex-col items-center justify-center gap-2 rounded-panel bg-fill text-footnote text-label-3">
-      <CarFront size={40} aria-hidden="true" />
-      {text.noPhoto}
-    </div>
-  )
-}
-
 /** Every photo of one car. The first is the cover. */
 export default function CarGallery({ paths, name }) {
   const sources = paths
     .map((path) => mediaUrl(path, process.env.NEXT_PUBLIC_MEDIA_BASE_URL))
     .filter(Boolean)
-  if (!sources.length) return <NoPhoto />
+  if (!sources.length) {
+    return (
+      <div className="flex aspect-[16/10] items-center justify-center rounded-panel bg-fill">
+        <NoPhoto />
+      </div>
+    )
+  }
   return (
     <ul className={ROW}>
       {sources.map((src, index) => (

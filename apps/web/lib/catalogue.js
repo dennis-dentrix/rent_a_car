@@ -1,16 +1,19 @@
 import { isAirportType } from '@carvo/shared'
 import { apiGet } from '@/lib/api'
-import { listedTypes } from '@/lib/live-cars'
+import { listedTypes, shownTypes } from '@/lib/live-cars'
 import { classPhoto } from '@/lib/photos'
 
 // Classes and locations change rarely and are cached; a list with dates carries live availability and is not.
 export const getClasses = (query = {}) =>
   apiGet('/classes', { query, revalidate: query.from ? 0 : 60 })
 
-/** The car types renters are offered. Names of any type, listed or not, come from `getClasses`. */
+// Only the photos are used, so a minute-old copy does no harm. Prices and availability are always read fresh.
+const getCarPhotos = () => apiGet('/vehicles', { query: { limit: 100 }, revalidate: 60 })
+
+/** The car types renters are offered, with pictures. Names of any type, listed or not, come from `getClasses`. */
 export async function getListedClasses() {
-  const result = await getClasses()
-  return result.data ? { ...result, data: listedTypes(result.data) } : result
+  const [types, cars] = await Promise.all([getClasses(), getCarPhotos()])
+  return types.data ? { ...types, data: shownTypes(types.data, cars.data) } : types
 }
 
 // Real cars carry a price, so they are read fresh.

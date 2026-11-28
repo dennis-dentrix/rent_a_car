@@ -18,7 +18,7 @@ function localPhoto(slug) {
 }
 
 /**
- * The photograph of a car type, or null (the page then shows its drawing). A photo recorded on the car type comes
+ * The photograph of a car type, or null (the page then says there is none). A photo recorded on the car type comes
  * first; then a file named after the car type, in `car-photos` (real) or `example-photos` (stand-in). Server only.
  */
 export function classPhoto(item) {

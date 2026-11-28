@@ -13,7 +13,7 @@ import PriceExplainer from '@/components/PriceExplainer'
 import SectionHeading from '@/components/SectionHeading'
 import StickySearchCta from '@/components/StickySearchCta'
 import CarPhoto from '@/components/CarPhoto'
-import VehicleArt from '@/components/VehicleArt'
+import NoPhoto from '@/components/NoPhoto'
 import { copy } from '@/copy/en'
 import TypeCars from '@/components/TypeCars'
 import { getClassBySlug, getListedClasses, getVehicles } from '@/lib/catalogue'
@@ -63,8 +63,8 @@ function Picture({ item }) {
     )
   }
   return (
-    <div className="rounded-panel bg-stage px-6 pb-4 pt-10 md:px-12 md:pt-14">
-      <VehicleArt label={item.name} styleHint={`${item.name} ${item.slug}`} className="w-full" />
+    <div className="flex aspect-[16/10] items-center justify-center rounded-panel bg-fill">
+      <NoPhoto />
     </div>
   )
 }

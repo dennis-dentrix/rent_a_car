@@ -43,7 +43,6 @@ export default {
       maxWidth,
       backgroundImage: {
         hero: 'linear-gradient(135deg, var(--color-hero) 0%, var(--color-primary) 55%, var(--color-hero-to) 120%)',
-        stage: 'linear-gradient(160deg, var(--color-stage-from), var(--color-stage-to))',
       },
       keyframes: {
         // The arc fades in as it starts, so its round end does not appear out of nowhere.

@@ -48,6 +48,9 @@ export const withCarPhotos = (classes, cars) =>
  */
 export const listedTypes = (types = []) => types.filter((type) => type.price_per_day_kes !== null)
 
+/** The types a renter is offered, each pictured by its own photo or else a real car's. */
+export const shownTypes = (types, cars = []) => withCarPhotos(listedTypes(types), cars)
+
 /** The address of one car's own page. A car whose type is not public has none. */
 export const carPath = (car) => (car.class ? `/cars/${car.class.slug}/${car.id}` : null)
 

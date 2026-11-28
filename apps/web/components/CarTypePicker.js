@@ -5,7 +5,6 @@ import Image from 'next/image'
 import { CarFront, Check, ChevronDown } from 'lucide-react'
 import Dropdown from '@/components/Dropdown'
 import { PICKER_TEXT } from '@/components/Field'
-import VehicleArt from '@/components/VehicleArt'
 import { copy } from '@/copy/en'
 import { cx } from '@/lib/cx'
 
@@ -31,11 +30,9 @@ function TypeRow({ option, isSelected, onToggle }) {
         isSelected && 'bg-accent-subtle',
       )}
     >
-      <span className="relative flex h-11 w-[4.5rem] shrink-0 items-center justify-center overflow-hidden rounded-control bg-stage">
-        {option.photo ? (
+      <span className="relative flex h-11 w-[4.5rem] shrink-0 items-center justify-center overflow-hidden rounded-control bg-fill">
+        {option.photo && (
           <Image src={option.photo} alt="" fill sizes="72px" className="object-cover" />
-        ) : (
-          <VehicleArt label={option.label} styleHint={option.value} isDecorative className="w-16" />
         )}
       </span>
       <span className="flex-1 truncate font-medium">{option.label}</span>
