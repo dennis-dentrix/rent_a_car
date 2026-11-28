@@ -1,3 +1,4 @@
+import LinkPending from '@/components/LinkPending'
 import Link from 'next/link'
 import { Check, SlidersHorizontal } from 'lucide-react'
 import { TRANSMISSIONS } from '@carvo/shared'
@@ -45,11 +46,25 @@ function Segments({ name, params, options }) {
               )}
             >
               {option.label}
+              <LinkPending size={14} className="ml-1" />
             </Link>
           </li>
         )
       })}
     </ul>
+  )
+}
+
+function Tick({ isOn }) {
+  return (
+    <span
+      className={cx(
+        'flex size-5 shrink-0 items-center justify-center rounded-md border',
+        isOn ? 'border-primary bg-primary text-on-primary' : 'border-separator',
+      )}
+    >
+      {isOn && <Check size={14} aria-hidden="true" />}
+    </span>
   )
 }
 
@@ -75,15 +90,9 @@ function Types({ cars, params }) {
               role="button"
               className="flex min-h-touch items-center gap-3 text-body"
             >
-              <span
-                className={cx(
-                  'flex size-5 shrink-0 items-center justify-center rounded-md border',
-                  isOn ? 'border-primary bg-primary text-on-primary' : 'border-separator',
-                )}
-              >
-                {isOn && <Check size={14} aria-hidden="true" />}
-              </span>
+              <Tick isOn={isOn} />
               <span className="flex-1">{name}</span>
+              <LinkPending size={14} />
               <span className="num rounded-pill bg-fill px-2 text-footnote text-label-2">
                 {count}
               </span>

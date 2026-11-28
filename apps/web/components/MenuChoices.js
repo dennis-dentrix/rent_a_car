@@ -1,9 +1,9 @@
 'use client'
 
+import SubmitButton from '@/components/SubmitButton'
 import { LogOut } from 'lucide-react'
 import { DISPLAY_CURRENCIES } from '@/lib/currency'
 import { signOutAction } from '@/app/auth/actions'
-import Button from '@/components/Button'
 import { useCurrency } from '@/components/CurrencyProvider'
 import SegmentedControl from '@/components/SegmentedControl'
 import { copy } from '@/copy/en'
@@ -40,10 +40,10 @@ export default function MenuChoices({ children }) {
       <SegmentedControl label={text.appearance} options={MODES} value={mode} onChange={choose} />
       {who && (
         <form action={signOutAction}>
-          <Button type="submit" variant="destructive" size="compact" isFullWidth>
+          <SubmitButton variant="destructive" size="compact" isFullWidth>
             <LogOut size={18} aria-hidden="true" />
             {copy.auth.signOut}
-          </Button>
+          </SubmitButton>
         </form>
       )}
     </>

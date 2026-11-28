@@ -1,5 +1,6 @@
 'use client'
 
+import { attempt } from '@/lib/attempt'
 import { useState, useTransition } from 'react'
 import { sendRenterCodeAction } from '@/app/inspections/actions'
 import Button from '@/components/Button'
@@ -12,7 +13,8 @@ const text = copy.inspections.sign
 export default function RenterCode({ id }) {
   const [outcome, setOutcome] = useState(null)
   const [isSending, startSending] = useTransition()
-  const send = () => startSending(async () => setOutcome(await sendRenterCodeAction(id)))
+  const send = () =>
+    startSending(async () => setOutcome(await attempt(() => sendRenterCodeAction(id))))
   return (
     <div className="flex flex-col gap-3">
       <Button type="button" variant="tonal" size="compact" onClick={send} isLoading={isSending}>

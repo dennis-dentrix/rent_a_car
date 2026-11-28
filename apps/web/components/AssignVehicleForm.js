@@ -1,6 +1,6 @@
 'use client'
 
-import { useActionState } from 'react'
+import { useFormAction } from '@/lib/use-form-action'
 import { assignVehicleAction } from '@/app/admin/actions'
 import Alert from '@/components/Alert'
 import Button from '@/components/Button'
@@ -32,7 +32,7 @@ function NoDrivers() {
  * { id, label }; `drivers` is null for an office pickup. `current` holds what the booking has now.
  */
 export default function AssignVehicleForm({ bookingId, vehicles, drivers, current }) {
-  const [state, run] = useActionState(assignVehicleAction, null)
+  const [state, run] = useFormAction(assignVehicleAction, null)
   if (!vehicles.length) return <p className="mt-2 text-cell text-label-2">{text.empty}</p>
   if (drivers && !drivers.length) return <NoDrivers />
   return (

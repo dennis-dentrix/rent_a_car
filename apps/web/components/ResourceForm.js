@@ -1,6 +1,6 @@
 'use client'
 
-import { useActionState } from 'react'
+import { useFormAction } from '@/lib/use-form-action'
 import { saveResourceAction } from '@/app/admin/setup/actions'
 import Alert from '@/components/Alert'
 import ResourceField from '@/components/ResourceFields'
@@ -38,7 +38,7 @@ export default function ResourceForm({
   fixed = {},
 }) {
   // A form that added something starts over for the next one; one that was refused keeps what was typed.
-  const [state, run] = useActionState(async (previous, formData) => {
+  const [state, run] = useFormAction(async (previous, formData) => {
     const result = await saveResourceAction(previous, formData)
     return { ...result, resets: (previous?.resets ?? 0) + (result.status === 'added' ? 1 : 0) }
   }, null)

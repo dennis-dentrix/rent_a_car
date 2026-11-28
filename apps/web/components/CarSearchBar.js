@@ -1,7 +1,7 @@
 'use client'
 
+import { usePush } from '@/lib/use-push'
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { Users } from 'lucide-react'
 import DatesField from '@/components/DatesField'
 import { DestinationCell, PickupCell, SelectCell } from '@/components/SearchFields'
@@ -37,7 +37,7 @@ function startingValues(params) {
 
 // A search without dates opens the date picker and says why.
 function useCarSearch(params) {
-  const router = useRouter()
+  const [isSearching, push] = usePush()
   const [values, setValues] = useState(() => startingValues(params))
   const [hasTriedWithoutDates, setHasTriedWithoutDates] = useState(false)
   const set = (key, value) => {
@@ -48,9 +48,9 @@ function useCarSearch(params) {
     event.preventDefault()
     if (!values.stay.start) return setHasTriedWithoutDates(true)
     const { gear, max, sort } = params
-    router.push(buildSearchUrl('car_hire', values, { gear, max, sort }))
+    push(buildSearchUrl('car_hire', values, { gear, max, sort }))
   }
-  return { values, set, submit, hasTriedWithoutDates }
+  return { values, set, submit, hasTriedWithoutDates, isSearching }
 }
 
 /** Where from, where to, dates and times, and driver: the same cells as the home page's search. */
@@ -61,6 +61,7 @@ export default function CarSearchBar({ params, places }) {
     <form onSubmit={form.submit}>
       <SearchStrip
         columns={4}
+        isSearching={form.isSearching}
         submitLabel={text.submit}
         className="overflow-hidden rounded-panel border border-separator bg-surface shadow-2 md:flex md:items-stretch"
       >

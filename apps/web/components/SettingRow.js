@@ -1,9 +1,9 @@
 'use client'
 
-import { useActionState } from 'react'
+import SubmitButton from '@/components/SubmitButton'
+import { useFormAction } from '@/lib/use-form-action'
 import { updateSettingAction } from '@/app/admin/settings/actions'
 import Alert from '@/components/Alert'
-import Button from '@/components/Button'
 import TextField from '@/components/Field'
 import Switch from '@/components/Switch'
 import { copy } from '@/copy/en'
@@ -24,7 +24,7 @@ function ToggleSetting({ settingKey, item, isOn }) {
 }
 
 function ValueSetting({ settingKey, item, value }) {
-  const [state, run] = useActionState(async (_previous, formData) => {
+  const [state, run] = useFormAction(async (_previous, formData) => {
     const entered = String(formData.get('value') ?? '').trim()
     const result = await updateSettingAction(settingKey, item.isText ? entered : Number(entered))
     return result.ok ? { status: 'saved', at: Date.now() } : { error: result.error }
@@ -42,9 +42,9 @@ function ValueSetting({ settingKey, item, value }) {
       />
       {state?.error && <Alert tone="error" title={state.error} />}
       <div className="flex items-center gap-3">
-        <Button type="submit" variant="tonal" size="compact">
+        <SubmitButton variant="tonal" size="compact" isFullWidth={false}>
           {text.save}
-        </Button>
+        </SubmitButton>
         {state?.status === 'saved' && (
           <span role="status" className="text-cell text-label-2">
             {text.saved}

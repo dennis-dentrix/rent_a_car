@@ -1,5 +1,6 @@
 'use client'
 
+import { attempt } from '@/lib/attempt'
 import { useEffect, useOptimistic, useRef, useState, useTransition } from 'react'
 import ChatBubbles from '@/components/ChatBubbles'
 import ChatComposer from '@/components/ChatComposer'
@@ -27,7 +28,7 @@ function useSending({ messages, side, action, hidden }) {
     startSending(async () => {
       const sent = { id: 'sending', body, isSending: true, is_from_company: side === 'company' }
       addSending({ ...sent, created_at: new Date().toISOString() })
-      const result = await action(null, asForm({ ...hidden, body }))
+      const result = await attempt(() => action(null, asForm({ ...hidden, body })))
       if (!result?.error) return
       setDraft(body)
       setError(result.error)

@@ -1,5 +1,6 @@
 'use client'
 
+import { attempt } from '@/lib/attempt'
 import Image from 'next/image'
 import { useState, useTransition } from 'react'
 import { ImagePlus, Trash2 } from 'lucide-react'
@@ -78,13 +79,13 @@ export default function VehiclePhotos({ car, photos }) {
     startWork(async () => {
       setProblem(null)
       for (const file of files.slice(0, room)) {
-        const { error } = await send(car, file)
+        const { error } = await attempt(() => send(car, file), { error: 'upload' })
         if (error) return setProblem(text.errors[error])
       }
     })
   const remove = (path) =>
     startWork(async () => {
-      const result = await removePhotoAction(car, path)
+      const result = await attempt(() => removePhotoAction(car, path))
       setProblem(result.error ?? null)
     })
   return (

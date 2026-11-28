@@ -1,7 +1,7 @@
 'use client'
 
+import { usePush } from '@/lib/use-push'
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { useAnalytics } from '@/components/AnalyticsProvider'
 import Card from '@/components/Card'
 import CarTypePicker from '@/components/CarTypePicker'
@@ -18,7 +18,7 @@ const FIELDS = { car_hire: CarHireFields, transfers: TransferFields, events: Eve
 // The choices, and what happens on submit. Searching without the date the service needs shows why
 // instead of listing every car as if it were free.
 function useSearchForm({ initialGroup, initialService }) {
-  const router = useRouter()
+  const [isSearching, push] = usePush()
   const { track } = useAnalytics()
   const [group, setGroup] = useState(initialGroup)
   const [values, setValues] = useState(() => ({ ...emptySearch(), service: initialService }))
@@ -38,9 +38,9 @@ function useSearchForm({ initialGroup, initialService }) {
     track('search_submitted', {
       duration_days: group === 'car_hire' ? hireDays(values.stay) : undefined,
     })
-    router.push(buildSearchUrl(group, values))
+    push(buildSearchUrl(group, values))
   }
-  return { group, chooseGroup, values, set, submit, hasTriedWithoutDate }
+  return { group, chooseGroup, values, set, submit, hasTriedWithoutDate, isSearching }
 }
 
 // The message under the date cell after a search without the date the service needs.
@@ -87,6 +87,7 @@ export default function HeroSearch({ search, initialGroup = 'car_hire', initialS
       <form onSubmit={form.submit} className="flex flex-col gap-4 md:p-6">
         <SearchStrip
           columns={FIELD_COUNTS[form.group]}
+          isSearching={form.isSearching}
           submitLabel={<SubmitLabel group={form.group} stay={form.values.stay} />}
           className="overflow-hidden bg-surface md:flex md:items-stretch md:rounded-card md:border md:border-separator"
         >

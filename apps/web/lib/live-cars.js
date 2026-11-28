@@ -42,6 +42,12 @@ export const withCarPhotos = (classes, cars) =>
       null,
   }))
 
+/**
+ * The car types worth showing: those with at least one car listed, which is when the type has a price. An empty type is
+ * left out everywhere a renter chooses.
+ */
+export const listedTypes = (types = []) => types.filter((type) => type.price_per_day_kes !== null)
+
 /** The address of one car's own page. A car whose type is not public has none. */
 export const carPath = (car) => (car.class ? `/cars/${car.class.slug}/${car.id}` : null)
 

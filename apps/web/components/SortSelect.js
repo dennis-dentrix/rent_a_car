@@ -1,6 +1,7 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
+import Spinner from '@/components/Spinner'
+import { usePush } from '@/lib/use-push'
 import { copy } from '@/copy/en'
 import { SORTS } from '@/lib/live-cars'
 import { withParams } from '@/lib/query'
@@ -9,11 +10,12 @@ const text = copy.liveCars.sort
 
 /** The order of the results, kept in the page's address. */
 export default function SortSelect({ params }) {
-  const router = useRouter()
+  const [isSorting, push] = usePush()
   const change = (event) =>
-    router.push(withParams('/cars', { ...params, sort: event.target.value }), { scroll: false })
+    push(withParams('/cars', { ...params, sort: event.target.value }), { scroll: false })
   return (
-    <label className="flex items-center gap-2 text-callout text-label-2">
+    <label className="flex items-center gap-2 text-callout text-label-2" aria-busy={isSorting}>
+      {isSorting && <Spinner />}
       {text.label}
       <select
         value={params.sort ?? SORTS[0]}

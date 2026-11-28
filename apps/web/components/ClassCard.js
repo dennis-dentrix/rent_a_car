@@ -19,7 +19,6 @@ function Availability({ count }) {
 }
 
 function PriceLine({ kes }) {
-  if (kes === null) return <span className="text-callout text-label-2">{copy.cars.noRate}</span>
   return (
     <span className="flex flex-col">
       <span className="text-caption uppercase text-label-2">{copy.cars.from}</span>

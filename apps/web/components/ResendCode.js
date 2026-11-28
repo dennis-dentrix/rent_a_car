@@ -1,8 +1,9 @@
 'use client'
 
-import { useActionState, useEffect, useState } from 'react'
+import SubmitButton from '@/components/SubmitButton'
+import { useFormAction } from '@/lib/use-form-action'
+import { useEffect, useState } from 'react'
 import { resendCodeAction } from '@/app/auth/actions'
-import Button from '@/components/Button'
 import { copy } from '@/copy/en'
 
 const text = copy.auth.verifyEmail
@@ -14,7 +15,7 @@ const COOLDOWN_SECONDS = 30
  */
 export default function ResendCode() {
   const [secondsLeft, setSecondsLeft] = useState(COOLDOWN_SECONDS)
-  const [state, run] = useActionState(async () => {
+  const [state, run] = useFormAction(async () => {
     const result = await resendCodeAction()
     if (result.status === 'sent') setSecondsLeft(COOLDOWN_SECONDS)
     return result
@@ -27,9 +28,9 @@ export default function ResendCode() {
 
   return (
     <form action={run} className="flex flex-col items-center gap-1">
-      <Button type="submit" variant="plain" size="compact" disabled={secondsLeft > 0}>
+      <SubmitButton variant="plain" size="compact" disabled={secondsLeft > 0} isFullWidth={false}>
         {secondsLeft > 0 ? text.resendIn(secondsLeft) : text.resend}
-      </Button>
+      </SubmitButton>
       <p aria-live="polite" className="min-h-5 text-footnote text-label-2">
         {state?.error ?? (state?.status === 'sent' ? text.resent : '')}
       </p>

@@ -1,3 +1,4 @@
+import OfflineNotice from '@/components/OfflineNotice'
 import './globals.css'
 import { Nunito_Sans } from 'next/font/google'
 import { brand } from '@carvo/shared/brand'
@@ -44,6 +45,7 @@ export default function RootLayout({ children }) {
             <AlertsProvider>{children}</AlertsProvider>
           </ToastProvider>
           <ConsentBanner />
+          <OfflineNotice />
         </AnalyticsProvider>
       </body>
     </html>

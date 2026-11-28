@@ -1,15 +1,19 @@
 'use client'
 
+import { copy } from '@/copy/en'
+import { attempt } from '@/lib/attempt'
 import { useState } from 'react'
 import { cx } from '@/lib/cx'
 
-function Track({ label, isOn, onPress }) {
+function Track({ label, isOn, isSaving, onPress }) {
   return (
     <button
       type="button"
       role="switch"
       aria-checked={isOn}
       aria-label={label}
+      aria-busy={isSaving}
+      disabled={isSaving}
       onClick={onPress}
       className={cx(
         // The invisible edge above and below makes the target tall enough for a thumb.
@@ -33,14 +37,14 @@ function Track({ label, isOn, onPress }) {
  */
 export default function Switch({ label, hint, isOn, onChange, failedText }) {
   const [shown, setShown] = useState(isOn)
-  const [failed, setFailed] = useState(false)
+  const [state, setState] = useState('idle')
   const press = async () => {
     const next = !shown
     setShown(next)
-    setFailed(false)
-    if (await onChange(next)) return
-    setShown(!next)
-    setFailed(true)
+    setState('saving')
+    const isKept = await attempt(() => onChange(next), false)
+    if (!isKept) setShown(!next)
+    setState(isKept ? 'idle' : 'failed')
   }
   return (
     <div>
@@ -49,9 +53,14 @@ export default function Switch({ label, hint, isOn, onChange, failedText }) {
           <p className="text-headline">{label}</p>
           {hint && <p className="text-callout text-label-2">{hint}</p>}
         </div>
-        <Track label={label} isOn={shown} onPress={press} />
+        <Track label={label} isOn={shown} isSaving={state === 'saving'} onPress={press} />
       </div>
-      {failed && (
+      {state === 'saving' && (
+        <p role="status" className="mt-1 text-footnote text-label-2">
+          {copy.errors.saving}
+        </p>
+      )}
+      {state === 'failed' && (
         <p role="alert" className="mt-1 text-footnote text-error">
           {failedText}
         </p>

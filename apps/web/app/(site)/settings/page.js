@@ -1,7 +1,7 @@
+import SubmitButton from '@/components/SubmitButton'
 import { changePasswordAction, signOutEverywhereAction } from '@/app/(site)/settings/actions'
 import AuthForm from '@/components/AuthForm'
 import AvatarForm from '@/components/AvatarForm'
-import Button from '@/components/Button'
 import LargeTitle from '@/components/LargeTitle'
 import MarketingSetting from '@/components/MarketingSetting'
 import ProfileSettings from '@/components/ProfileSettings'
@@ -49,9 +49,9 @@ function Security({ profile }) {
           <p className="text-headline">{everywhere.title}</p>
           <p className="text-callout text-label-2">{everywhere.hint}</p>
         </div>
-        <Button type="submit" variant="destructive" size="compact">
+        <SubmitButton variant="destructive" size="compact" isFullWidth={false}>
           {everywhere.action}
-        </Button>
+        </SubmitButton>
       </form>
     </SettingsSection>
   )

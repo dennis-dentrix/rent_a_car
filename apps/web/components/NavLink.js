@@ -1,5 +1,6 @@
 'use client'
 
+import LinkPending from '@/components/LinkPending'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import NavBadge from '@/components/NavBadge'
@@ -25,7 +26,9 @@ function TabItem({ Icon, isActive, badge, children }) {
           isActive && 'bg-accent-subtle',
         )}
       >
-        <Icon size={24} strokeWidth={isActive ? 2.25 : 1.75} aria-hidden="true" />
+        <LinkPending size={24}>
+          <Icon size={24} strokeWidth={isActive ? 2.25 : 1.75} aria-hidden="true" />
+        </LinkPending>
         {badge && <NavBadge name={badge} className="absolute right-1 top-0" />}
       </span>
       <span className="max-w-full truncate text-caption">{children}</span>
@@ -67,6 +70,7 @@ export default function NavLink({ href, icon, variant = 'top', isExact = false, 
     >
       {Icon && <Icon size={20} aria-hidden="true" />}
       {children}
+      <LinkPending size={16} className="ml-2" />
     </Link>
   )
 }

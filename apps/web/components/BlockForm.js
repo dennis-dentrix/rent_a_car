@@ -1,7 +1,7 @@
 'use client'
 
+import { useFormAction } from '@/lib/use-form-action'
 import FieldPair from '@/components/FieldPair'
-import { useActionState } from 'react'
 import { blockDatesAction } from '@/app/console/calendar-actions'
 import Alert from '@/components/Alert'
 import TextField from '@/components/Field'
@@ -13,7 +13,7 @@ const text = copy.calendar
 
 /** Blocks one car for some days. `cars` are { value, label }. */
 export default function BlockForm({ cars }) {
-  const [state, run] = useActionState(blockDatesAction, null)
+  const [state, run] = useFormAction(blockDatesAction, null)
   return (
     <form key={state?.sentAt} action={run} className="flex flex-col gap-3">
       {state?.error && <Alert tone="error" title={state.error} />}

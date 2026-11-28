@@ -23,5 +23,7 @@ export async function adminSend(method, path, body) {
   const result = await apiSend(method, path, { token, body })
   if (!result.error) return { ok: true, data: result.data }
   const message = REFUSALS.includes(result.error) ? result.message : null
-  return { error: message || copy.admin.bookings.errors.generic, fields: result.details }
+  const general =
+    result.error === 'UNREACHABLE' ? copy.errors.unreachable : copy.admin.bookings.errors.generic
+  return { error: message || general, fields: result.details }
 }

@@ -1,5 +1,6 @@
 'use client'
 
+import { attempt } from '@/lib/attempt'
 import { useEffect, useRef, useState } from 'react'
 import { confirmEnrolAction, startEnrolAction } from '@/app/auth/actions'
 import Alert from '@/components/Alert'
@@ -32,7 +33,7 @@ export default function EnrolPanel({ next }) {
   useEffect(() => {
     if (hasStarted.current) return
     hasStarted.current = true
-    startEnrolAction().then((result) => setSetup(result))
+    attempt(startEnrolAction).then((result) => setSetup(result))
   }, [])
 
   if (!setup) return <p className="text-callout text-label-2">{copy.auth.working}</p>

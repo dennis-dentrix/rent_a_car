@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { carPath, filterCars, sortCars, toggledTypes, withCarPhotos } from './live-cars.js'
+import {
+  carPath,
+  filterCars,
+  sortCars,
+  toggledTypes,
+  withCarPhotos,
+  listedTypes,
+} from './live-cars.js'
 
 const cars = [
   { id: 1, transmission: 'automatic', class: { slug: 'suv' } },
@@ -89,5 +96,16 @@ describe('the price and type filters', () => {
     expect(toggledTypes('suv', 'compact')).toBe('suv,compact')
     expect(toggledTypes('suv,compact', 'suv')).toBe('compact')
     expect(toggledTypes(undefined, 'van')).toBe('van')
+  })
+})
+
+describe('car types shown to renters', () => {
+  it('are those with a car listed, so none is offered that cannot be hired', () => {
+    const types = [
+      { slug: 'compact', price_per_day_kes: null },
+      { slug: 'economy', price_per_day_kes: 3500 },
+    ]
+    expect(listedTypes(types)).toEqual([types[1]])
+    expect(listedTypes(undefined)).toEqual([])
   })
 })

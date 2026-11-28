@@ -1,5 +1,6 @@
 'use client'
 
+import { attempt } from '@/lib/attempt'
 import { useState, useTransition } from 'react'
 import { markNoShowAction, recordMilestoneAction } from '@/app/console/actions'
 import Alert from '@/components/Alert'
@@ -15,7 +16,7 @@ const canMarkNoShow = ({ status, no_show_at: noShowAt, start_at: startAt }, now)
 export default function CompanyStep({ bookingId, journey, startAt, now }) {
   const [problem, setProblem] = useState(false)
   const [isBusy, startWork] = useTransition()
-  const run = (work) => startWork(async () => setProblem(!(await work())))
+  const run = (work) => startWork(async () => setProblem(!(await attempt(work, false))))
   const noShow = () => {
     if (window.confirm(text.noShowConfirm)) run(() => markNoShowAction(bookingId))
   }

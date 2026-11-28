@@ -1,7 +1,7 @@
 'use client'
 
+import { usePush } from '@/lib/use-push'
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import Button from '@/components/Button'
 import DatesField from '@/components/DatesField'
 import { copy } from '@/copy/en'
@@ -12,7 +12,7 @@ import { buildSearchUrl, emptySearch } from '@/lib/search-url'
  * chosen. Searching without dates opens the picker and says why, as the main search does.
  */
 export default function ClassDates({ slug }) {
-  const router = useRouter()
+  const [isSearching, push] = usePush()
   const [stay, setStay] = useState(() => emptySearch().stay)
   const [hasTriedWithoutDates, setHasTriedWithoutDates] = useState(false)
 
@@ -23,7 +23,7 @@ export default function ClassDates({ slug }) {
   const submit = (event) => {
     event.preventDefault()
     if (!stay.start) return setHasTriedWithoutDates(true)
-    router.push(buildSearchUrl('car_hire', { ...emptySearch(), stay }, { class: slug }))
+    push(buildSearchUrl('car_hire', { ...emptySearch(), stay }, { class: slug }))
   }
 
   return (
@@ -35,7 +35,7 @@ export default function ClassDates({ slug }) {
           error={hasTriedWithoutDates ? copy.search.datesRequired : ''}
         />
       </div>
-      <Button type="submit" isFullWidth>
+      <Button type="submit" isFullWidth isLoading={isSearching}>
         {copy.classPage.check}
       </Button>
     </form>

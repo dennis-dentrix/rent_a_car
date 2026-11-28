@@ -1,5 +1,6 @@
 'use client'
 
+import { attempt } from '@/lib/attempt'
 import { useOptimistic, useState, useTransition } from 'react'
 import InlineRate from '@/components/InlineRate'
 import { copy } from '@/copy/en'
@@ -15,7 +16,7 @@ export default function SavedRate({ value, save, ...rate }) {
   const keep = (next) =>
     startSaving(async () => {
       showSoon(next)
-      const result = await save(next)
+      const result = await attempt(() => save(next))
       setProblem(result.error ?? null)
     })
   return (

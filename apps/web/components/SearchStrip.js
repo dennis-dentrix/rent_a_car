@@ -5,7 +5,7 @@ import Button from '@/components/Button'
  * Search fields as one joined card: stacked rows on a phone, one line on a wide screen, then the search button.
  * `children` are the cells; `columns` is how many share the line on the widest screens.
  */
-export default function SearchStrip({ columns, submitLabel, children, className }) {
+export default function SearchStrip({ columns, submitLabel, isSearching, children, className }) {
   return (
     <div className={className}>
       <div
@@ -15,8 +15,8 @@ export default function SearchStrip({ columns, submitLabel, children, className 
         {children}
       </div>
       <div className="bg-surface p-2 md:flex md:shrink-0 md:p-1.5">
-        <Button type="submit" isFullWidth className="md:h-full md:px-8">
-          <Search size={20} aria-hidden="true" />
+        <Button type="submit" isFullWidth isLoading={isSearching} className="md:h-full md:px-8">
+          {!isSearching && <Search size={20} aria-hidden="true" />}
           {submitLabel}
         </Button>
       </div>

@@ -1,6 +1,6 @@
 'use client'
 
-import { useActionState } from 'react'
+import { useFormAction } from '@/lib/use-form-action'
 import { setRateAction } from '@/app/admin/settings/actions'
 import Alert from '@/components/Alert'
 import SubmitButton from '@/components/SubmitButton'
@@ -11,7 +11,7 @@ const text = copy.adminSetup.settings
 
 /** The dollar rate for new quotes. It is a number and the day it was set for, saved together. */
 export default function UsdRateForm({ rate, date }) {
-  const [state, run] = useActionState(setRateAction, null)
+  const [state, run] = useFormAction(setRateAction, null)
   return (
     <form
       action={run}

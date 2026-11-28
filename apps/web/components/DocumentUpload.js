@@ -1,5 +1,6 @@
 'use client'
 
+import { attempt } from '@/lib/attempt'
 import { useRef, useState } from 'react'
 import { DOCUMENT_CONTENT_TYPES } from '@carvo/shared'
 import Button from '@/components/Button'
@@ -16,7 +17,9 @@ export default function DocumentUpload({ bookingId, type, label }) {
     const file = event.target.files[0]
     if (!file) return
     setState({ isBusy: true, error: '' })
-    const { error } = await uploadDocument(file, { bookingId, type })
+    const { error } = await attempt(() => uploadDocument(file, { bookingId, type }), {
+      error: 'upload',
+    })
     input.current.value = ''
     setState({ isBusy: false, error: error ? text.errors[error] : '' })
   }

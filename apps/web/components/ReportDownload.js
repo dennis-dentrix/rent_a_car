@@ -1,5 +1,6 @@
 'use client'
 
+import { attempt } from '@/lib/attempt'
 import { useState, useTransition } from 'react'
 import { Download } from 'lucide-react'
 import { reportLinkAction } from '@/app/inspections/actions'
@@ -22,7 +23,8 @@ export default function ReportDownload({ side, id }) {
       </Button>
     )
   }
-  const get = () => startFetching(async () => setOutcome(await reportLinkAction(side, id)))
+  const get = () =>
+    startFetching(async () => setOutcome(await attempt(() => reportLinkAction(side, id))))
   return (
     <div className="flex flex-col items-start gap-2">
       <Button type="button" size="compact" onClick={get} isLoading={isFetching}>

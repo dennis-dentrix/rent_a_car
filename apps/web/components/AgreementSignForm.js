@@ -1,5 +1,6 @@
 'use client'
 
+import { attempt } from '@/lib/attempt'
 import { useState, useTransition } from 'react'
 import { signAgreementAction } from '@/app/(site)/account/actions'
 import SignatureFields from '@/components/SignatureFields'
@@ -17,12 +18,14 @@ export default function AgreementSignForm({ bookingId, fingerprint, name }) {
     const form = new FormData(event.currentTarget)
     if (!form.get('accept')) return setProblem(text.needTick)
     startSigning(async () => {
-      const { error } = await signAgreementAction(bookingId, {
-        signed_name: form.get('signed_name'),
-        accept_terms: true,
-        terms_sha256: fingerprint,
-        ...(drawing && { signature_image: drawing }),
-      })
+      const { error } = await attempt(() =>
+        signAgreementAction(bookingId, {
+          signed_name: form.get('signed_name'),
+          accept_terms: true,
+          terms_sha256: fingerprint,
+          ...(drawing && { signature_image: drawing }),
+        }),
+      )
       setProblem(error ? text.failed : null)
     })
   }

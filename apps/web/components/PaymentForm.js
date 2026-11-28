@@ -1,6 +1,6 @@
 'use client'
 
-import { useActionState } from 'react'
+import { useFormAction } from '@/lib/use-form-action'
 import { HANDOVER_PAYMENT_METHODS } from '@carvo/shared'
 import { recordPaymentAction } from '@/app/console/hire-actions'
 import Alert from '@/components/Alert'
@@ -14,7 +14,7 @@ const METHODS = HANDOVER_PAYMENT_METHODS.map((value) => ({ value, label: text.me
 
 /** One payment received: how much, how, and its reference. It starts at what is still owed. */
 export default function PaymentForm({ bookingId, owed }) {
-  const [state, run] = useActionState(recordPaymentAction, null)
+  const [state, run] = useFormAction(recordPaymentAction, null)
   return (
     <form action={run} className="flex flex-col gap-3">
       <input type="hidden" name="id" value={bookingId} />

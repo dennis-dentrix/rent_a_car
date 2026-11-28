@@ -1,4 +1,4 @@
-import { getClasses } from '@/lib/catalogue'
+import { getListedClasses } from '@/lib/catalogue'
 import { getPosts } from '@/lib/blog'
 import { absoluteUrl } from '@/lib/site'
 
@@ -9,7 +9,7 @@ import { absoluteUrl } from '@/lib/site'
 export const revalidate = 300
 
 export default async function sitemap() {
-  const [classes, posts] = await Promise.all([getClasses(), getPosts()])
+  const [classes, posts] = await Promise.all([getListedClasses(), getPosts()])
   const carTypes = (classes.data ?? []).map((item) => ({
     url: absoluteUrl(`/cars/${item.slug}`),
     changeFrequency: 'weekly',

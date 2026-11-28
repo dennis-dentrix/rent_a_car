@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import { Loader } from 'lucide-react'
+import LinkPending from '@/components/LinkPending'
+import Spinner from '@/components/Spinner'
 import { cx } from '@/lib/cx'
 
 const VARIANTS = {
@@ -45,9 +46,8 @@ export default function Button({
   const classes = buttonClasses({ variant, size, isFullWidth, className })
   const content = (
     <>
-      {isLoading && (
-        <Loader size={18} className="animate-[spin_700ms_linear_infinite]" aria-hidden="true" />
-      )}
+      {isLoading && <Spinner />}
+      {href && <LinkPending />}
       {children}
     </>
   )
@@ -63,8 +63,8 @@ export default function Button({
       type="button"
       className={classes}
       aria-busy={isLoading || undefined}
-      disabled={rest.disabled || isLoading}
       {...rest}
+      disabled={rest.disabled || isLoading}
     >
       {content}
     </button>

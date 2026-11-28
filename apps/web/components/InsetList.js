@@ -1,6 +1,13 @@
+import LinkPending from '@/components/LinkPending'
 import Link from 'next/link'
 import { ChevronRight } from 'lucide-react'
 import { cx } from '@/lib/cx'
+
+// A row that leads to another page spins in place of its arrow while that page loads.
+function Chevron({ isLink }) {
+  const arrow = <ChevronRight size={18} className="shrink-0 text-label-3" aria-hidden="true" />
+  return isLink ? <LinkPending>{arrow}</LinkPending> : arrow
+}
 
 function Content({ item }) {
   return (
@@ -21,9 +28,7 @@ function Content({ item }) {
         )}
       </span>
       {item.trailing}
-      {(item.href || item.onSelect) && (
-        <ChevronRight size={18} className="shrink-0 text-label-3" aria-hidden="true" />
-      )}
+      {(item.href || item.onSelect) && <Chevron isLink={Boolean(item.href)} />}
     </>
   )
 }

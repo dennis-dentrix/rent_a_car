@@ -2,6 +2,7 @@
 // read it from this file; no sentence is written inside a component.
 import { alerts } from './alerts.js'
 import { menu } from './menu.js'
+import { errors } from './errors.js'
 import { admin } from './admin.js'
 import { adminFleet } from './admin-fleet.js'
 import { adminSetup } from './admin-setup.js'
@@ -31,6 +32,7 @@ import { services } from './services.js'
 export const copy = {
   alerts,
   menu,
+  errors,
   inspections,
   carFacts,
   journey,
@@ -218,7 +220,6 @@ export const copy = {
     seats: (count) => `${count} seats`,
     from: 'From',
     perDay: 'per day',
-    noRate: 'No cars listed yet',
     available: (count) => `${count} available`,
     notAvailable: 'Not available for these dates',
     emptyTitle: 'No cars match',

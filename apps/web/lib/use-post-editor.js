@@ -1,3 +1,4 @@
+import { attempt } from '@/lib/attempt'
 import { useEffect, useState } from 'react'
 import { removeImageAction, savePostAction, updateImageAction } from '@/app/admin/posts/actions'
 import { copy } from '@/copy/en'
@@ -32,14 +33,14 @@ function useImages({ postId, initial, draft, setDraft, setProblems }) {
     const before = { images, draft }
     setImages(images.filter((image) => image.id !== imageId))
     setDraft(withoutImage(draft, imageId))
-    const result = await removeImageAction(postId, imageId)
+    const result = await attempt(() => removeImageAction(postId, imageId))
     if (!result.error) return
     setImages(before.images)
     setDraft(before.draft)
     setProblems([text.images.errors.remove])
   }
   const update = async (imageId, changes) => {
-    const result = await updateImageAction(postId, imageId, changes)
+    const result = await attempt(() => updateImageAction(postId, imageId, changes))
     if (result.error) return false
     setImages((list) => list.map((image) => (image.id === imageId ? result.data : image)))
     return true
@@ -72,10 +73,8 @@ async function saveGuide(ctx, extra = {}) {
   ctx.setProblems([])
   ctx.setSaveState({ kind: 'saving' })
   const canChangeSlug = ctx.post.status === 'draft' && !ctx.post.published_at
-  const result = await savePostAction(ctx.post.id, {
-    ...payloadFromDraft(ctx.draft, { canChangeSlug }),
-    ...extra,
-  })
+  const changes = { ...payloadFromDraft(ctx.draft, { canChangeSlug }), ...extra }
+  const result = await attempt(() => savePostAction(ctx.post.id, changes))
   if (result.error) {
     ctx.setSaveState({ kind: 'failed' })
     ctx.setProblems(messagesFrom(result))
@@ -86,7 +85,7 @@ async function saveGuide(ctx, extra = {}) {
 }
 
 async function unpublishGuide(ctx) {
-  const result = await savePostAction(ctx.post.id, { status: 'draft' })
+  const result = await attempt(() => savePostAction(ctx.post.id, { status: 'draft' }))
   if (result.error) ctx.setProblems(messagesFrom(result))
   else ctx.setPost(result.data)
 }

@@ -1,5 +1,6 @@
 'use client'
 
+import { attempt } from '@/lib/attempt'
 import { useRouter } from 'next/navigation'
 import { useRef, useState } from 'react'
 import { removeAvatarAction } from '@/app/(site)/account/actions'
@@ -29,14 +30,14 @@ function useAvatarActions() {
     const file = event.target.files[0]
     if (!file) return
     setState({ isBusy: true, error: '' })
-    const result = await uploadAvatar(file)
+    const result = await attempt(() => uploadAvatar(file), { error: 'upload' })
     input.current.value = ''
     finish(result.error ? text.errors[result.error] : '')
   }
 
   const remove = async () => {
     setState({ isBusy: true, error: '' })
-    const result = await removeAvatarAction()
+    const result = await attempt(removeAvatarAction)
     finish(result.error ? text.errors.remove : '')
   }
 

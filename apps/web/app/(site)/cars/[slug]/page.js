@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import { formatMoney } from '@carvo/shared'
 import { TrackEvent } from '@/components/AnalyticsProvider'
 import Breadcrumbs from '@/components/Breadcrumbs'
@@ -16,8 +16,8 @@ import CarPhoto from '@/components/CarPhoto'
 import VehicleArt from '@/components/VehicleArt'
 import { copy } from '@/copy/en'
 import TypeCars from '@/components/TypeCars'
-import { getClassBySlug, getClasses, getVehicles } from '@/lib/catalogue'
-import { carsOfType, withCarPhotos } from '@/lib/live-cars'
+import { getClassBySlug, getListedClasses, getVehicles } from '@/lib/catalogue'
+import { carsOfType, withCarPhotos, listedTypes } from '@/lib/live-cars'
 import { classPhoto } from '@/lib/photos'
 import { pageMetadata } from '@/lib/seo'
 import { breadcrumbJsonLd, productJsonLd } from '@/lib/structured-data'
@@ -35,7 +35,7 @@ const trailFor = (name, slug) => [
 
 // Known car types are built ahead of time; a new one is built the first time it is asked for.
 export async function generateStaticParams() {
-  const list = await getClasses()
+  const list = await getListedClasses()
   return (list.data ?? []).map((item) => ({ slug: item.slug }))
 }
 
@@ -97,6 +97,8 @@ export default async function ClassPage({ params }) {
   const [result, vehicles] = await Promise.all([getClassBySlug(slug), getVehicles()])
   if (result.isMissing) notFound()
   if (result.error) return <LoadError text={text} href={pathFor(slug)} />
+  // A type with no car to hire has nothing to show: the renter is sent to the cars there are.
+  if (listedTypes([result.item]).length === 0) redirect('/cars')
   const { detail } = result
   const cars = vehicles.data ?? []
   const [item, ...others] = withCarPhotos([result.item, ...result.others], cars)

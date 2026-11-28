@@ -1,3 +1,4 @@
+import LinkPending from '@/components/LinkPending'
 import Link from 'next/link'
 import NavBadge from '@/components/NavBadge'
 import { NAV_ICONS } from '@/lib/nav-icons'
@@ -10,7 +11,9 @@ function Tile({ tile }) {
         href={tile.href}
         className="state-layer relative flex h-full flex-col gap-3 rounded-panel bg-accent-subtle p-4 text-primary transition-transform duration-fast active:scale-[0.97]"
       >
-        <Icon size={26} aria-hidden="true" />
+        <LinkPending size={26}>
+          <Icon size={26} aria-hidden="true" />
+        </LinkPending>
         <span className="text-headline">{tile.label}</span>
         {tile.badge && <NavBadge name={tile.badge} className="absolute right-3 top-3" />}
       </Link>

@@ -1,5 +1,6 @@
 'use client'
 
+import { attempt } from '@/lib/attempt'
 import { useState, useTransition } from 'react'
 import { signInspectionAction } from '@/app/inspections/actions'
 import RenterCode from '@/components/RenterCode'
@@ -22,12 +23,14 @@ export default function SignForm({ side, report, name = '' }) {
     const form = new FormData(event.currentTarget)
     if (!drawing) return setProblem(text.needDrawing)
     startSigning(async () => {
-      const result = await signInspectionAction(side, report.id, {
-        signed_name: form.get('signed_name'),
-        signature_image: drawing,
-        report_sha256: report.sha256,
-        ...(needsCode && { code: String(form.get('code')).trim() }),
-      })
+      const result = await attempt(() =>
+        signInspectionAction(side, report.id, {
+          signed_name: form.get('signed_name'),
+          signature_image: drawing,
+          report_sha256: report.sha256,
+          ...(needsCode && { code: String(form.get('code')).trim() }),
+        }),
+      )
       setProblem(result.error ?? null)
     })
   }

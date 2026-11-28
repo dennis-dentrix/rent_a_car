@@ -1,9 +1,9 @@
 'use client'
 
-import { useActionState } from 'react'
+import SubmitButton from '@/components/SubmitButton'
+import { useFormAction } from '@/lib/use-form-action'
 import { documentLinkAction } from '@/app/admin/actions'
 import Alert from '@/components/Alert'
-import Button from '@/components/Button'
 import TextField from '@/components/Field'
 import { copy } from '@/copy/en'
 
@@ -14,16 +14,16 @@ const text = copy.admin.documents
  * rather than opened by the page, because a browser may block a window that opens after a wait.
  */
 export default function DocumentViewer({ id, action = documentLinkAction }) {
-  const [state, run] = useActionState(action, null)
+  const [state, run] = useFormAction(action, null)
   return (
     <form action={run} className="mt-3 flex flex-col gap-3">
       <input type="hidden" name="id" value={id} />
       {state?.error && <Alert tone="error" title={state.error} />}
       <TextField label={text.openReason} name="reason" />
       <div className="flex items-center gap-4">
-        <Button type="submit" variant="tonal" size="compact">
+        <SubmitButton variant="tonal" size="compact" isFullWidth={false}>
           {text.open}
-        </Button>
+        </SubmitButton>
         {state?.url && (
           <a
             href={state.url}

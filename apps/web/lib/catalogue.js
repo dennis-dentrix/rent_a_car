@@ -1,10 +1,17 @@
 import { isAirportType } from '@carvo/shared'
 import { apiGet } from '@/lib/api'
+import { listedTypes } from '@/lib/live-cars'
 import { classPhoto } from '@/lib/photos'
 
 // Classes and locations change rarely and are cached; a list with dates carries live availability and is not.
 export const getClasses = (query = {}) =>
   apiGet('/classes', { query, revalidate: query.from ? 0 : 60 })
+
+/** The car types renters are offered. Names of any type, listed or not, come from `getClasses`. */
+export async function getListedClasses() {
+  const result = await getClasses()
+  return result.data ? { ...result, data: listedTypes(result.data) } : result
+}
 
 // Real cars carry a price, so they are read fresh.
 /** The cars renters may see; with `from` and `to`, only the free ones, each with its total. */
@@ -27,7 +34,7 @@ const toOption = (value, label) => ({ value, label })
  * transfer, and the car types to choose from. Each list is empty if the API did not answer.
  */
 export async function getSearchOptions() {
-  const [locations, classes] = await Promise.all([getLocations(), getClasses()])
+  const [locations, classes] = await Promise.all([getLocations(), getListedClasses()])
   const all = locations.data ?? []
   const options = (items) => items.map((place) => toOption(place.name, place.name))
   return {
@@ -51,5 +58,6 @@ export async function getClassBySlug(slug) {
   if (!item) return { isMissing: true }
   const detail = await apiGet(`/classes/${item.id}`, { revalidate: 60 })
   if (detail.error) return { error: detail.error }
-  return { item, detail: detail.data, others: list.data.filter((other) => other.id !== item.id) }
+  const others = listedTypes(list.data).filter((other) => other.id !== item.id)
+  return { item, detail: detail.data, others }
 }

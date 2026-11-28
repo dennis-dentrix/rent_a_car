@@ -1,5 +1,6 @@
 'use client'
 
+import LinkPending from '@/components/LinkPending'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import NavBadge from '@/components/NavBadge'
@@ -25,7 +26,9 @@ function Item({ item, isCurrent }) {
             : 'text-label-2 hover:bg-fill hover:text-label',
         )}
       >
-        <Icon size={18} strokeWidth={isCurrent ? 2.25 : 1.75} aria-hidden="true" />
+        <LinkPending size={18}>
+          <Icon size={18} strokeWidth={isCurrent ? 2.25 : 1.75} aria-hidden="true" />
+        </LinkPending>
         <span className="truncate">{item.label}</span>
         {item.badge && <NavBadge name={item.badge} className="ml-auto" />}
       </Link>

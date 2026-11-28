@@ -1,7 +1,9 @@
 'use client'
 
+import Spinner from '@/components/Spinner'
 import Link from 'next/link'
 import { useCallback, useRef, useState } from 'react'
+import { useFormStatus } from 'react-dom'
 import { CalendarDays, LayoutDashboard, LogIn, LogOut, MessageSquare, Settings } from 'lucide-react'
 import { signOutAction } from '@/app/auth/actions'
 import Avatar from '@/components/Avatar'
@@ -49,6 +51,16 @@ function OwnLinks({ role, onClose }) {
   )
 }
 
+function SignOutItem() {
+  const { pending } = useFormStatus()
+  return (
+    <button type="submit" role="menuitem" disabled={pending} className={ITEM_CLASS}>
+      {pending ? <Spinner /> : <LogOut size={18} className="text-label-2" aria-hidden="true" />}
+      {text.signOut}
+    </button>
+  )
+}
+
 function MenuPanel({ who, onClose }) {
   return (
     <div
@@ -62,10 +74,7 @@ function MenuPanel({ who, onClose }) {
         {text.settings}
       </MenuLink>
       <form action={signOutAction}>
-        <button type="submit" role="menuitem" className={ITEM_CLASS}>
-          <LogOut size={18} className="text-label-2" aria-hidden="true" />
-          {text.signOut}
-        </button>
+        <SignOutItem />
       </form>
     </div>
   )

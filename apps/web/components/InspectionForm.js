@@ -1,5 +1,6 @@
 'use client'
 
+import { attempt } from '@/lib/attempt'
 import { useRouter } from 'next/navigation'
 import { useState, useTransition } from 'react'
 import { FUEL_LEVELS, MIN_INSPECTION_PHOTOS } from '@carvo/shared'
@@ -33,7 +34,8 @@ function useSubmit({ bookingId, type, photos }) {
       return setProblem(text.problems.photos(MIN_INSPECTION_PHOTOS))
     }
     startSaving(async () => {
-      const result = await submitInspection(formData, { bookingId, type, photos })
+      const send = () => submitInspection(formData, { bookingId, type, photos })
+      const result = await attempt(send, { error: 'upload' })
       if (result.id) return router.push(`/console/inspections/${result.id}`)
       setProblem(result.message ?? text.problems[result.error])
     })

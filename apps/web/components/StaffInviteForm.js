@@ -1,6 +1,6 @@
 'use client'
 
-import { useActionState } from 'react'
+import { useFormAction } from '@/lib/use-form-action'
 import { inviteStaffAction } from '@/app/admin/actions'
 import Alert from '@/components/Alert'
 import SubmitButton from '@/components/SubmitButton'
@@ -12,7 +12,7 @@ const text = copy.admin.team
 
 /** Adds a team member by email. The form clears when the invite is sent, and keeps what was typed when it is refused. */
 export default function StaffInviteForm() {
-  const [state, run] = useActionState(inviteStaffAction, null)
+  const [state, run] = useFormAction(inviteStaffAction, null)
   const values = state?.values
   return (
     <form

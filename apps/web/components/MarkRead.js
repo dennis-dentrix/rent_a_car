@@ -1,5 +1,6 @@
 'use client'
 
+import { attempt } from '@/lib/attempt'
 import { useEffect } from 'react'
 import { markReadAction } from '@/app/messages/actions'
 import { ALERTS_CHANGED } from '@/lib/use-alert-poll'
@@ -14,7 +15,8 @@ export default function MarkRead({ id, lastMessageAt }) {
   useEffect(() => {
     const mark = async () => {
       if (document.hidden) return
-      await markReadAction(id)
+      // Nothing to tell anyone if this does not get through: it is tried again shortly.
+      await attempt(() => markReadAction(id))
       window.dispatchEvent(new Event(ALERTS_CHANGED))
     }
     mark()

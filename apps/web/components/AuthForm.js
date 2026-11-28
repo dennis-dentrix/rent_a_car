@@ -1,6 +1,7 @@
 'use client'
 
-import { useActionState, useEffect, useEffectEvent, useRef } from 'react'
+import { useFormAction } from '@/lib/use-form-action'
+import { useEffect, useEffectEvent, useRef } from 'react'
 import Alert from '@/components/Alert'
 import HiddenFields from '@/components/HiddenFields'
 import TextField from '@/components/Field'
@@ -67,7 +68,7 @@ export default function AuthForm({
   onSaved,
   children,
 }) {
-  const [state, run] = useActionState(action, null)
+  const [state, run] = useFormAction(action, null)
   const formRef = useRef(null)
   useAnswerEffects(state, formRef, onSaved)
   if (state?.status === 'sent' && sent) {

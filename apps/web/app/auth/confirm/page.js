@@ -1,6 +1,6 @@
+import SubmitButton from '@/components/SubmitButton'
 import { redirect } from 'next/navigation'
 import { confirmLinkAction } from '@/app/auth/actions'
-import Button from '@/components/Button'
 import LargeTitle from '@/components/LargeTitle'
 import { copy } from '@/copy/en'
 
@@ -20,9 +20,7 @@ export default async function ConfirmLinkPage({ searchParams }) {
         <input type="hidden" name="token_hash" value={tokenHash} />
         <input type="hidden" name="type" value={type} />
         <input type="hidden" name="next" value={next ?? ''} />
-        <Button type="submit" isFullWidth>
-          {text.submit}
-        </Button>
+        <SubmitButton isFullWidth>{text.submit}</SubmitButton>
       </form>
     </>
   )
